@@ -13,6 +13,8 @@ import {
 import CommunityCard from "@/components/CommunityCard";
 import FloatingChatWidget from "@/components/FloatingChatWidget";
 import { ArrowRight, BookOpen, Calendar, Heart, User } from "lucide-react";
+import SlideIn from "@/components/SlideIn";
+import { useEffect, useState } from "react";
 
 interface Testimony {
   id: number;
@@ -37,7 +39,27 @@ interface DailyEncouragement {
   image: string;
 }
 
+const preloadImage = (url: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = url;
+
+    img.onload = () => resolve(url);
+    img.onerror = () => reject(new Error(`Failed to load image: ${url}`));
+  });
+};
+
 const Home = () => {
+  const [loadedImage, setLoadedImage] = useState<string>("");
+
+  useEffect(() => {
+    const imageUrl = "/school_girl5.webp"; // Replace with your actual image path
+
+    preloadImage(imageUrl)
+      .then((url) => setLoadedImage(url))
+      .catch((err) => console.log(err.message));
+  }, []);
+
   const communityFeatures = [
     {
       icon: faComment,
@@ -190,31 +212,37 @@ const Home = () => {
         <Container noVerticalPadding>
           <div className="flex justify-center items-center md:justify-between h-full">
             <div className="flex flex-col items-center md:items-start gap-4 text-center md:text-left">
-              <h1 className="text-6xl text-[#747474] font-bold max-w-2xl playfair-display-600 text-balance">
-                Fuel Your Faith One Day at a Time
-              </h1>
-              <p className="text-lg text-stone-500">
-                Faith-based content every day to renew your mind and grow
-                spiritually.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-2 text-lg">
-                <Link
-                  to="/signup"
-                  className="flex items-center gap-3 px-4 py-2 font-semibold rounded-md border border-[#3B3B1A] bg-[#3B3B1A] text-white"
-                >
-                  Join Our Community <FontAwesomeIcon icon={faArrowRight} />
-                </Link>
-                <Link
-                  to="/about"
-                  className="inline-block px-4 py-2 rounded-md border border-white bg-stone-100 text-gray-500"
-                >
-                  Learn More
-                </Link>
-              </div>
+              <SlideIn direction="left" delay={0.5}>
+                <h1 className="text-6xl text-[#747474] font-bold max-w-2xl playfair-display-600 text-balance">
+                  Fuel Your Faith One Day at a Time
+                </h1>
+              </SlideIn>
+              <SlideIn direction="left" delay={0.7}>
+                <p className="text-lg text-stone-500">
+                  Faith-based content every day to renew your mind and grow
+                  spiritually.
+                </p>
+              </SlideIn>
+              <SlideIn direction="left" delay={0.9}>
+                <div className="flex flex-col sm:flex-row gap-2 text-lg">
+                  <Link
+                    to="/signup"
+                    className="flex items-center gap-3 px-4 py-2 font-semibold rounded-md border border-[#3B3B1A] bg-[#3B3B1A] text-white"
+                  >
+                    Join Our Community <FontAwesomeIcon icon={faArrowRight} />
+                  </Link>
+                  <Link
+                    to="/about"
+                    className="inline-block px-4 py-2 rounded-md border border-white bg-stone-100 text-gray-500"
+                  >
+                    Learn More
+                  </Link>
+                </div>
+              </SlideIn>
             </div>
             <div className="hidden md:block max-w-xl overflow-y-hidden h-full">
               <img
-                src="school_girl5.webp"
+                src={loadedImage}
                 className="relative top-16 size-full object-contain"
                 alt="daily immune"
               />
