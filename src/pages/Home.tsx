@@ -324,7 +324,7 @@ const Home = () => {
             {testimonies.slice(1).map((testimony) => (
               <article
                 key={testimony.id}
-                className="bg-white rounded-md shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100 h-full"
+                className="bg-white rounded-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100 h-full"
               >
                 <div className="relative">
                   <img
@@ -378,9 +378,12 @@ const Home = () => {
 
           {/* View All Button */}
           <div className="text-center mt-12">
-            <button className="bg-white text-gray-500 border px-8 py-3 rounded-md font-semibold hover:bg-[#3B3B1A] hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl">
-              View All Testimonies
-            </button>
+            <Link
+              to="/testimonies"
+              className="bg-white text-gray-500 border px-8 py-3 rounded-md font-semibold hover:bg-[#3B3B1A] hover:text-white transition-all duration-300 hover:shadow-xl"
+            >
+              More Testimonies
+            </Link>
           </div>
         </div>
       </Section>
@@ -417,11 +420,11 @@ const Home = () => {
                     {encouragements[0].title}
                   </h3>
 
-                  <blockquote className="border-l-4 border-amber-400 pl-4 mb-6">
+                  <blockquote className="border-l-4 border-stone-400 pl-4 mb-6">
                     <p className="text-lg text-gray-700 italic mb-2">
                       "{encouragements[0].verse}"
                     </p>
-                    <cite className="text-amber-600 font-semibold">
+                    <cite className="text-stone-600 font-semibold">
                       {encouragements[0].reference}
                     </cite>
                   </blockquote>
@@ -456,7 +459,7 @@ const Home = () => {
               {encouragements.slice(1).map((encouragement) => (
                 <article
                   key={encouragement.id}
-                  className="bg-white rounded-md shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100"
+                  className="bg-white rounded-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100"
                 >
                   <div className="relative">
                     <img
@@ -476,7 +479,7 @@ const Home = () => {
                       {encouragement.title}
                     </h4>
 
-                    <blockquote className="border-l-3 border-amber-300 pl-3 mb-4">
+                    <blockquote className="border-l-3 border-stone-300 pl-3 mb-4">
                       <p className="text-sm text-gray-700 italic mb-1">
                         "
                         {encouragement.verse.length > 80
@@ -484,7 +487,7 @@ const Home = () => {
                           : encouragement.verse}
                         "
                       </p>
-                      <cite className="text-amber-600 text-sm font-medium">
+                      <cite className="text-stone-600 text-sm font-medium">
                         {encouragement.reference}
                       </cite>
                     </blockquote>
