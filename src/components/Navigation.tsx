@@ -38,7 +38,7 @@ const Navigation = () => {
     >
       <Container>
         <div className="flex justify-between items-center md:grid md:grid-cols-3">
-          <img src="logo_trimmed.png" className="h-16" alt="logo" />
+          <img src="logo_trimmed.webp" className="h-16" alt="logo" />
           <ul className="hidden md:flex justify-center gap-6">
             <li>
               <Link to="/">Home</Link>
