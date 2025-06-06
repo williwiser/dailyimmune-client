@@ -1,10 +1,49 @@
 import AuthLayout from "@/layouts/AuthLayout";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useState, type ChangeEvent, type FormEvent } from "react";
+import axios from "axios";
+import PulseLoader from "react-spinners/PulseLoader";
+import { useAuth } from "@/context/useAuth";
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const LogIn = () => {
-  const handleSubmit = () => {};
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [gotError, setGotError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { user, setUser } = useAuth();
+  const navigate = useNavigate();
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    axios
+      .post(`${BACKEND_URL}/api/v1/auth/login`, formData, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        setUser(response.data);
+        console.log(user);
+        navigate("/dashboard");
+      })
+      .catch((error) => {
+        setGotError(true);
+        if (axios.isAxiosError(error) && error.response) {
+          setErrorMessage(error.response.data.error);
+        } else {
+          setErrorMessage("Something went wrong. Please try again later.");
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
   const handleGoogleSignIn = () => {};
   return (
     <AuthLayout title="Log In">
@@ -29,7 +68,9 @@ const LogIn = () => {
           </span>
           <input
             name="email"
-            type="text"
+            type="email"
+            onChange={handleChange}
+            value={formData.email}
             className="p-2 border rounded-md w-full"
           />
         </label>
@@ -39,16 +80,28 @@ const LogIn = () => {
           </span>
           <input
             name="password"
-            type="text"
+            type="password"
+            onChange={handleChange}
+            value={formData.password}
             className="p-2 border rounded-md w-full"
           />
         </label>
         <button
           type="submit"
-          className="px-4 py-2 rounded-md border border-[#3B3B1A] bg-[#3B3B1A] text-white w-full"
+          className={`inline-flex justify-center items-center px-4 py-2 min-h-[2.6rem] rounded-md border  ${
+            isLoading
+              ? "bg-[#858570] border-[#858570]"
+              : "bg-[#3B3B1A] border-[#3B3B1A]"
+          } text-white w-full transition-colors duration-200 `}
+          disabled={isLoading}
         >
-          Log In
+          {isLoading ? <PulseLoader color="#ffffff" /> : "Log In"}
         </button>
+        {gotError ? (
+          <p className="text-sm text-center text-red-500">{errorMessage}</p>
+        ) : (
+          ""
+        )}
         <p className="text-xs text-gray-500 text-center mt-2">
           New here?{" "}
           <Link to="/signup" className="text-[#3B3B1A]">

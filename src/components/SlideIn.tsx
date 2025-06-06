@@ -7,6 +7,7 @@ interface SlideInProps {
   children: React.ReactNode;
   direction?: "left" | "right" | "up" | "down";
   delay?: number;
+  className?: string;
 }
 
 const directionMap = {
@@ -16,7 +17,12 @@ const directionMap = {
   down: { x: 0, y: 50 },
 };
 
-const SlideIn = ({ children, direction = "up", delay = 0 }: SlideInProps) => {
+const SlideIn = ({
+  children,
+  direction = "up",
+  delay = 0,
+  className = "",
+}: SlideInProps) => {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.2 });
   const [hasAnimated, setHasAnimated] = useState(false);
 
@@ -31,7 +37,7 @@ const SlideIn = ({ children, direction = "up", delay = 0 }: SlideInProps) => {
       animate={hasAnimated ? { opacity: 1, x: 0, y: 0 } : {}}
       transition={{ duration: 0.6, ease: "easeOut", delay }}
     >
-      {children}
+      <div className={className}>{children}</div>
     </motion.div>
   );
 };

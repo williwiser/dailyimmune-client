@@ -32,7 +32,7 @@ const Navigation = () => {
 
   return (
     <nav
-      className={`fixed w-full  z-20 text-lg text-[#747474] transition-all duration-300 ${
+      className={`fixed w-full z-20 text-lg text-[#747474] transition-all duration-300 ${
         isScrolled ? "shadow-sm bg-white" : "shadow-none"
       }`}
     >
@@ -126,6 +126,7 @@ const Navigation = () => {
               </Link>
             </li>
           </ul>
+
           <button className="md:hidden" onClick={() => setShowMenu(!showMenu)}>
             <FontAwesomeIcon icon={showMenu ? faClose : faBars} />
           </button>

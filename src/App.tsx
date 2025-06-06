@@ -9,6 +9,13 @@ import Shop from "./pages/Shop";
 import About from "./pages/About";
 import Prayer from "./pages/Prayer";
 import Forum from "./pages/Forum";
+//import Dashboard from "./pages/Dashboard";
+import VerifyToken from "./pages/VerifyToken";
+import ActivationLink from "./pages/ActivationLink";
+import AuthProvider from "./context/AuthProvider";
+import Dash2 from "./pages/Dash2";
+import DashboardLayout from "./layouts/DashboardLayout";
+import CreateTestimony from "./pages/CreateTestimony";
 
 const router = createBrowserRouter([
   {
@@ -44,12 +51,27 @@ const router = createBrowserRouter([
       },
     ],
   },
+  {
+    path: "dashboard",
+    element: <DashboardLayout />,
+    children: [
+      { index: true, element: <Dash2 /> },
+      { path: "testimonies", element: <Testimonies /> },
+      { path: "testimonies/new", element: <CreateTestimony /> },
+    ],
+  },
   { path: "/signup", element: <SignUp /> },
   { path: "/login", element: <LogIn /> },
+  { path: "/verify-token", element: <VerifyToken /> },
+  { path: "/activation-link", element: <ActivationLink /> },
 ]);
 
 const App = () => {
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  );
 };
 
 export default App;
