@@ -17,7 +17,7 @@ const CreateTestimony = () => {
   // State management
   const [articles, setArticles] = useState<Article[]>([]);
   const [currentArticle, setCurrentArticle] = useState<Article | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const [, setIsEditing] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [showPreview, setShowPreview] = useState(false);
 
