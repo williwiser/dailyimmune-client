@@ -14,7 +14,6 @@ import CommunityCard from "@/components/CommunityCard";
 import FloatingChatWidget from "@/components/FloatingChatWidget";
 import { ArrowRight, BookOpen, Calendar, Heart, User } from "lucide-react";
 import SlideIn from "@/components/SlideIn";
-import { useEffect, useState } from "react";
 
 interface Testimony {
   id: number;
@@ -39,27 +38,7 @@ interface DailyEncouragement {
   image: string;
 }
 
-const preloadImage = (url: string): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.src = url;
-
-    img.onload = () => resolve(url);
-    img.onerror = () => reject(new Error(`Failed to load image: ${url}`));
-  });
-};
-
 const Home = () => {
-  const [loadedImage, setLoadedImage] = useState<string>("");
-
-  useEffect(() => {
-    const imageUrl = "/school_girl5.webp"; // Replace with your actual image path
-
-    preloadImage(imageUrl)
-      .then((url) => setLoadedImage(url))
-      .catch((err) => console.log(err.message));
-  }, []);
-
   const communityFeatures = [
     {
       icon: faComment,
@@ -242,7 +221,7 @@ const Home = () => {
             </div>
             <div className="hidden md:block max-w-xl overflow-y-hidden h-full">
               <img
-                src={loadedImage}
+                src="/school_girl5.webp"
                 className="relative top-16 size-full object-contain"
                 alt="daily immune"
               />
