@@ -12,7 +12,7 @@ const VerifyToken = () => {
   const token = searchParams.get("token");
   useEffect(() => {
     axios
-      .get(`${BACKEND_URL}/api/v1/auth/verify-email?token=${token}`)
+      .get(`${BACKEND_URL}/api/v1/auth/activate?token=${token}`)
       .then((response) => {
         console.log(response);
         if (response.status == 201) {
