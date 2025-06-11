@@ -80,6 +80,7 @@ const SignUp = () => {
             <input
               name="firstName"
               type="text"
+              value={formData.firstName}
               className="p-2 border rounded-md w-full"
               onChange={handleChange}
             />
@@ -91,6 +92,7 @@ const SignUp = () => {
             <input
               name="lastName"
               type="text"
+              value={formData.lastName}
               className="p-2 border rounded-md w-full"
               onChange={handleChange}
             />
@@ -103,6 +105,7 @@ const SignUp = () => {
           <input
             name="email"
             type="email"
+            value={formData.email}
             className="p-2 border rounded-md w-full"
             onChange={handleChange}
           />
@@ -114,6 +117,7 @@ const SignUp = () => {
           <input
             name="password"
             type="password"
+            value={formData.password}
             className="p-2 border rounded-md w-full"
             onChange={handleChange}
           />
