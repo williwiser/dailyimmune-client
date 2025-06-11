@@ -62,7 +62,7 @@ const router = createBrowserRouter([
   },
   { path: "/signup", element: <SignUp /> },
   { path: "/login", element: <LogIn /> },
-  { path: "/verify-token", element: <VerifyToken /> },
+  { path: "/activate", element: <VerifyToken /> },
   { path: "/activation-link", element: <ActivationLink /> },
 ]);
 
