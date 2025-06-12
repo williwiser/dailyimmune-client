@@ -1,6 +1,7 @@
 import AuthLayout from "@/layouts/AuthLayout";
 
 const ActivationLink = () => {
+  const handleResendLink = () => {};
   return (
     <AuthLayout title="We've Sent You a Link!">
       <div className="text-center text-gray-500 flex flex-col gap-3">
@@ -10,9 +11,9 @@ const ActivationLink = () => {
         <hr />
         <p className="text-xs">
           Can't find it? Check your spam folder or{" "}
-          <a href="/signup" className="text-[#3B3B1A]">
+          <button onClick={handleResendLink} className="text-[#3B3B1A]">
             resend the link
-          </a>
+          </button>
           .
         </p>
       </div>

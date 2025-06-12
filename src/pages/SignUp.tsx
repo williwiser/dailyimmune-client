@@ -24,18 +24,18 @@ const SignUp = () => {
     setIsLoading(true);
     axios
       .post(`${BACKEND_URL}/api/v1/auth/signup`, formData)
-      .then((response) => {
-        if (response.status == 400) {
-          setGotError(true);
-          setErrorMessage("An account with this email already exists.");
-          return;
-        }
+      .then(() => {
         navigate("/activation-link");
       })
       .catch((error) => {
         setGotError(true);
+        if (error.response.status == 400) {
+          setGotError(true);
+          setErrorMessage("An account with this email already exists.");
+          return;
+        }
         if (axios.isAxiosError(error) && error.response) {
-          setErrorMessage(error.response.data.error);
+          setErrorMessage(error.response.data.message);
         } else {
           console.error(error);
           setErrorMessage("Something went wrong. Please try again later.");

@@ -31,7 +31,7 @@ const LogIn = () => {
       .catch((error) => {
         setGotError(true);
         if (axios.isAxiosError(error) && error.response) {
-          setErrorMessage(error.response.data.error);
+          setErrorMessage(error.response.data.message);
         } else {
           setErrorMessage("Something went wrong. Please try again later.");
         }
