@@ -46,7 +46,7 @@ const Dashboard: React.FC = () => {
         <div className="max-w-7xl mx-auto space-y-6">
           {/* Welcome Section with Verse of the Day */}
           <SlideIn direction="down">
-            <div className="flex flex-col gap-2 text-[#747474] bg-[url(/vines.png)] bg-white bg-size-[13rem] bg-no-repeat bg-bottom-right md:bg-right rounded-md p-6">
+            <div className="flex flex-col gap-2 text-[#747474] bg-[url(/vines.webp)] bg-white bg-size-[13rem] bg-no-repeat bg-bottom-right md:bg-right rounded-md p-6">
               <h1 className="text-5xl  playfair-display-600">
                 {getGreeting()}, {user?.firstName}
               </h1>
