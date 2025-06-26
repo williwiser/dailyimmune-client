@@ -6,7 +6,7 @@ import axios from "axios";
 import "draft-js/dist/Draft.css";
 import { Check, Circle, FullscreenIcon, ImagePlus } from "lucide-react";
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
-import { Link, matchPath, useLocation, useParams } from "react-router";
+import { Link, useLocation, useParams } from "react-router";
 import PulseLoader from "react-spinners/PulseLoader";
 import { toast, Toaster } from "sonner";
 
@@ -28,8 +28,8 @@ const ArticleEditor = () => {
   const params = useParams();
   const { id } = params;
   const location = useLocation();
-  const match = matchPath({ path: "/testimonies/:id/edit" }, location.pathname);
-  const isEditMode = !match;
+  const match = location.pathname.endsWith("/edit");
+  const isEditMode = match;
   const [testimony, setTestimony] = useState<Testimony>({
     id: "",
     title: "",
