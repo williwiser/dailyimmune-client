@@ -1,11 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Heart, MessageCircle, Clock, PenSquare } from "lucide-react";
 import Container from "@/layouts/Container";
 import { Link } from "react-router";
 import SlideIn from "@/components/SlideIn";
 import { useAuth } from "@/context/useAuth";
+import axios from "axios";
+import TestimonyCard from "@/components/TestimonyCard";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
+type Testimony = {
+  id: string;
+  title: string;
+  body: string;
+  thumbnail: string;
+  updatedAt: Date;
+  // add other properties if needed
+};
 
 const Dashboard: React.FC = () => {
+  const [testimonies, setTestimonies] = useState<Testimony[]>([]);
   const getGreeting = (): string => {
     const hour = new Date().getHours();
     if (hour < 12) return "Good morning";
@@ -13,6 +28,20 @@ const Dashboard: React.FC = () => {
     return "Good evening";
   };
   const { user } = useAuth();
+  const truncateText = (text: string, wordLimit: number) => {
+    const words = text.split(" ");
+    if (words.length <= wordLimit) return text;
+
+    return words.slice(0, wordLimit).join(" ") + "...";
+  };
+  useEffect(() => {
+    axios
+      .get(`${BACKEND_URL}/api/v1/testimonies?authorId=${user?.id}`)
+      .then((response) => {
+        setTestimonies(response.data);
+        console.log(response.data);
+      });
+  }, [user?.id]);
   const recentActivity = [
     {
       type: "testimony",
@@ -41,12 +70,12 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#eae7dd] md:p-6">
+    <div className="min-h-screen g-[#eae7dd] bg-stone-100  md:p-6">
       <Container>
         <div className="max-w-7xl mx-auto space-y-6">
           {/* Welcome Section with Verse of the Day */}
           <SlideIn direction="down">
-            <div className="flex flex-col gap-2 text-[#747474] bg-[url(/vines.webp)] bg-white bg-size-[13rem] bg-no-repeat bg-bottom-right md:bg-right rounded-md p-6">
+            <div className="flex flex-col gap-2 text-[#747474] bg-[url(/vines.webp)] bg-white border bg-size-[13rem] bg-no-repeat bg-bottom-right md:bg-right rounded-md p-6">
               <h1 className="text-5xl  playfair-display-600">
                 {getGreeting()}, {user?.firstName}
               </h1>
@@ -60,11 +89,13 @@ const Dashboard: React.FC = () => {
                     <PenSquare /> <span>Share your testimony</span>
                   </div>
                 </Link>
-                <Link to="/" className="w-full md:w-fit">
+
+                <Link to="prayer" className="w-full md:w-fit">
                   <div className="inline-flex gap-2 justify-center rounded-md bg-gray-200 px-6 py-2 w-full">
                     <Heart /> <span>Submit prayer request</span>
                   </div>
                 </Link>
+
                 <Link to="/" className="w-full md:w-fit">
                   <div className="inline-flex gap-2 justify-center rounded-md bg-gray-200 px-6 py-2 w-full">
                     <MessageCircle /> <span>Talk to us</span>
@@ -73,6 +104,39 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
           </SlideIn>
+          <div
+            className={
+              testimonies.length == 0
+                ? "bg-white p-6 rounded-md border border-stone-300"
+                : ""
+            }
+          >
+            <h2 className="text-2xl font-bold text-[#3b3b19]">
+              My Testimonies
+            </h2>
+            <ScrollArea className="w-full overflow-y-visible">
+              <div className="grid grid-cols-4 mt-6 gap-6 w-max">
+                {testimonies.length == 0 ? (
+                  <p className=" text-[#747474]">
+                    Your testimonies will appear here.
+                  </p>
+                ) : (
+                  testimonies.map((testimony) => (
+                    <TestimonyCard
+                      key={testimony.id}
+                      id={parseInt(testimony.id)}
+                      thumbnail={testimony.thumbnail}
+                      title={testimony.title}
+                      body={truncateText(testimony.body, 15)}
+                      edited={testimony.updatedAt}
+                    />
+                  ))
+                )}
+              </div>
+              <br />
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </div>
           {/* Recent Activity and Testimonies Side by Side */}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

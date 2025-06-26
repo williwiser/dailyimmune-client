@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import Container from "../layouts/Container";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -9,6 +9,7 @@ import {
 import { useEffect, useState } from "react";
 import { Bell, Settings } from "lucide-react";
 import { useAuth } from "@/context/useAuth";
+import { useNavigate } from "react-router";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +17,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import axios from "axios";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -32,7 +44,7 @@ const AuthNavigation = () => {
       .then((response) => {
         console.log(response);
         setUser(null);
-
+        navigate("/");
         return;
       })
       .catch((error) => {
@@ -50,9 +62,6 @@ const AuthNavigation = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  if (!user) {
-    navigate("/", { preventScrollReset: false });
-  }
   return (
     <>
       <nav
@@ -92,14 +101,36 @@ const AuthNavigation = () => {
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent>
-                  <DropdownMenuItem>Profile</DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="profile">Profile</Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem>Orders</DropdownMenuItem>
                   <DropdownMenuItem>Settings</DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <button className="w-full" onClick={handleSignOut}>
-                      Sign Out
-                    </button>
+                    <AlertDialog>
+                      <AlertDialogTrigger className="text-sm pl-2 cursor-pointer">
+                        Sign Out
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Logging out will end your current session. Don't
+                            worry though, we'll be here when you return!
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            className="bg-[#3b3b19]"
+                            onClick={handleSignOut}
+                          >
+                            Continue
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

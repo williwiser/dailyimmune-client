@@ -7,12 +7,14 @@ import axios from "axios";
 //   email: string;
 // }
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ;
 
 export const fetchUser = async () => {
   const response = await axios.get(`${BACKEND_URL}/api/v1/users/me`, {
     withCredentials: true,
   });
   if (response.status !== 200) return null;
+  console.log(response.data);
   return response.data;
 };

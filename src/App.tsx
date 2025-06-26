@@ -15,7 +15,10 @@ import ActivationLink from "./pages/ActivationLink";
 import AuthProvider from "./context/AuthProvider";
 import Dash2 from "./pages/Dash2";
 import DashboardLayout from "./layouts/DashboardLayout";
-import CreateTestimony from "./pages/CreateTestimony";
+import ArticleEditor from "./pages/ArticleEditor";
+import Article from "./pages/Article";
+import SubmitPrayerRequest from "./pages/SubmitPrayerRequest";
+import Profile from "./pages/Profile";
 
 const router = createBrowserRouter([
   {
@@ -57,7 +60,11 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Dash2 /> },
       { path: "testimonies", element: <Testimonies /> },
-      { path: "testimonies/new", element: <CreateTestimony /> },
+      { path: "testimonies/new", element: <ArticleEditor /> },
+      { path: "testimonies/:id", element: <Article /> },
+      { path: "testimonies/:id/edit", element: <ArticleEditor /> },
+      { path: "prayer", element: <SubmitPrayerRequest /> },
+      { path: "profile", element: <Profile /> },
     ],
   },
   { path: "/signup", element: <SignUp /> },
