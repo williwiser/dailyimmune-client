@@ -30,6 +30,7 @@ const ArticleEditor = () => {
   const location = useLocation();
   const match = location.pathname.endsWith("/edit");
   const isEditMode = match;
+  console.log(isEditMode);
   const [testimony, setTestimony] = useState<Testimony>({
     id: "",
     title: "",
