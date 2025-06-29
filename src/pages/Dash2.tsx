@@ -10,17 +10,25 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
+type User = {
+  id: string;
+  firstName: string;
+  lastName: string;
+};
 type Testimony = {
   id: string;
   title: string;
   body: string;
   thumbnail: string;
   updatedAt: Date;
+  user: User;
+  status: string;
   // add other properties if needed
 };
 
 const Dashboard: React.FC = () => {
   const [testimonies, setTestimonies] = useState<Testimony[]>([]);
+
   const getGreeting = (): string => {
     const hour = new Date().getHours();
     if (hour < 12) return "Good morning";
@@ -36,7 +44,7 @@ const Dashboard: React.FC = () => {
   };
   useEffect(() => {
     axios
-      .get(`${BACKEND_URL}/api/v1/testimonies?authorId=${user?.id}`, {
+      .get(`${BACKEND_URL}/api/v1/testimonies/drafts?page=1&limit=5`, {
         withCredentials: true,
       })
       .then((response) => {
@@ -116,8 +124,8 @@ const Dashboard: React.FC = () => {
             <h2 className="text-2xl font-bold text-[#3b3b19]">
               My Testimonies
             </h2>
-            <ScrollArea className="w-full overflow-y-visible">
-              <div className="grid grid-cols-4 mt-6 gap-6 w-max">
+            <ScrollArea className="block md:hidden w-full overflow-y-visible">
+              <div className="grid grid-cols-3 mt-6 gap-6 w-max">
                 {testimonies.length == 0 ? (
                   <p className=" text-[#747474]">
                     Your testimonies will appear here.
@@ -131,6 +139,8 @@ const Dashboard: React.FC = () => {
                       title={testimony.title}
                       body={truncateText(testimony.body, 15)}
                       edited={testimony.updatedAt}
+                      author={`${testimony.user.firstName} ${testimony.user.lastName}`}
+                      status={testimony.status}
                     />
                   ))
                 )}
@@ -138,6 +148,27 @@ const Dashboard: React.FC = () => {
               <br />
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
+
+            <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 mt-6 gap-6 w-full">
+              {testimonies.length == 0 ? (
+                <p className=" text-[#747474]">
+                  Your testimonies will appear here.
+                </p>
+              ) : (
+                testimonies.map((testimony) => (
+                  <TestimonyCard
+                    key={testimony.id}
+                    id={parseInt(testimony.id)}
+                    thumbnail={testimony.thumbnail}
+                    title={testimony.title}
+                    body={truncateText(testimony.body, 15)}
+                    edited={testimony.updatedAt}
+                    author={`${testimony.user.firstName} ${testimony.user.lastName}`}
+                    status={testimony.status}
+                  />
+                ))
+              )}
+            </div>
           </div>
           {/* Recent Activity and Testimonies Side by Side */}
 

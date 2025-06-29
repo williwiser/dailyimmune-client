@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/breadcrumb";
 
 import { Link, useParams } from "react-router";
+import { useAuth } from "@/context/useAuth";
 
 interface User {
   id: string;
@@ -40,6 +41,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 const Article = () => {
   const params = useParams();
   const id = params.id;
+  const { user } = useAuth();
   const [liked, setLiked] = useState(false);
   const [testimony, setTestimony] = useState<Testimony>({
     id: "",
@@ -53,43 +55,57 @@ const Article = () => {
   });
 
   const [favorite, setFavorite] = useState(false);
+  const isLoggedIn = user !== null;
+
+  console.log(`isLoggedIn: ${isLoggedIn}`);
 
   useEffect(() => {
-    axios
-      .get(`${BACKEND_URL}/api/v1/testimonies/${id}`, {
-        withCredentials: true,
-      })
-      .then((response) => {
-        setLiked(response.data.likedByUser);
-      });
-  }, [id]);
+    if (isLoggedIn)
+      axios
+        .get(`${BACKEND_URL}/api/v1/testimonies/${id}`, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          setLiked(response.data.likedByUser);
+        });
+  }, [id, isLoggedIn]);
 
   const toggleFavorite = () => {
-    setFavorite((prev) => !prev);
-    if (!favorite) {
-      toast("Added to favorites!");
+    if (isLoggedIn) {
+      setFavorite((prev) => !prev);
+      if (!favorite) {
+        toast("Added to favorites!");
+      } else {
+        toast("Removed from favorites");
+      }
     } else {
-      toast("Removed from favorites");
+      toast("You must be logged in to save posts.");
     }
   };
 
   const toggleLiked = () => {
-    setLiked((prev) => !prev);
-    axios
-      .patch(
-        `${BACKEND_URL}/api/v1/testimonies/${id}/${liked ? "unlike" : "like"}`,
-        {},
-        {
-          withCredentials: true,
-        }
-      )
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-        setLiked((prev) => !prev);
-      });
+    if (isLoggedIn) {
+      setLiked((prev) => !prev);
+      axios
+        .patch(
+          `${BACKEND_URL}/api/v1/testimonies/${id}/${
+            liked ? "unlike" : "like"
+          }`,
+          {},
+          {
+            withCredentials: true,
+          }
+        )
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+          setLiked((prev) => !prev);
+        });
+    } else {
+      toast("You must be logged in to like posts.");
+    }
   };
   useEffect(() => {
     axios
@@ -100,12 +116,14 @@ const Article = () => {
         setTestimony(response.data);
       });
   }, [id, testimony, liked]);
-
-  console.log("liked: " + liked);
+  console.log(testimony.thumbnail);
   return (
     <div>
       <Toaster />
-      <Header title="" className="bg-[url(/placeholder.jpg)] bg-cover h-56" />
+      <Header
+        title=""
+        className={`bg-[url("${testimony.thumbnail}")] bg-stone-100 bg-cover h-56`}
+      />
       <Container>
         <article className="py-8">
           <Breadcrumb className="mb-4">
@@ -141,9 +159,14 @@ const Article = () => {
               </p>
             </div>
             <div className="flex gap-3">
-              <Link to={`edit`} className="p-2">
-                <Edit />
-              </Link>
+              {isLoggedIn && user.id === testimony.user.id ? (
+                <Link
+                  to={`/dashboard/testimonies/${testimony.id}/edit`}
+                  className="p-2"
+                >
+                  <Edit />
+                </Link>
+              ) : null}
               <button className="cursor-pointer" onClick={toggleFavorite}>
                 <Star
                   fill={favorite ? "#DAA520" : "transparent"}

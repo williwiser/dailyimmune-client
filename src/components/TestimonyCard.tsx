@@ -1,3 +1,4 @@
+import { Calendar, User } from "lucide-react";
 import { Link } from "react-router";
 
 interface TestimonyCardProps {
@@ -6,6 +7,8 @@ interface TestimonyCardProps {
   title: string;
   body: string;
   edited: Date;
+  author: string;
+  status?: string;
 }
 
 const TestimonyCard = ({
@@ -14,26 +17,53 @@ const TestimonyCard = ({
   title,
   body,
   edited,
+  status,
+  author,
 }: TestimonyCardProps) => {
   return (
-    <div className="bg-white overflow-hidden rounded-md shadow-md border transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl max-w-xs">
-      <img
-        src={thumbnail == "" ? "/placeholder.jpg" : thumbnail}
-        alt="Testimony Thumbnail"
-        className="w-full h-40 object-cover"
-      />
-      <div className="p-4">
-        <h1 className="text-lg font-semibold">{title}</h1>
-        <p className="text-sm text-gray-500 w-full">{body}</p>
-        <div className="flex justify-between items-center mt-4">
-          <span className="text-sm text-gray-500 ">
-            Last Edited • {new Date(edited).toLocaleDateString()}
+    <div className="bg-white overflow-hidden rounded-md shadow-md border transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl max-w-[18rem]">
+      <div className="relative">
+        <img
+          src={thumbnail ? thumbnail : "/placeholder.jpg"}
+          alt="Testimony Thumbnail"
+          className="w-full h-48 object-cover"
+        />
+        {status === "draft" ? (
+          <span className="absolute bottom-4 left-4 bg-white/80 py-0.5 px-2 rounded-full text-sm">
+            {status}
           </span>
+        ) : null}
+      </div>
+      <div className="p-4 ull flex flex-col">
+        <div>
+          <h1 className="text-lg font-semibold text-gray-800 mb-3 line-clamp-2">
+            {title}
+          </h1>
+
+          <p className="text-sm text-gray-500 mb-4 w-full leading-relaxed line-clamp-3">
+            {body}
+          </p>
+        </div>
+        <div className="flex justify-between items-center gap-1 text-sm mt-auto mb-2">
+          <div className="flex gap-1 items-center">
+            <User className="size-4" />
+            <span className="text-sm text-gray-500 ">{author}</span>
+          </div>
+
+          <div className="flex gap-1 items-center">
+            <Calendar className="size-4" />
+            <span className="text-sm text-gray-500 ">
+              {new Date(edited).toLocaleDateString()}
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-[#3B3B1A] text-sm font-medium">3 min read</span>
           <Link
-            to={`testimonies/${id}`}
+            to={`/testimonies/${id}`}
             className="font-semibold text-[#3B3B1A] text-sm"
           >
-            View
+            Read
           </Link>
         </div>
       </div>

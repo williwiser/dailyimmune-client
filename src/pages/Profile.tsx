@@ -33,13 +33,17 @@ const Profile = () => {
   }, []);
   return (
     <div>
-      <Header className="bg-[url(/placeholder.jpg)] bg-cover" />
+      <Header
+        title="Profile"
+        desc="Manage your profile, testimonies, and messages"
+        className="bg-stone-100 bg-cover"
+      />
       <header>
         <Container>
-          <div className="flex gap-4">
+          <div className="flex items-center gap-4">
             <img
               src="/placeholder.jpg"
-              className="relative bottom-16 size-48 rounded-full border-8 border-white"
+              className="size-36 rounded-full "
               alt="profile photo"
             />
             <div className="flex flex-col gap-2">

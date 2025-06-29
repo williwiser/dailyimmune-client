@@ -19,6 +19,8 @@ import ArticleEditor from "./pages/ArticleEditor";
 import Article from "./pages/Article";
 import SubmitPrayerRequest from "./pages/SubmitPrayerRequest";
 import Profile from "./pages/Profile";
+import UniversalLayout from "./layouts/UniversalLayout";
+import PrayerRequests from "./pages/PrayerRequests";
 
 const router = createBrowserRouter([
   {
@@ -28,10 +30,7 @@ const router = createBrowserRouter([
         path: "/",
         element: <Home />,
       },
-      {
-        path: "/testimonies",
-        element: <Testimonies />,
-      },
+
       {
         path: "/encouragement",
         element: <Encouragement />,
@@ -55,13 +54,23 @@ const router = createBrowserRouter([
     ],
   },
   {
+    element: <UniversalLayout />,
+    children: [
+      {
+        path: "/testimonies",
+        element: <Testimonies />,
+      },
+      { path: "testimonies/:id", element: <Article /> },
+      { path: "prayers", element: <PrayerRequests /> },
+    ],
+  },
+  {
     path: "dashboard",
     element: <DashboardLayout />,
     children: [
       { index: true, element: <Dash2 /> },
       { path: "testimonies", element: <Testimonies /> },
       { path: "testimonies/new", element: <ArticleEditor /> },
-      { path: "testimonies/:id", element: <Article /> },
       { path: "testimonies/:id/edit", element: <ArticleEditor /> },
       { path: "prayer", element: <SubmitPrayerRequest /> },
       { path: "profile", element: <Profile /> },
