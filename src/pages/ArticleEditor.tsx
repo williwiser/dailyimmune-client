@@ -32,6 +32,15 @@ interface Testimony {
   title: string;
   thumbnail: File | null;
   body: string;
+  status: string;
+}
+
+interface FormData {
+  title: string;
+  thumbnail: File | null;
+  body: string;
+  status: string;
+  action: string;
 }
 
 const statusStates = [
@@ -54,24 +63,19 @@ const ArticleEditor = () => {
     title: "",
     body: "",
     thumbnail: null,
+    status: "",
   });
   const [gotError, setGotError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping] = useState(false);
-  const [formData, setFormData] = useState<{
-    title: string;
-    thumbnail: File | null;
-    body: string;
-    status: string;
-    action: string;
-  }>({
+  const [formData, setFormData] = useState<FormData>({
     title: "",
     thumbnail: null,
     body: "",
     status: "draft",
     action: "",
   });
-  const [status, setStatus] = useState(
+  const [savedStatus, setSavedStatus] = useState(
     isEditMode ? statusStates[0] : statusStates[1]
   );
 
@@ -87,6 +91,7 @@ const ArticleEditor = () => {
             title: response.data.title,
             thumbnail: response.data.thumbnail,
             body: response.data.body,
+            status: response.data.status,
           });
 
           setFormData({
@@ -119,13 +124,15 @@ const ArticleEditor = () => {
     if (action === "save") {
       setIsSaving(true);
       setFormData({ ...formData, status: "draft" });
+      formData.status = "draft";
     } else if (action === "publish") {
       setIsLoading(true);
       setFormData({ ...formData, status: "published" });
+      formData.status = "published";
     }
     // Step 1: Get signed URL from backend
 
-    console.log(formData);
+    // console.log(formData); // Logging moved to useEffect
 
     axios
       .post(`${BACKEND_URL}/api/v1/testimonies`, formData, {
@@ -135,7 +142,7 @@ const ArticleEditor = () => {
         },
       })
       .then(() => {
-        setStatus(statusStates[0]);
+        setSavedStatus(statusStates[0]);
         if (action === "save")
           toast.success("Your article has been saved to drafts!");
         else if (action === "publish") {
@@ -163,21 +170,23 @@ const ArticleEditor = () => {
     if (action === "save") {
       setIsSaving(true);
       setFormData({ ...formData, status: "draft" });
+      formData.status = "draft";
     } else if (action === "publish") {
       setIsLoading(true);
-      setFormData({ ...formData, status: "published" });
+      setFormData((prev) => ({ ...prev, status: "published" }));
+      formData.status = "published";
     }
     // Step 1: Get signed URL from backend
 
-    console.log(formData);
-    setIsLoading(true);
     axios
       .patch(`${BACKEND_URL}/api/v1/testimonies/${testimony.id}`, formData, {
         withCredentials: true,
       })
       .then(() => {
+        setSavedStatus(statusStates[0]);
         if (action === "save") {
           toast.success("Your article has been saved to drafts!");
+          setIsSaving(false);
         } else if (action === "publish") {
           setShowDialog(true);
         }
@@ -196,10 +205,9 @@ const ArticleEditor = () => {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setStatus(statusStates[1]);
+    setSavedStatus(statusStates[1]);
   };
 
-  console.log(formData);
   return (
     <div>
       <Toaster />
@@ -224,8 +232,8 @@ const ArticleEditor = () => {
                   <PulseLoader color="#6a7282" />
                 ) : (
                   <div className="flex items-center gap-1">
-                    <span className="text-xs">{status.icon}</span>
-                    <span className="text-gray-500">{status.text}</span>
+                    <span className="text-xs">{savedStatus.icon}</span>
+                    <span className="text-gray-500">{savedStatus.text}</span>
                   </div>
                 )}
                 <button
