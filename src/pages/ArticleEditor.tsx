@@ -93,7 +93,7 @@ const ArticleEditor = () => {
             title: response.data.title,
             thumbnail: response.data.thumbnail,
             body: response.data.body,
-            status: "pending",
+            status: response.data.status,
             action: "",
           });
         });
