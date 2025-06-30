@@ -10,7 +10,7 @@ interface SectionProps {
 
 const Section = ({ title, desc, children, className }: SectionProps) => {
   return (
-    <section className={`${className}`}>
+    <section className={`${className} py-10`}>
       <Container>
         <div className="text-center mb-10">
           <h1 className="text-5xl text-[#747474] playfair-display-600 font-bold mb-3">

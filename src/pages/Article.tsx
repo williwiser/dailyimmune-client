@@ -16,6 +16,7 @@ import {
 
 import { Link, useParams } from "react-router";
 import { useAuth } from "@/context/useAuth";
+import Loader from "@/components/Loader";
 
 interface User {
   id: string;
@@ -40,6 +41,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const Article = () => {
   const params = useParams();
+  const [isLoading, setIsLoading] = useState(true);
   const id = params.id;
   const { user } = useAuth();
   const [liked, setLiked] = useState(false);
@@ -113,6 +115,7 @@ const Article = () => {
         withCredentials: true,
       })
       .then((response) => {
+        setIsLoading(false);
         setTestimony(response.data);
       });
   }, [id, testimony, liked]);
@@ -124,89 +127,100 @@ const Article = () => {
         title=""
         className={`bg-[url("${testimony.thumbnail}")] bg-stone-100 bg-cover h-56`}
       />
-      <Container>
-        <article className="py-8">
-          <Breadcrumb className="mb-4">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/">Home</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Testimony</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-          <div className="flex flex-col md:flex-row justify-between md:items-center w-full gap-4">
-            <div className="flex flex-col gap-4">
-              <h1 className="playfair-display-600 text-5xl">
-                {testimony.title}
-              </h1>
-              <p className="text-gray-500 italic">
-                {`by ${testimony.user.firstName} ${testimony.user.lastName} • ${
-                  testimony.createdAt
-                    ? new Intl.DateTimeFormat("en-GB", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                      }).format(new Date(testimony.createdAt))
-                    : ""
-                }`}
-              </p>
-            </div>
-            <div className="flex gap-3">
-              {isLoggedIn && user.id === testimony.user.id ? (
-                <Link
-                  to={`/dashboard/testimonies/${testimony.id}/edit`}
-                  className="p-2"
-                >
-                  <Edit />
-                </Link>
-              ) : null}
-              <button className="cursor-pointer" onClick={toggleFavorite}>
-                <Star
-                  fill={favorite ? "#DAA520" : "transparent"}
-                  color={favorite ? "#DAA520" : "#000"}
-                  className="transition-all duration-300 fade-in-10 checked:scale-110"
-                />
-              </button>
-              <div className="flex gap-1 bg-gray-100 p-2 rounded-md">
-                <motion.button
-                  onClick={toggleLiked}
-                  initial={false}
-                  animate={{ scale: liked ? 1.2 : 1, rotate: liked ? 360 : 0 }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 10,
-                  }}
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    outline: "none",
-                  }}
-                >
-                  <Heart
-                    fill={liked ? "#DC143C" : "transparent"}
-                    color={liked ? "#DC143C" : "#000"}
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <Container>
+          <article className="py-8">
+            <Breadcrumb className="mb-4">
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Testimony</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+            <div className="flex flex-col md:flex-row justify-between md:items-center w-full gap-4">
+              <div className="flex flex-col gap-4">
+                <h1 className="playfair-display-600 text-5xl">
+                  {testimony.title}
+                </h1>
+                <p className="text-gray-500 italic">
+                  {`by ${testimony.user.firstName} ${
+                    testimony.user.lastName
+                  } • ${
+                    testimony.createdAt
+                      ? new Intl.DateTimeFormat("en-GB", {
+                          day: "2-digit",
+                          month: "long",
+                          year: "numeric",
+                        }).format(new Date(testimony.createdAt))
+                      : ""
+                  }`}
+                </p>
+              </div>
+              <div className="flex gap-3">
+                {isLoggedIn && user.id === testimony.user.id ? (
+                  <Link
+                    to={`/dashboard/testimonies/${testimony.id}/edit`}
+                    className="p-2"
+                  >
+                    <Edit />
+                  </Link>
+                ) : null}
+                <button className="cursor-pointer" onClick={toggleFavorite}>
+                  <Star
+                    fill={favorite ? "#DAA520" : "transparent"}
+                    color={favorite ? "#DAA520" : "#000"}
                     className="transition-all duration-300 fade-in-10 checked:scale-110"
                   />
-                </motion.button>{" "}
-                <span>
-                  {testimony.likes} {testimony.likes === 1 ? "like" : "likes"}
-                </span>
+                </button>
+                <div className="flex gap-1 bg-gray-100 p-2 rounded-md">
+                  <motion.button
+                    onClick={toggleLiked}
+                    initial={false}
+                    animate={{
+                      scale: liked ? 1.2 : 1,
+                      rotate: liked ? 360 : 0,
+                    }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 10,
+                    }}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      outline: "none",
+                    }}
+                  >
+                    <Heart
+                      fill={liked ? "#DC143C" : "transparent"}
+                      color={liked ? "#DC143C" : "#000"}
+                      className="transition-all duration-300 fade-in-10 checked:scale-110"
+                    />
+                  </motion.button>{" "}
+                  <span>
+                    {testimony.likes} {testimony.likes === 1 ? "like" : "likes"}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-          <hr className="my-4  border-gray-400" />
-          <p className="text-gray-500 whitespace-pre-line">{testimony.body}</p>
-        </article>
-      </Container>
+            <hr className="my-4  border-gray-400" />
+            <p className="text-gray-500 whitespace-pre-line">
+              {testimony.body}
+            </p>
+          </article>
+        </Container>
+      )}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { Calendar, User } from "lucide-react";
+import { Calendar, Edit3, User } from "lucide-react";
 import { Link } from "react-router";
 
 interface TestimonyCardProps {
@@ -9,6 +9,7 @@ interface TestimonyCardProps {
   edited: Date;
   author: string;
   status?: string;
+  edit?: boolean;
 }
 
 const TestimonyCard = ({
@@ -19,6 +20,7 @@ const TestimonyCard = ({
   edited,
   status,
   author,
+  edit,
 }: TestimonyCardProps) => {
   return (
     <div className="bg-white overflow-hidden rounded-md shadow-md border transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl max-w-[18rem]">
@@ -32,6 +34,13 @@ const TestimonyCard = ({
           <span className="absolute bottom-4 left-4 bg-white/80 py-0.5 px-2 rounded-full text-sm">
             {status}
           </span>
+        ) : null}
+        {edit ? (
+          <Link to={`testimonies/${id}/edit`}>
+            <span className="absolute top-4 right-4 bg-white/80 p-2 rounded-full text-sm">
+              <Edit3 size={14} />
+            </span>
+          </Link>
         ) : null}
       </div>
       <div className="p-4 ull flex flex-col">

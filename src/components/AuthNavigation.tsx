@@ -30,6 +30,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import axios from "axios";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -137,11 +138,10 @@ const AuthNavigation = () => {
               <Settings className="w-5 h-5 text-gray-600 hover:text-blue-600 cursor-pointer transition-colors" />
               <DropdownMenu>
                 <DropdownMenuTrigger>
-                  <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center cursor-pointer">
-                    <span className="text-white text-sm font-medium">
-                      {user?.firstName[0]}
-                    </span>
-                  </div>
+                  <Avatar className="cursor-pointer">
+                    <AvatarImage src={user?.profilePhoto} />
+                    <AvatarFallback>{user?.firstName[0]}</AvatarFallback>
+                  </Avatar>
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent className="p-2">

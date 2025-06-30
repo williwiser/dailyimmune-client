@@ -5,6 +5,7 @@ import { Link } from "react-router";
 import SlideIn from "@/components/SlideIn";
 import { useAuth } from "@/context/useAuth";
 import axios from "axios";
+import Loader from "@/components/Loader";
 import TestimonyCard from "@/components/TestimonyCard";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
@@ -26,8 +27,19 @@ type Testimony = {
   // add other properties if needed
 };
 
+type Statistic = {
+  numberOfRequests: number;
+  numberOfPrayersReceived: number;
+};
+
 const Dashboard: React.FC = () => {
   const [testimonies, setTestimonies] = useState<Testimony[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [statistics] = useState<Statistic>({
+    numberOfRequests: 0,
+    numberOfPrayersReceived: 0,
+  });
+  const [drafts, setDrafts] = useState<Testimony[]>([]);
 
   const getGreeting = (): string => {
     const hour = new Date().getHours();
@@ -44,14 +56,26 @@ const Dashboard: React.FC = () => {
   };
   useEffect(() => {
     axios
-      .get(`${BACKEND_URL}/api/v1/testimonies/drafts?page=1&limit=5`, {
+      .get(`${BACKEND_URL}/api/v1/testimonies/drafts?page=1&limit=4`, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        setDrafts(response.data);
+        console.log("drafts: " + response.data);
+      });
+
+    axios
+      .get(`${BACKEND_URL}/api/v1/testimonies?page=1&limit=4`, {
         withCredentials: true,
       })
       .then((response) => {
         setTestimonies(response.data);
         console.log(response.data);
       });
-  }, [user?.id]);
+
+    setIsLoading(false);
+  }, []);
+
   const recentActivity = [
     {
       type: "testimony",
@@ -79,7 +103,9 @@ const Dashboard: React.FC = () => {
     },
   ];
 
-  return (
+  return isLoading ? (
+    <Loader />
+  ) : (
     <div className="min-h-screen g-[#eae7dd] bg-stone-100  md:p-6">
       <Container>
         <div className="max-w-7xl mx-auto space-y-6">
@@ -114,48 +140,42 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
           </SlideIn>
-          <div
-            className={
-              testimonies.length == 0
-                ? "bg-white p-6 rounded-md border border-stone-300"
-                : ""
-            }
-          >
-            <h2 className="text-2xl font-bold text-[#3b3b19]">
-              My Testimonies
-            </h2>
-            <ScrollArea className="block md:hidden w-full overflow-y-visible">
-              <div className="grid grid-cols-3 mt-6 gap-6 w-max">
-                {testimonies.length == 0 ? (
-                  <p className=" text-[#747474]">
-                    Your testimonies will appear here.
-                  </p>
-                ) : (
-                  testimonies.map((testimony) => (
+          {testimonies.length === 0 && drafts.length === 0 ? (
+            <div className="bg-white p-6 rounded-md border border-stone-300">
+              <h2 className="text-2xl font-bold text-[#3b3b19]">
+                My Testimonies
+              </h2>
+              <p className=" text-[#747474] mt-6">
+                Your testimonies will appear here.
+              </p>
+            </div>
+          ) : null}
+          {/* my drafts */}
+          {drafts.length === 0 ? null : (
+            <div>
+              <h2 className="text-2xl font-bold text-[#3b3b19]">My Drafts</h2>
+              <ScrollArea className="block md:hidden w-full overflow-y-visible">
+                <div className="flex mt-6 gap-6 w-max">
+                  {drafts.map((draft) => (
                     <TestimonyCard
-                      key={testimony.id}
-                      id={parseInt(testimony.id)}
-                      thumbnail={testimony.thumbnail}
-                      title={testimony.title}
-                      body={truncateText(testimony.body, 15)}
-                      edited={testimony.updatedAt}
-                      author={`${testimony.user.firstName} ${testimony.user.lastName}`}
-                      status={testimony.status}
+                      key={draft.id}
+                      id={parseInt(draft.id)}
+                      thumbnail={draft.thumbnail}
+                      title={draft.title}
+                      body={truncateText(draft.body, 15)}
+                      edited={draft.updatedAt}
+                      author={`${draft.user.firstName} ${draft.user.lastName}`}
+                      status={draft.status}
+                      edit={draft.user.id == user?.id}
                     />
-                  ))
-                )}
-              </div>
-              <br />
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
+                  ))}
+                </div>
+                <br />
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
 
-            <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 mt-6 gap-6 w-full">
-              {testimonies.length == 0 ? (
-                <p className=" text-[#747474]">
-                  Your testimonies will appear here.
-                </p>
-              ) : (
-                testimonies.map((testimony) => (
+              <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 mt-6 gap-6 w-full">
+                {drafts.map((testimony) => (
                   <TestimonyCard
                     key={testimony.id}
                     id={parseInt(testimony.id)}
@@ -165,11 +185,55 @@ const Dashboard: React.FC = () => {
                     edited={testimony.updatedAt}
                     author={`${testimony.user.firstName} ${testimony.user.lastName}`}
                     status={testimony.status}
+                    edit={testimony.user.id == user?.id}
                   />
-                ))
-              )}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+          {/* published testimonies */}
+          {testimonies.length === 0 ? null : (
+            <div>
+              <h2 className="text-2xl font-bold text-[#3b3b19]">
+                My Testimonies
+              </h2>
+              <ScrollArea className="block md:hidden w-full overflow-y-visible">
+                <div className="flex mt-6 gap-6 w-max">
+                  {testimonies.map((testimony) => (
+                    <TestimonyCard
+                      key={testimony.id}
+                      id={parseInt(testimony.id)}
+                      thumbnail={testimony.thumbnail}
+                      title={testimony.title}
+                      body={truncateText(testimony.body, 15)}
+                      edited={testimony.updatedAt}
+                      author={`${testimony.user.firstName} ${testimony.user.lastName}`}
+                      status={testimony.status}
+                      edit={testimony.user.id == user?.id}
+                    />
+                  ))}
+                </div>
+                <br />
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
+
+              <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 mt-6 gap-6 w-full">
+                {testimonies.map((testimony) => (
+                  <TestimonyCard
+                    key={testimony.id}
+                    id={parseInt(testimony.id)}
+                    thumbnail={testimony.thumbnail}
+                    title={testimony.title}
+                    body={truncateText(testimony.body, 15)}
+                    edited={testimony.updatedAt}
+                    author={`${testimony.user.firstName} ${testimony.user.lastName}`}
+                    status={testimony.status}
+                    edit={testimony.user.id == user?.id}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
           {/* Recent Activity and Testimonies Side by Side */}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -293,9 +357,12 @@ const Dashboard: React.FC = () => {
                 </div>
 
                 <div className="mt-6 text-center">
-                  <button className="bg-[#3b3b19] text-white px-4 py-2 rounded-md hover:bg-[#4a4a22] transition-colors duration-200 text-sm">
+                  <Link
+                    to="/testimonies"
+                    className="bg-[#3b3b19] text-white px-4 py-2 rounded-md hover:bg-[#4a4a22] transition-colors duration-200 text-sm"
+                  >
                     Read All Testimonies
-                  </button>
+                  </Link>
                 </div>
               </div>
             </SlideIn>
@@ -304,7 +371,9 @@ const Dashboard: React.FC = () => {
           {/* Personal Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-white rounded-md p-6 border border-gray-200 text-center">
-              <div className="text-3xl font-bold text-[#3b3b19] mb-2">3</div>
+              <div className="text-3xl font-bold text-[#3b3b19] mb-2">
+                {statistics.numberOfRequests}
+              </div>
               <div className="text-[#747474]">Your Prayer Requests</div>
             </div>
 

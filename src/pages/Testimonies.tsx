@@ -32,7 +32,9 @@ const Testimonies = () => {
   };
   useEffect(() => {
     axios
-      .get(`${BACKEND_URL}/api/v1/testimonies`, { withCredentials: true })
+      .get(`${BACKEND_URL}/api/v1/testimonies?page=1&limit=24`, {
+        withCredentials: true,
+      })
       .then((response) => {
         setTestimonies(response.data);
       });
