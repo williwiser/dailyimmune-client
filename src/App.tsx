@@ -21,6 +21,7 @@ import SubmitPrayerRequest from "./pages/SubmitPrayerRequest";
 import Profile from "./pages/Profile";
 import UniversalLayout from "./layouts/UniversalLayout";
 import PrayerRequests from "./pages/PrayerRequests";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const router = createBrowserRouter([
   {
@@ -84,9 +85,11 @@ const router = createBrowserRouter([
 
 const App = () => {
   return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <GoogleOAuthProvider clientId="10720018217-esrs5ojfien6rbceu9rvn210s6um0uvk.apps.googleusercontent.com">
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </GoogleOAuthProvider>
   );
 };
 

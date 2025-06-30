@@ -5,10 +5,13 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import PulseLoader from "react-spinners/PulseLoader";
+import { useGoogleLogin } from "@react-oauth/google";
+import { useAuth } from "@/context/useAuth";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const SignUp = () => {
+  const { setUser } = useAuth();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -18,7 +21,27 @@ const SignUp = () => {
   const [gotError, setGotError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
   const navigate = useNavigate();
+  const googleLogin = useGoogleLogin({
+    flow: "auth-code",
+    onSuccess: async (codeResponse) => {
+      console.log("codeResponse " + codeResponse.code);
+      setIsLoadingGoogle(true);
+      const tokens = await axios.post(
+        `${BACKEND_URL}/api/v1/auth/google`,
+        {
+          code: codeResponse.code,
+        },
+        { withCredentials: true }
+      );
+      console.log(tokens.data);
+      setUser(tokens.data);
+      setIsLoadingGoogle(false);
+      navigate("/dashboard");
+    },
+    onError: (errorResponse) => console.log(errorResponse),
+  });
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -54,17 +77,32 @@ const SignUp = () => {
     }));
   };
 
-  const handleGoogleSignUp = () => {};
+  const handleGoogleLogIn = () => {
+    setIsLoadingGoogle(true);
+    googleLogin();
+    setIsLoadingGoogle(false);
+  };
   return (
     <AuthLayout title="Sign Up">
       <button
-        className="px-4 py-2 rounded-md border border-gray-300 hover:bg-[#3B3B1A] hover:border-[#3B3B1A] hover:text-white transition duration-200"
-        onClick={handleGoogleSignUp}
+        className={`${
+          isLoadingGoogle ? "bg-gray-100" : ""
+        } px-4 py-2 rounded-md border inline-flex justify-center items-center border-gray-300 hover:bg-[#3B3B1A] hover:border-[#3B3B1A] hover:text-white transition duration-200 cursor-pointer`}
+        onClick={handleGoogleLogIn}
+        disabled={isLoadingGoogle}
       >
-        <div className="flex gap-2 items-center justify-center">
-          <FontAwesomeIcon icon={faGoogle} />
-          <span>Sign up with Google</span>
-        </div>
+        {isLoadingGoogle ? (
+          <PulseLoader />
+        ) : (
+          <div className="relative flex justify-start items-center w-full">
+            <div className="absolute left-0">
+              <FontAwesomeIcon icon={faGoogle} className="justify-self-start" />
+            </div>
+            <div className="mx-auto">
+              <span className="justify-self-center">Continue with Google</span>
+            </div>
+          </div>
+        )}
       </button>
       <div className="flex items-center gap-1 text-xs text-gray-400">
         <hr className="w-full" />

@@ -1,11 +1,12 @@
 import AuthLayout from "@/layouts/AuthLayout";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { Link, useNavigate } from "react-router";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import axios from "axios";
 import PulseLoader from "react-spinners/PulseLoader";
 import { useAuth } from "@/context/useAuth";
+import { useGoogleLogin } from "@react-oauth/google";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -13,9 +14,39 @@ const LogIn = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [gotError, setGotError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
+
+  const googleLogin = useGoogleLogin({
+    flow: "auth-code",
+    onSuccess: async (codeResponse) => {
+      console.log("codeResponse " + codeResponse.code);
+      setIsLoadingGoogle(true);
+      const tokens = await axios.post(
+        `${BACKEND_URL}/api/v1/auth/google`,
+        {
+          code: codeResponse.code,
+        },
+        { withCredentials: true }
+      );
+      console.log(tokens.data);
+      setUser(tokens.data);
+      setIsLoadingGoogle(false);
+      navigate("/dashboard");
+    },
+    onError: (errorResponse) => console.log(errorResponse),
+  });
   const [isLoading, setIsLoading] = useState(false);
+
   const { user, setUser } = useAuth();
+
   const navigate = useNavigate();
+
+  const handleGoogleLogIn = () => {
+    setIsLoadingGoogle(true);
+    googleLogin();
+    setIsLoadingGoogle(false);
+  };
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -44,18 +75,30 @@ const LogIn = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  const handleGoogleSignIn = () => {};
+
   return (
     <AuthLayout title="Log In">
       <button
-        className="px-4 py-2 rounded-md border border-gray-300 hover:bg-[#3B3B1A] hover:border-[#3B3B1A] hover:text-white transition duration-200"
-        onClick={handleGoogleSignIn}
+        className={`${
+          isLoadingGoogle ? "bg-gray-100" : ""
+        } px-4 py-2 rounded-md border inline-flex justify-center items-center border-gray-300 hover:bg-[#3B3B1A] hover:border-[#3B3B1A] hover:text-white transition duration-200 cursor-pointer`}
+        onClick={handleGoogleLogIn}
+        disabled={isLoadingGoogle}
       >
-        <div className="flex gap-2 items-center justify-center">
-          <FontAwesomeIcon icon={faGoogle} />
-          <span>Sign in with Google</span>
-        </div>
+        {isLoadingGoogle ? (
+          <PulseLoader />
+        ) : (
+          <div className="relative flex justify-start items-center w-full">
+            <div className="absolute left-0">
+              <FontAwesomeIcon icon={faGoogle} className="justify-self-start" />
+            </div>
+            <div className="mx-auto">
+              <span className="justify-self-center">Continue with Google</span>
+            </div>
+          </div>
+        )}
       </button>
+
       <div className="flex items-center gap-1 text-xs text-gray-400">
         <hr className="w-full" />
         or
