@@ -49,7 +49,7 @@ const Profile = () => {
         <>
           <header>
             <Container>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col md:flex-row items-center gap-4">
                 <div className="relative">
                   <Avatar className="cursor-pointer size-36 rounded-full border">
                     <AvatarImage src={user?.profilePhoto} />
@@ -62,7 +62,7 @@ const Profile = () => {
                     <Edit2 color="white" />
                   </button>
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col text-center md:text-left gap-2">
                   <h1 className="text-3xl font-bold">{`${user?.firstName} ${user?.lastName}`}</h1>
                   <p className="text-gray-500 italic">{`Joined ${joined}`}</p>
                 </div>

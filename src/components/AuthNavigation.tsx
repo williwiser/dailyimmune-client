@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBars,
   faChevronDown,
-  faChevronRight,
+  faChevronUp,
   faClose,
   faPray,
   faReceipt,
@@ -49,8 +49,8 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const AuthNavigation = () => {
   const [showMenu, setShowMenu] = useState(false);
-  const [showCommunityMenu, setShowCommunityMenu] = useState(true);
-  const [showProfileMenu, setShowProfileMenu] = useState(true);
+  const [showCommunityMenu, setShowCommunityMenu] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
@@ -256,7 +256,7 @@ const AuthNavigation = () => {
                   <span>Community</span>
                 </div>
                 <FontAwesomeIcon
-                  icon={showCommunityMenu ? faChevronRight : faChevronDown}
+                  icon={showCommunityMenu ? faChevronUp : faChevronDown}
                   className="text-gray-600"
                 />
               </button>
@@ -355,7 +355,7 @@ const AuthNavigation = () => {
                   <span>{user?.firstName}</span>
                 </div>
                 <FontAwesomeIcon
-                  icon={showProfileMenu ? faChevronRight : faChevronDown}
+                  icon={showProfileMenu ? faChevronUp : faChevronDown}
                   className="text-gray-600"
                 />
               </button>
@@ -370,7 +370,7 @@ const AuthNavigation = () => {
                 <Link
                   className="flex justify-between items-center size-full p-4"
                   onClick={() => setShowMenu(false)}
-                  to="profile"
+                  to="/dashboard/profile"
                 >
                   <div className="flex pl-10 gap-4 items-center">
                     <User />

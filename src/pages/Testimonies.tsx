@@ -1,5 +1,6 @@
 import SearchBar from "@/components/SearchBar";
 import TestimonyCard from "@/components/TestimonyCard";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import Header from "@/layouts/Header";
 import Section from "@/layouts/Section";
 import axios from "axios";
@@ -23,7 +24,7 @@ type Testimony = {
 };
 
 const Testimonies = () => {
-  const [testimonies, setTestimonies] = useState([]);
+  const [newTestimonies, setNewTestimonies] = useState([]);
   const truncateText = (text: string, wordLimit: number) => {
     const words = text.split(" ");
     if (words.length <= wordLimit) return text;
@@ -36,10 +37,10 @@ const Testimonies = () => {
         withCredentials: true,
       })
       .then((response) => {
-        setTestimonies(response.data);
+        setNewTestimonies(response.data);
       });
   }, []);
-  console.log(testimonies);
+
   return (
     <>
       <Header
@@ -52,20 +53,30 @@ const Testimonies = () => {
         </div>
       </Header>
       <Section>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {testimonies.map((testimony: Testimony) => (
-            <TestimonyCard
-              key={testimony.id}
-              id={parseInt(testimony.id)}
-              thumbnail={testimony.thumbnail}
-              title={testimony.title}
-              body={truncateText(testimony.body, 15)}
-              edited={testimony.updatedAt}
-              author={`${testimony.user.firstName} ${testimony.user.lastName}`}
-              status={testimony.status}
-            />
-          ))}
-        </div>
+        {newTestimonies.length === 0 ? null : (
+          <div>
+            <h2 className="text-2xl font-bold text-[#3b3b19] mb-4">
+              New Testimonies
+            </h2>
+            <ScrollArea className="block md:hidden w-full overflow-y-visible">
+              <div className="flex gap-6 w-max">
+                {newTestimonies.map((testimony: Testimony) => (
+                  <TestimonyCard
+                    key={testimony.id}
+                    id={parseInt(testimony.id)}
+                    thumbnail={testimony.thumbnail}
+                    title={testimony.title}
+                    body={truncateText(testimony.body, 15)}
+                    edited={testimony.updatedAt}
+                    author={`${testimony.user.firstName} ${testimony.user.lastName}`}
+                    status={testimony.status}
+                  />
+                ))}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </div>
+        )}
       </Section>
     </>
   );

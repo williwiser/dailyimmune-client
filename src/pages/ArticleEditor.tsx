@@ -1,4 +1,4 @@
-import { DialogHeader } from "@/components/ui/dialog";
+import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
 import Container from "@/layouts/Container";
 import Section from "@/layouts/Section";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
@@ -13,7 +13,13 @@ import {
 import axios from "axios";
 import "draft-js/dist/Draft.css";
 import { Check, Circle, Image, ImagePlus, Rocket, Save } from "lucide-react";
-import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
 import { Link, useLocation, useParams } from "react-router";
 import PulseLoader from "react-spinners/PulseLoader";
 import { toast, Toaster } from "sonner";
@@ -52,6 +58,7 @@ const ArticleEditor = () => {
   const isEditMode = match;
   const [isSaving, setIsSaving] = useState(false);
   const [image, setImage] = useState<File | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const [testimony, setTestimony] = useState<Testimony>({
     id: "",
     title: "",
@@ -208,6 +215,7 @@ const ArticleEditor = () => {
       <form
         onSubmit={isEditMode ? updateArticle : submitNewArticle}
         encType="multipart/form-data"
+        ref={formRef}
       >
         <div className="border-b text-lg bg-gray-50">
           <Container>
@@ -249,10 +257,9 @@ const ArticleEditor = () => {
                 </button>
 
                 <button
-                  type="submit"
                   className="inline-flex justify-center items-center px-3 py-1 rounded-md bg-green-500 text-white cursor-pointer hover:bg-green-400 transition-all duration-300"
+                  type="submit"
                   name="publish"
-                  value="publish"
                 >
                   {isLoading ? (
                     <span className="w-fit">
@@ -263,27 +270,26 @@ const ArticleEditor = () => {
                   )}
                 </button>
               </div>
-              <div className="flex gap-4">
+              <div className="flex gap-4 md:hidden">
                 <button
                   type="submit"
                   name="save"
-                  value="publish"
+                  value="save"
                   className="text-gray-500"
                 >
                   {isSaving ? <DotLoader size={28} color="grey" /> : <Save />}
                 </button>
-                <button
-                  type="submit"
-                  name="publish"
-                  value="publish"
-                  className="bg-green-500 p-1.5 rounded-full text-white"
-                >
-                  {isLoading ? (
-                    <DotLoader size={28} color="grey" />
-                  ) : (
+                {isLoading ? (
+                  <DotLoader size={28} color="grey" />
+                ) : (
+                  <button
+                    type="submit"
+                    name="publish"
+                    className="bg-green-500 p-1.5 rounded-full text-white"
+                  >
                     <Rocket />
-                  )}
-                </button>
+                  </button>
+                )}
               </div>
             </div>
           </Container>
@@ -345,22 +351,24 @@ const ArticleEditor = () => {
         <Dialog open={showDialog} onOpenChange={setShowDialog}>
           <DialogContent className="flex flex-col justify-center items-center [&>button:last-child]:hidden">
             <DialogHeader>
-              <DialogTitle className="mb-4 text-center text-4xl playfair-display-600 text-[#747474]">
+              <DialogTitle className="text-center text-4xl playfair-display-600 text-[#747474]">
                 You article has been published!
               </DialogTitle>
-              <DialogDescription className="flex justify-center text-center w-full">
-                <p className="max-w-sm w-full ">
-                  Thank you for sharing your story. Your words have the power to
-                  inspire, encourage, and point others to God's grace.
-                </p>
-              </DialogDescription>
             </DialogHeader>
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="inline-flex w-full md:w-fit justify-center items-center bg-[#3B3B1A] text-white px-4 py-2 rounded-md font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
-            >
-              Continue
-            </button>
+            <DialogDescription className="flex justify-center text-center w-full">
+              <p className="max-w-sm w-full ">
+                Thank you for sharing your story. Your words have the power to
+                inspire, encourage, and point others to God's grace.
+              </p>
+            </DialogDescription>
+            <DialogFooter>
+              <button
+                onClick={() => navigate("/dashboard")}
+                className="inline-flex w-full md:w-fit justify-center items-center bg-[#3B3B1A] text-white px-4 py-2 rounded-md font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+              >
+                Continue
+              </button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </form>

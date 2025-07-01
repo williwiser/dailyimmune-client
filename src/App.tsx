@@ -22,65 +22,71 @@ import Profile from "./pages/Profile";
 import UniversalLayout from "./layouts/UniversalLayout";
 import PrayerRequests from "./pages/PrayerRequests";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import ScrollToTopLayout from "./components/ScrollToTopLayout";
 
 const router = createBrowserRouter([
   {
-    element: <MainLayout />,
+    element: <ScrollToTopLayout />,
     children: [
       {
-        path: "/",
-        element: <Home />,
-      },
+        element: <MainLayout />,
+        children: [
+          {
+            path: "/",
+            element: <Home />,
+          },
 
-      {
-        path: "/encouragement",
-        element: <Encouragement />,
+          {
+            path: "/encouragement",
+            element: <Encouragement />,
+          },
+          {
+            path: "/shop",
+            element: <Shop />,
+          },
+          {
+            path: "/about",
+            element: <About />,
+          },
+          {
+            path: "/prayer",
+            element: <Prayer />,
+          },
+          {
+            path: "/forum",
+            element: <Forum />,
+          },
+        ],
       },
       {
-        path: "/shop",
-        element: <Shop />,
+        element: <UniversalLayout />,
+        children: [
+          {
+            path: "/testimonies",
+            element: <Testimonies />,
+          },
+          { path: "testimonies/:id", element: <Article /> },
+          { path: "prayers", element: <PrayerRequests /> },
+        ],
       },
       {
-        path: "/about",
-        element: <About />,
+        path: "dashboard",
+        element: <DashboardLayout />,
+        children: [
+          { index: true, element: <Dash2 /> },
+          { path: "testimonies", element: <Testimonies /> },
+          { path: "testimonies/new", element: <ArticleEditor /> },
+          { path: "testimonies/:id/edit", element: <ArticleEditor /> },
+          { path: "prayer", element: <SubmitPrayerRequest /> },
+          { path: "profile", element: <Profile /> },
+        ],
       },
-      {
-        path: "/prayer",
-        element: <Prayer />,
-      },
-      {
-        path: "/forum",
-        element: <Forum />,
-      },
+      { path: "/signup", element: <SignUp /> },
+      { path: "/login", element: <LogIn /> },
+      { path: "/activate", element: <VerifyToken /> },
+      { path: "/activation-link", element: <ActivationLink /> },
     ],
   },
-  {
-    element: <UniversalLayout />,
-    children: [
-      {
-        path: "/testimonies",
-        element: <Testimonies />,
-      },
-      { path: "testimonies/:id", element: <Article /> },
-      { path: "prayers", element: <PrayerRequests /> },
-    ],
-  },
-  {
-    path: "dashboard",
-    element: <DashboardLayout />,
-    children: [
-      { index: true, element: <Dash2 /> },
-      { path: "testimonies", element: <Testimonies /> },
-      { path: "testimonies/new", element: <ArticleEditor /> },
-      { path: "testimonies/:id/edit", element: <ArticleEditor /> },
-      { path: "prayer", element: <SubmitPrayerRequest /> },
-      { path: "profile", element: <Profile /> },
-    ],
-  },
-  { path: "/signup", element: <SignUp /> },
-  { path: "/login", element: <LogIn /> },
-  { path: "/activate", element: <VerifyToken /> },
-  { path: "/activation-link", element: <ActivationLink /> },
 ]);
 
 const App = () => {
