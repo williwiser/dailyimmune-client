@@ -65,9 +65,12 @@ const Dashboard: React.FC = () => {
       });
 
     axios
-      .get(`${BACKEND_URL}/api/v1/testimonies?page=1&limit=4`, {
-        withCredentials: true,
-      })
+      .get(
+        `${BACKEND_URL}/api/v1/testimonies?authorId=${user?.id}&page=1&limit=4`,
+        {
+          withCredentials: true,
+        }
+      )
       .then((response) => {
         setTestimonies(response.data);
         console.log(response.data);
