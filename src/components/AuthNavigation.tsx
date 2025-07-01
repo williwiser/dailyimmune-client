@@ -6,9 +6,22 @@ import {
   faChevronDown,
   faChevronRight,
   faClose,
+  faPray,
+  faReceipt,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import { Bell, MessageCircle, ReceiptText, Settings, User } from "lucide-react";
+import {
+  Bell,
+  Heart,
+  LayoutDashboard,
+  LogOut,
+  MessageCircle,
+  ReceiptText,
+  Settings,
+  ShoppingBag,
+  User,
+  Users,
+} from "lucide-react";
 import { useAuth } from "@/context/useAuth";
 import { useNavigate } from "react-router";
 import {
@@ -36,6 +49,8 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const AuthNavigation = () => {
   const [showMenu, setShowMenu] = useState(false);
+  const [showCommunityMenu, setShowCommunityMenu] = useState(true);
+  const [showProfileMenu, setShowProfileMenu] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
@@ -206,86 +221,188 @@ const AuthNavigation = () => {
             </button>
           </div>
         </Container>
+
+        {/* mobile menu */}
+
         <div
           className={`${
             showMenu ? "fixed" : "hidden"
-          } md:hidden w-full bg-slate-800 text-white h-full`}
+          } md:hidden w-full bg-gray-500 text-white h-full`}
         >
-          <Container>
-            <ul className="text-lg font-semibold">
-              <li>
-                <Link
-                  className="flex justify-between items-center size-full p-4"
-                  onClick={() => setShowMenu(false)}
-                  to="/"
-                >
-                  <span>Home</span>
-                  <FontAwesomeIcon
-                    icon={faChevronRight}
-                    className="text-slate-500"
-                  />
-                </Link>
-              </li>
-              <li>
-                <Link
-                  className="flex justify-between items-center size-full p-4"
-                  onClick={() => setShowMenu(false)}
-                  to="/"
-                >
+          <ul className="text-lg font-semibold">
+            <li>
+              <Link
+                className="flex justify-between items-center size-full p-4"
+                onClick={() => {
+                  setShowMenu(false);
+                  setShowCommunityMenu(false);
+                  setShowProfileMenu(false);
+                }}
+                to="/dashboard"
+              >
+                <div className="flex gap-4 items-center">
+                  <LayoutDashboard />
+                  <span>Dashboard</span>
+                </div>
+              </Link>
+            </li>
+            <li>
+              <button
+                className="flex justify-between items-center size-full p-4"
+                onClick={() => setShowCommunityMenu((prev) => !prev)}
+              >
+                <div className="flex gap-4 items-center">
+                  <Users />
                   <span>Community</span>
-                  <FontAwesomeIcon
-                    icon={faChevronRight}
-                    className="text-slate-500"
-                  />
+                </div>
+                <FontAwesomeIcon
+                  icon={showCommunityMenu ? faChevronRight : faChevronDown}
+                  className="text-gray-600"
+                />
+              </button>
+            </li>
+
+            {/* community menu*/}
+            <ul
+              className={`${
+                showCommunityMenu ? "" : "hidden"
+              } bg-gray-600 w-full`}
+            >
+              <li>
+                <Link
+                  className="flex justify-between items-center size-full p-4"
+                  onClick={() => setShowMenu(false)}
+                  to="/testimonies"
+                >
+                  <div className="flex pl-10 gap-4 items-center">
+                    <Heart />
+                    <span>Testimonies</span>
+                  </div>
                 </Link>
               </li>
               <li>
                 <Link
                   className="flex justify-between items-center size-full p-4"
                   onClick={() => setShowMenu(false)}
-                  to="/encouragement"
+                  to="/prayers"
                 >
-                  <span>Encouragement</span>
-                  <FontAwesomeIcon
-                    icon={faChevronRight}
-                    className="text-slate-500"
-                  />
+                  <div className="flex pl-10 gap-4 items-center">
+                    <FontAwesomeIcon icon={faPray} />
+                    <span>Prayer Requests</span>
+                  </div>
                 </Link>
               </li>
               <li>
                 <Link
                   className="flex justify-between items-center size-full p-4"
                   onClick={() => setShowMenu(false)}
-                  to="/shop"
+                  to="/dashboard"
                 >
-                  <span>Shop</span>
-                  <FontAwesomeIcon
-                    icon={faChevronRight}
-                    className="text-slate-500"
-                  />
-                </Link>
-              </li>
-              <hr className="border-slate-700 border-b-2"></hr>
-              <li>
-                <Link
-                  className="flex justify-between items-center size-full p-4"
-                  onClick={() => setShowMenu(false)}
-                  to="/login"
-                >
-                  Log In
-                </Link>
-              </li>
-              <li>
-                <Link
-                  className="flex justify-between items-center size-full p-4"
-                  onClick={() => setShowMenu(false)}
-                  to="/signup"
-                >
-                  Sign Up
+                  <div className="flex pl-10 gap-4 items-center">
+                    <MessageCircle />
+                    <span>Forum</span>
+                  </div>
                 </Link>
               </li>
             </ul>
-          </Container>
+            <li>
+              <Link
+                className="flex justify-between items-center size-full p-4"
+                onClick={() => setShowMenu(false)}
+                to="/shop"
+              >
+                <div className="flex gap-4 items-center">
+                  <ShoppingBag />
+                  <span>Shop</span>
+                </div>
+              </Link>
+            </li>
+            <hr className="border-gray-600 border-b-2"></hr>
+            <li>
+              <Link
+                className="flex justify-between items-center size-full p-4"
+                onClick={() => setShowMenu(false)}
+                to="/signup"
+              >
+                <div className="flex gap-4 items-center">
+                  <MessageCircle />
+                  <span>Messages</span>
+                </div>
+              </Link>
+            </li>
+            <li>
+              <Link
+                className="flex justify-between items-center size-full p-4"
+                onClick={() => setShowMenu(false)}
+                to="/signup"
+              >
+                <div className="flex gap-4 items-center">
+                  <Bell />
+                  <span>Notifications</span>
+                </div>
+              </Link>
+            </li>
+            <li>
+              <button
+                className="flex justify-between items-center size-full p-4"
+                onClick={() => setShowProfileMenu((prev) => !prev)}
+              >
+                <div className="flex gap-4 items-center">
+                  <img
+                    src={user?.profilePhoto}
+                    className="size-7 rounded-full"
+                  />{" "}
+                  <span>{user?.firstName}</span>
+                </div>
+                <FontAwesomeIcon
+                  icon={showProfileMenu ? faChevronRight : faChevronDown}
+                  className="text-gray-600"
+                />
+              </button>
+            </li>
+            {/* account menu*/}
+            <ul
+              className={`${
+                showProfileMenu ? "" : "hidden"
+              } bg-gray-600 w-full`}
+            >
+              <li>
+                <Link
+                  className="flex justify-between items-center size-full p-4"
+                  onClick={() => setShowMenu(false)}
+                  to="profile"
+                >
+                  <div className="flex pl-10 gap-4 items-center">
+                    <User />
+                    <span>Profile</span>
+                  </div>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  className="flex justify-between items-center size-full p-4"
+                  onClick={() => setShowMenu(false)}
+                  to="/orders"
+                >
+                  <div className="flex pl-10 gap-4 items-center">
+                    <FontAwesomeIcon icon={faReceipt} />
+                    <span>Orders</span>
+                  </div>
+                </Link>
+              </li>
+              <li>
+                <button
+                  className="flex justify-between items-center size-full p-4"
+                  onClick={handleSignOut}
+                >
+                  <div className="flex pl-10 gap-4 items-center">
+                    <LogOut />
+                    <span>Log out</span>
+                  </div>
+                </button>
+              </li>
+            </ul>
+          </ul>
         </div>
       </nav>
     </>

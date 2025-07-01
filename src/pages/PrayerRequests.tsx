@@ -6,11 +6,17 @@ import { useEffect, useState } from "react";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
+interface User {
+  id: string;
+  firstName: string;
+  lastName: string;
+}
 interface PrayerRequest {
   id: string;
   subject: string;
   body: string;
   updatedAt: Date;
+  user: User;
   // add other properties if needed
 }
 
@@ -29,6 +35,7 @@ const PrayerRequests = () => {
         setPrayerRequests(response.data);
       });
   }, []);
+
   return (
     <>
       <Header
@@ -37,12 +44,13 @@ const PrayerRequests = () => {
         className="bg-stone-100"
       />
       <Section>
-        <div className="grid grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {prayerRequests.map((prayerRequest: PrayerRequest) => (
             <PrayerRequestCard
               key={prayerRequest.id}
               id={parseInt(prayerRequest.id)}
               subject={prayerRequest.subject}
+              author={prayerRequest.user.firstName}
               body={truncateText(prayerRequest.body, 15)}
               edited={prayerRequest.updatedAt}
             />

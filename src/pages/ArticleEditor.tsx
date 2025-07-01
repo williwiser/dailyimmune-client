@@ -12,18 +12,12 @@ import {
 } from "@/components/ui/dialog";
 import axios from "axios";
 import "draft-js/dist/Draft.css";
-import {
-  Check,
-  Circle,
-  FullscreenIcon,
-  Image,
-  ImagePlus,
-  Save,
-} from "lucide-react";
+import { Check, Circle, Image, ImagePlus, Rocket, Save } from "lucide-react";
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { Link, useLocation, useParams } from "react-router";
 import PulseLoader from "react-spinners/PulseLoader";
 import { toast, Toaster } from "sonner";
+import DotLoader from "react-spinners/DotLoader";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -227,7 +221,7 @@ const ArticleEditor = () => {
                 </Link>
                 <h1 className="font-bold">Draft article</h1>
               </div>
-              <div className="flex gap-4 items-center">
+              <div className="hidden md:flex gap-4 items-center">
                 {isTyping ? (
                   <PulseLoader color="#6a7282" />
                 ) : (
@@ -255,6 +249,7 @@ const ArticleEditor = () => {
                 </button>
 
                 <button
+                  type="submit"
                   className="inline-flex justify-center items-center px-3 py-1 rounded-md bg-green-500 text-white cursor-pointer hover:bg-green-400 transition-all duration-300"
                   name="publish"
                   value="publish"
@@ -267,8 +262,27 @@ const ArticleEditor = () => {
                     "Publish"
                   )}
                 </button>
-                <button>
-                  <FullscreenIcon />
+              </div>
+              <div className="flex gap-4">
+                <button
+                  type="submit"
+                  name="save"
+                  value="publish"
+                  className="text-gray-500"
+                >
+                  {isSaving ? <DotLoader size={28} color="grey" /> : <Save />}
+                </button>
+                <button
+                  type="submit"
+                  name="publish"
+                  value="publish"
+                  className="bg-green-500 p-1.5 rounded-full text-white"
+                >
+                  {isLoading ? (
+                    <DotLoader size={28} color="grey" />
+                  ) : (
+                    <Rocket />
+                  )}
                 </button>
               </div>
             </div>

@@ -89,7 +89,7 @@ const SubmitPrayerRequest = () => {
         <div className="flex justify-center">
           <form
             onSubmit={handleSubmit}
-            className="flex flex-col justify-center items-center gap-4 w-full max-w-xl bg-white p-6 rounded-md border border-gray-200"
+            className="flex flex-col justify-center items-center gap-4 w-full md:max-w-xl bg-white p-4 md:p-6 rounded-md border border-gray-200"
           >
             <h1 className="playfair-display-600 text-4xl text-[#747474] text-center">
               Submit a Prayer Request
