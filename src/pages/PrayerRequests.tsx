@@ -16,7 +16,8 @@ interface PrayerRequest {
   subject: string;
   body: string;
   updatedAt: Date;
-  user: User;
+  requester: User;
+  isAnswered: boolean;
   // add other properties if needed
 }
 
@@ -30,9 +31,12 @@ const PrayerRequests = () => {
   };
   useEffect(() => {
     axios
-      .get(`${BACKEND_URL}/api/v1/prayers`, { withCredentials: true })
+      .get(`${BACKEND_URL}/api/v1/prayers?page=1&limit=25`, {
+        withCredentials: true,
+      })
       .then((response) => {
         setPrayerRequests(response.data);
+        console.log(response.data);
       });
   }, []);
 
@@ -44,16 +48,22 @@ const PrayerRequests = () => {
         className="bg-stone-100"
       />
       <Section>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ">
           {prayerRequests.map((prayerRequest: PrayerRequest) => (
-            <PrayerRequestCard
+            <div
               key={prayerRequest.id}
-              id={parseInt(prayerRequest.id)}
-              subject={prayerRequest.subject}
-              author={prayerRequest.user.firstName}
-              body={truncateText(prayerRequest.body, 15)}
-              edited={prayerRequest.updatedAt}
-            />
+              className="flex items-center justify-center"
+            >
+              <PrayerRequestCard
+                key={prayerRequest.id}
+                id={parseInt(prayerRequest.id)}
+                subject={prayerRequest.subject}
+                author={`${prayerRequest.requester.firstName} ${prayerRequest.requester.lastName}`}
+                body={truncateText(prayerRequest.body, 15)}
+                edited={prayerRequest.updatedAt}
+                isAnswered={prayerRequest.isAnswered}
+              />
+            </div>
           ))}
         </div>
       </Section>

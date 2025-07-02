@@ -8,6 +8,7 @@ import axios from "axios";
 import Loader from "@/components/Loader";
 import TestimonyCard from "@/components/TestimonyCard";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import PrayerRequestCard from "@/components/PrayerRequestCard";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -26,6 +27,16 @@ type Testimony = {
   status: string;
   // add other properties if needed
 };
+interface PrayerRequest {
+  id: string;
+  subject: string;
+  body: string;
+  updatedAt: Date;
+  requester: User;
+  isAnswered: boolean;
+  isPublic: boolean;
+  // add other properties if needed
+}
 
 type Statistic = {
   numberOfRequests: number;
@@ -34,6 +45,7 @@ type Statistic = {
 
 const Dashboard: React.FC = () => {
   const [testimonies, setTestimonies] = useState<Testimony[]>([]);
+  const [prayerRequests, setPrayerRequests] = useState<PrayerRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [statistics] = useState<Statistic>({
     numberOfRequests: 0,
@@ -76,8 +88,17 @@ const Dashboard: React.FC = () => {
         console.log(response.data);
       });
 
+    axios
+      .get(`${BACKEND_URL}/api/v1/prayers/me?&page=1&limit=4`, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        setPrayerRequests(response.data);
+        console.log(response.data);
+      });
+
     setIsLoading(false);
-  }, []);
+  }, [user?.id]);
 
   const recentActivity = [
     {
@@ -237,6 +258,51 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
           )}
+
+          {/* prayer requests */}
+          {prayerRequests.length === 0 ? null : (
+            <div>
+              <h2 className="text-2xl font-bold text-[#3b3b19]">
+                My Prayer Requests
+              </h2>
+              <ScrollArea className="block md:hidden w-full overflow-y-visible">
+                <div className="flex mt-6 gap-6 w-max">
+                  {prayerRequests.map((prayerRequest) => (
+                    <PrayerRequestCard
+                      key={prayerRequest.id}
+                      id={parseInt(prayerRequest.id)}
+                      subject={prayerRequest.subject}
+                      body={truncateText(prayerRequest.body, 15)}
+                      isAnswered={prayerRequest.isAnswered}
+                      author={`${prayerRequest.requester.firstName} ${prayerRequest.requester.lastName}`}
+                      edited={prayerRequest.updatedAt}
+                      isPublic={prayerRequest.isPublic}
+                      edit
+                    />
+                  ))}
+                </div>
+                <br />
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
+
+              <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 mt-6 gap-6 w-full">
+                {prayerRequests.map((prayerRequest) => (
+                  <PrayerRequestCard
+                    key={prayerRequest.id}
+                    id={parseInt(prayerRequest.id)}
+                    subject={prayerRequest.subject}
+                    body={truncateText(prayerRequest.body, 15)}
+                    isAnswered={prayerRequest.isAnswered}
+                    author={`${prayerRequest.requester.firstName} ${prayerRequest.requester.lastName}`}
+                    edited={prayerRequest.updatedAt}
+                    isPublic={prayerRequest.isPublic}
+                    edit
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Recent Activity and Testimonies Side by Side */}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -80,7 +80,7 @@ const Navigation = () => {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link to="/prayer">
+                      <Link to="/prayers">
                         <div>
                           <p className="font-semibold">Prayer Requests</p>
                           <p className="text-gray-500 max-w-[10rem]">

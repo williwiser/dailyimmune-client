@@ -58,7 +58,7 @@ const Testimonies = () => {
             <h2 className="text-2xl font-bold text-[#3b3b19] mb-4">
               New Testimonies
             </h2>
-            <ScrollArea className="block md:hidden w-full overflow-y-visible">
+            <ScrollArea className="block  w-full overflow-y-visible">
               <div className="flex gap-6 w-max">
                 {newTestimonies.map((testimony: Testimony) => (
                   <TestimonyCard
