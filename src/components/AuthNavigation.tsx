@@ -1,13 +1,18 @@
 import { Link } from "react-router";
 import Container from "../layouts/Container";
+import { formatDistanceToNow } from "date-fns";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBars,
   faChevronDown,
   faChevronUp,
   faClose,
+  faDotCircle,
+  faHeart,
+  faMessage,
   faPray,
   faReceipt,
+  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import {
@@ -45,12 +50,24 @@ import {
 import axios from "axios";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
+interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  isRead: boolean;
+  type: string;
+  userId: string;
+  createdAt: Date;
+}
+
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const AuthNavigation = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [showCommunityMenu, setShowCommunityMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
@@ -79,6 +96,43 @@ const AuthNavigation = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    axios
+      .get(`${BACKEND_URL}/api/v1/notifications/unread-count`, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        setUnreadCount(response.data.unreadCount);
+      });
+  }, []);
+
+  useEffect(() => {
+    axios
+      .get(`${BACKEND_URL}/api/v1/notifications?limit=4`, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        setNotifications(response.data);
+      });
+  });
+
+  const handleNotificationCount = async () => {
+    console.log("hello boom");
+    setUnreadCount(0);
+    axios
+      .patch(
+        `${BACKEND_URL}/api/v1/notifications/mark-all-read`,
+        {},
+        { withCredentials: true }
+      )
+      .then(() => {
+        return;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <>
       <nav
@@ -97,7 +151,7 @@ const AuthNavigation = () => {
                     <Link to="/">Dashboard</Link>
                   </li>
                   <li>
-                    <DropdownMenu>
+                    <DropdownMenu modal={false}>
                       <DropdownMenuTrigger className="flex items-center gap-1 cursor-pointer">
                         <span>Community</span>
                         {"   "}
@@ -149,9 +203,93 @@ const AuthNavigation = () => {
               </ul>
             </div>
             <div className="hidden md:flex items-center justify-end space-x-4">
-              <Bell className="w-5 h-5 text-gray-600 hover:text-blue-600 cursor-pointer transition-colors" />
+              <DropdownMenu modal={false}>
+                <DropdownMenuTrigger
+                  className="flex items-center gap-1 cursor-pointer"
+                  asChild
+                >
+                  <button
+                    className="relative"
+                    onClick={handleNotificationCount}
+                  >
+                    <Bell className="w-5 h-5 text-gray-600 hover:text-gray-800 cursor-pointer transition-colors" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-2 -right-2 text-xs bg-red-600 text-white size-4 flex items-center justify-center rounded-full">
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
+                    )}
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="flex flex-col gap-4 bg-white border-none p-4 h-max w-full">
+                  <div className="flex flex-col h-full justify-between gap-5">
+                    {notifications.length === 0 ? (
+                      <div className="flex justify-center items-center text-sm text-gray-500 text-semibold">
+                        No new notifications
+                      </div>
+                    ) : (
+                      notifications.map((notification) => {
+                        return (
+                          <DropdownMenuItem asChild>
+                            <Link to="/testimonies">
+                              {(() => {
+                                switch (notification.type) {
+                                  case "like":
+                                    return (
+                                      <FontAwesomeIcon
+                                        icon={faHeart}
+                                        className="mr-4"
+                                      />
+                                    );
+                                  case "comment":
+                                    return (
+                                      <FontAwesomeIcon
+                                        icon={faMessage}
+                                        className="mr-4"
+                                      />
+                                    );
+                                  case "admin":
+                                    return (
+                                      <FontAwesomeIcon
+                                        icon={faUser}
+                                        className="mr-4"
+                                      />
+                                    );
+                                  default:
+                                    return (
+                                      <FontAwesomeIcon
+                                        icon={faDotCircle}
+                                        className="mr-4"
+                                      />
+                                    );
+                                }
+                              })()}
+                              <div>
+                                <p className="font-semibold text-sm">
+                                  {notification.title}
+                                </p>
+
+                                <p className="text-gray-500 text-xs max-w-[12rem]">
+                                  {notification.message}
+                                </p>
+
+                                <span className="text-gray-500 text-xs max-w-[12rem] italic">
+                                  {formatDistanceToNow(
+                                    new Date(notification.createdAt),
+                                    { addSuffix: true }
+                                  )}
+                                </span>
+                              </div>
+                            </Link>
+                          </DropdownMenuItem>
+                        );
+                      })
+                    )}
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               <Settings className="w-5 h-5 text-gray-600 hover:text-blue-600 cursor-pointer transition-colors" />
-              <DropdownMenu>
+              <DropdownMenu modal={false}>
                 <DropdownMenuTrigger>
                   <Avatar className="cursor-pointer">
                     <AvatarImage src={user?.profilePhoto} />

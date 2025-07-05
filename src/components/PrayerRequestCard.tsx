@@ -13,6 +13,7 @@ import { Button } from "./ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheckToSlot,
+  faClose,
   faHeart,
   faPray,
 } from "@fortawesome/free-solid-svg-icons";
@@ -40,6 +41,8 @@ const PrayerRequestCard = ({
 }: TestimonyCardProps) => {
   const [showPrayer, setShowPrayer] = useState(false);
   const [prayerAnswered, setPrayerAnswered] = useState(isAnswered);
+  const [prayingForYou, setPrayingForYou] = useState(false);
+  const [prayingCount, setPrayingCount] = useState(0);
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const handleAnsweredPrayer = () => {
@@ -52,6 +55,18 @@ const PrayerRequestCard = ({
       )
       .then((response) => console.log(response.data))
       .catch(() => setPrayerAnswered((prev) => !prev));
+  };
+
+  const handlePrayingForYou = () => {
+    setPrayingForYou((prev) => !prev);
+    setPrayingCount((prev) => (prayingForYou ? prev - 1 : prev + 1));
+    axios
+      .post(
+        `${BACKEND_URL}/api/v1/prayers/new-prayer-interaction/${id}`,
+        {},
+        { withCredentials: true }
+      )
+      .then((response) => console.log(response.data));
   };
 
   const handleRemove = () => {
@@ -139,7 +154,7 @@ const PrayerRequestCard = ({
             <div className="flex justify-between">
               <p className="text-xs">
                 <FontAwesomeIcon icon={faHeart} className="text-gray-500" />{" "}
-                <span className="text-gray-500">0 Praying</span>
+                <span className="text-gray-500">{prayingCount} Praying</span>
               </p>
               <p className="text-xs text-gray-500">
                 {new Date(edited).toLocaleDateString()}
@@ -157,8 +172,12 @@ const PrayerRequestCard = ({
                   <FontAwesomeIcon icon={faCheckToSlot} /> Answered
                 </Button>
               )
+            ) : prayingForYou ? (
+              <Button onClick={handlePrayingForYou}>
+                <FontAwesomeIcon icon={faClose} /> Remove from prayer list
+              </Button>
             ) : (
-              <Button>
+              <Button onClick={handlePrayingForYou}>
                 <FontAwesomeIcon icon={faHeart} /> Praying for you
               </Button>
             )}
