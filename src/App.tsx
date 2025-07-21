@@ -26,7 +26,6 @@ import LoggedInLayout from "./layouts/LoggedInLayout";
 import Dashboard from "./pages/Dash2";
 import MyTestimonies from "./pages/MyTestimonies";
 import MyPrayerRequests from "./pages/MyPrayerRequests";
-import Blocked from "./pages/Blocked";
 
 const router = createBrowserRouter([
   {
@@ -59,10 +58,6 @@ const router = createBrowserRouter([
           {
             path: "/forum",
             element: <Forum />,
-          },
-          {
-            path: "/blocked",
-            element: <Blocked />,
           },
         ],
       },
