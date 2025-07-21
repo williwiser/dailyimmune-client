@@ -5,6 +5,7 @@ export interface User {
   lastName: string;
   email: string;
   profilePhoto: string;
+  bio: string;
 }
 
 export interface AuthContextType {

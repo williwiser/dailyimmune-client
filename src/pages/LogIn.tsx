@@ -36,9 +36,7 @@ const LogIn = () => {
     onError: (errorResponse) => console.log(errorResponse),
   });
   const [isLoading, setIsLoading] = useState(false);
-
   const { user, setUser } = useAuth();
-
   const navigate = useNavigate();
 
   const handleGoogleLogIn = () => {

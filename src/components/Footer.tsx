@@ -16,7 +16,7 @@ const Footer = () => {
         <div className="text-white p-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <ul>
-              <img src="logo_white.png" className="max-w-[10rem] mb-3" />
+              <img src="/logo_white.png" className="max-w-[10rem] mb-3" />
               <p>
                 A Christian community dedicated to sharing faith, encouragement,
                 and fellowship.

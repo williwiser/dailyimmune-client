@@ -11,7 +11,6 @@ import {
   faUserGroup,
 } from "@fortawesome/free-solid-svg-icons";
 import CommunityCard from "@/components/CommunityCard";
-import FloatingChatWidget from "@/components/FloatingChatWidget";
 import { ArrowRight, BookOpen, Calendar, Heart, User } from "lucide-react";
 import SlideIn from "@/components/SlideIn";
 
@@ -541,7 +540,6 @@ const Home = () => {
           </Link>
         </div>
       </Section>
-      <FloatingChatWidget />
     </>
   );
 };

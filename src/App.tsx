@@ -13,7 +13,6 @@ import Forum from "./pages/Forum";
 import VerifyToken from "./pages/VerifyToken";
 import ActivationLink from "./pages/ActivationLink";
 import AuthProvider from "./context/AuthProvider";
-import Dash2 from "./pages/Dash2";
 import DashboardLayout from "./layouts/DashboardLayout";
 import ArticleEditor from "./pages/ArticleEditor";
 import Article from "./pages/Article";
@@ -23,6 +22,11 @@ import UniversalLayout from "./layouts/UniversalLayout";
 import PrayerRequests from "./pages/PrayerRequests";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import ScrollToTopLayout from "./components/ScrollToTopLayout";
+import LoggedInLayout from "./layouts/LoggedInLayout";
+import Dashboard from "./pages/Dash2";
+import MyTestimonies from "./pages/MyTestimonies";
+import MyPrayerRequests from "./pages/MyPrayerRequests";
+import Blocked from "./pages/Blocked";
 
 const router = createBrowserRouter([
   {
@@ -56,6 +60,10 @@ const router = createBrowserRouter([
             path: "/forum",
             element: <Forum />,
           },
+          {
+            path: "/blocked",
+            element: <Blocked />,
+          },
         ],
       },
       {
@@ -73,7 +81,17 @@ const router = createBrowserRouter([
         path: "dashboard",
         element: <DashboardLayout />,
         children: [
-          { index: true, element: <Dash2 /> },
+          { index: true, element: <Dashboard /> },
+          { path: "testimonies/me", element: <MyTestimonies /> },
+          { path: "testimonies/saved", element: <MyTestimonies /> },
+          { path: "prayer-requests/me", element: <MyPrayerRequests /> },
+          { path: "events/me", element: <MyTestimonies /> },
+        ],
+      },
+      {
+        path: "dashboard",
+        element: <LoggedInLayout />,
+        children: [
           { path: "testimonies", element: <Testimonies /> },
           { path: "testimonies/new", element: <ArticleEditor /> },
           { path: "testimonies/:id/edit", element: <ArticleEditor /> },

@@ -18,11 +18,11 @@ import { useEffect, useState } from "react";
 import {
   Bell,
   Heart,
+  HelpCircleIcon,
   LayoutDashboard,
   LogOut,
   MessageCircle,
   ReceiptText,
-  Settings,
   ShoppingBag,
   User,
   Users,
@@ -61,6 +61,10 @@ interface Notification {
 }
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+interface BlockData {
+  reason: string;
+  comment: string;
+}
 
 const AuthNavigation = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -69,6 +73,11 @@ const AuthNavigation = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [blockData, setBlockData] = useState<BlockData>({
+    reason: "",
+    comment: "",
+  });
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
 
@@ -104,6 +113,15 @@ const AuthNavigation = () => {
       .then((response) => {
         setUnreadCount(response.data.unreadCount);
       });
+
+    axios
+      .get(`${BACKEND_URL}/api/v1/users/block-status`, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        setBlockData(response.data);
+        setIsBlocked(response.data.blocked);
+      });
   }, []);
 
   useEffect(() => {
@@ -117,7 +135,6 @@ const AuthNavigation = () => {
   });
 
   const handleNotificationCount = async () => {
-    console.log("hello boom");
     setUnreadCount(0);
     axios
       .patch(
@@ -135,6 +152,28 @@ const AuthNavigation = () => {
 
   return (
     <>
+      <AlertDialog open={isBlocked} onOpenChange={setIsBlocked}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Your account has been blocked</AlertDialogTitle>
+            <AlertDialogDescription>
+              Our administrator(s) have blocked your account for the following
+              violation:{" "}
+              <span className="font-semibold">{blockData.reason}</span>{" "}
+              <br></br>
+              <br></br>
+              <span className="italic">
+                {blockData.comment && `Comment: ${blockData.comment}`}
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={handleSignOut}>
+              Log Out
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <nav
         className={`fixed w-full z-20 text-lg text-[#747474] border-b transition-all duration-300 bg-white ${
           isScrolled ? "shadow-sm " : "shadow-none"
@@ -143,7 +182,7 @@ const AuthNavigation = () => {
         <Container>
           <div className="flex justify-between items-center">
             <div className="flex items-center">
-              <img src="logo_trimmed.webp" className="h-16" alt="logo" />
+              <img src="/logo_trimmed.webp" className="h-16" alt="logo" />
               <div className="hidden md:block border-r-2 h-[2.3rem] mx-6"></div>
               <ul>
                 <ul className="hidden md:flex justify-center gap-6">
@@ -288,7 +327,7 @@ const AuthNavigation = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <Settings className="w-5 h-5 text-gray-600 hover:text-blue-600 cursor-pointer transition-colors" />
+              <HelpCircleIcon className="w-5 h-5 text-gray-600 hover:text-blue-600 cursor-pointer transition-colors" />
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger>
                   <Avatar className="cursor-pointer">

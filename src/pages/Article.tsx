@@ -118,7 +118,7 @@ const Article = () => {
         setIsLoading(false);
         setTestimony(response.data);
       });
-  }, [id, testimony, liked]);
+  }, [id]);
   console.log(testimony.thumbnail);
   return (
     <div>
