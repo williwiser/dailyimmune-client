@@ -63,7 +63,7 @@ const Testimonies = () => {
                 {newTestimonies.map((testimony: Testimony) => (
                   <TestimonyCard
                     key={testimony.id}
-                    id={parseInt(testimony.id)}
+                    id={testimony.id}
                     thumbnail={testimony.thumbnail}
                     title={testimony.title}
                     body={truncateText(testimony.body, 15)}

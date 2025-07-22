@@ -56,7 +56,7 @@ const PrayerRequests = () => {
             >
               <PrayerRequestCard
                 key={prayerRequest.id}
-                id={parseInt(prayerRequest.id)}
+                id={prayerRequest.id}
                 subject={prayerRequest.subject}
                 author={`${prayerRequest.requester.firstName} ${prayerRequest.requester.lastName}`}
                 body={truncateText(prayerRequest.body, 15)}
