@@ -15,6 +15,9 @@ import axios from "axios";
 import Loader from "@/components/Loader";
 import { Avatar } from "@radix-ui/react-avatar";
 import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import { slugify } from "@/utils/slugify";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -294,23 +297,35 @@ const Dashboard: React.FC = () => {
                     <Link
                       to={
                         activity.type === "testimony"
-                          ? `/testimonies/${activity.id.split("-")[1]}`
+                          ? `/testimonies/${
+                              activity.id.split("-")[1]
+                            }/${slugify(activity.content)}`
                           : activity.type === "prayerRequest"
                           ? "/prayers"
                           : "/"
                       }
-                      className="flex flex-col p-4 border-b g-[#eae7dd] rounded-md hover:bg-gray-50 transition-colors duration-200"
+                      className="flex flex-col p-4 border-b g-[#eae7dd] hover:bg-gray-50 transition-colors duration-200 sm:h-56"
                     >
                       <div className="flex gap-2 mb-2">
                         <Avatar className="cursor-pointer size-10">
-                          <AvatarImage src={activity.authorPhoto} />
+                          <AvatarImage
+                            src={activity.authorPhoto}
+                            className="rounded-full"
+                          />
                           <AvatarFallback>
                             {activity.authorName[0]}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-semibold text-[#3b3b19] text-sm">
-                            {activity.authorName}
+                          <p className="text-[#3b3b19] text-sm">
+                            <span className="font-semibold">
+                              {activity.authorName}
+                            </span>{" "}
+                            {activity.type === "prayerRequest" && (
+                              <span className="text-gray-500 italic">
+                                submitted a prayer request
+                              </span>
+                            )}
                           </p>
                           <span className="text-sm text-[#747474]">
                             {formatDistanceToNow(new Date(activity.createdAt), {
@@ -320,16 +335,21 @@ const Dashboard: React.FC = () => {
                         </div>
                       </div>
                       <div className="flex flex-col sm:flex-row justify-between gap-4">
-                        <div className="w-full">
-                          <div className="flex flex-col justify-between mb-1">
-                            <h1 className="font-bold text-lg">
-                              {activity.content}
-                            </h1>
-                            {activity.type === "testimony" ? (
-                              <p className="mb-4 text-sm text-gray-500 text-pretty">
-                                {activity.extra?.body}
-                              </p>
+                        <div className="flex-1">
+                          <div className="flex flex-col mb-1 h-full">
+                            {activity.type === "prayerRequest" ? (
+                              <h1 className="font-bold text-lg mb-1 ">
+                                Prayer Request: {activity.content}
+                              </h1>
+                            ) : activity.type === "testimony" ? (
+                              <h1 className="font-bold text-lg mb-1">
+                                {activity.content}
+                              </h1>
                             ) : null}
+
+                            <p className="mb-4 sm:mb-0 text-sm text-gray-500 text-pretty">
+                              {activity.extra?.body}
+                            </p>
                           </div>
                           <div className="flex gap-4 mt-auto">
                             <button className="cursor-pointer text-gray-400 hover:text-gray-600 transition-all duration-200">
@@ -343,7 +363,15 @@ const Dashboard: React.FC = () => {
                             </button>
                           </div>
                         </div>
-                        {activity.thumbnail ? (
+                        {activity.type === "prayerRequest" ? (
+                          <div className="hidden sm:flex justify-center items-center bg-stone-200 size-full sm:size-28 rounded-md">
+                            <FontAwesomeIcon
+                              icon={faHeart}
+                              className="text-2xl"
+                              color="#44403b"
+                            />
+                          </div>
+                        ) : activity.thumbnail ? (
                           <img
                             src={activity.thumbnail}
                             className="w-full h-full sm:w-28 sm:h-28 object-cover rounded-md"

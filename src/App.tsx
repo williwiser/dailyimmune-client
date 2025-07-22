@@ -26,6 +26,7 @@ import LoggedInLayout from "./layouts/LoggedInLayout";
 import Dashboard from "./pages/Dash2";
 import MyTestimonies from "./pages/MyTestimonies";
 import MyPrayerRequests from "./pages/MyPrayerRequests";
+import { Events } from "./pages/Events";
 
 const router = createBrowserRouter([
   {
@@ -68,7 +69,7 @@ const router = createBrowserRouter([
             path: "/testimonies",
             element: <Testimonies />,
           },
-          { path: "testimonies/:id", element: <Article /> },
+          { path: "testimonies/:id/:slug", element: <Article /> },
           { path: "prayers", element: <PrayerRequests /> },
         ],
       },
@@ -80,7 +81,7 @@ const router = createBrowserRouter([
           { path: "testimonies/me", element: <MyTestimonies /> },
           { path: "testimonies/saved", element: <MyTestimonies /> },
           { path: "prayer-requests/me", element: <MyPrayerRequests /> },
-          { path: "events/me", element: <MyTestimonies /> },
+          { path: "events/me", element: <Events /> },
         ],
       },
       {

@@ -51,6 +51,7 @@ const Article = () => {
     authorId: "",
     body: "",
     likes: 0,
+    thumbnail: "",
     createdAt: undefined,
     user: { id: "", firstName: "", lastName: "" },
     likedByUser: false,
@@ -125,7 +126,7 @@ const Article = () => {
       <Toaster />
       <Header
         title=""
-        className={`bg-[url("${testimony.thumbnail}")] bg-stone-100 bg-cover h-56`}
+        className={`bg-stone-100 bg-[url(${testimony.thumbnail})]  bg-cover h-56`}
       />
       {isLoading ? (
         <Loader />

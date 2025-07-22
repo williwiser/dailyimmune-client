@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { useAuth } from "@/context/useAuth";
 import { useEffect, useState, type ChangeEvent } from "react";
+import { toast } from "sonner";
 
 type User = {
   id: string;
@@ -33,6 +34,23 @@ const MyTestimonies = () => {
     if (words.length <= wordLimit) return text;
 
     return words.slice(0, wordLimit).join(" ") + "...";
+  };
+
+  const handleDelete = (postId: string) => {
+    axios
+      .delete(`${BACKEND_URL}/api/v1/testimonies/${postId}`, {
+        withCredentials: true,
+      })
+      .then(() => {
+        setTestimonies((prev) =>
+          prev.filter((post: Testimony) => post.id !== postId)
+        );
+        toast.success("Testimony removed successfully");
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error("Testimony could not be deleted");
+      });
   };
 
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
@@ -75,13 +93,13 @@ const MyTestimonies = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           {testimonies.length === 0 ? (
-            <p className="text-gray-500">No testimonies</p>
+            <p className="text-gray-500 px-4">No testimonies</p>
           ) : (
             testimonies.map((testimony: Testimony) => (
               <div className="flex justify-center">
                 <TestimonyCard
                   key={testimony.id}
-                  id={parseInt(testimony.id)}
+                  id={testimony.id}
                   thumbnail={testimony.thumbnail}
                   title={testimony.title}
                   body={truncateText(testimony.body, 15)}
@@ -89,6 +107,7 @@ const MyTestimonies = () => {
                   author={`${testimony.user.firstName} ${testimony.user.lastName}`}
                   status={testimony.status}
                   edit
+                  onDelete={handleDelete}
                 />
               </div>
             ))

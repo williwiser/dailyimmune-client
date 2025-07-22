@@ -19,7 +19,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 interface TestimonyCardProps {
-  id: number;
+  id: string;
   author: string;
   subject: string;
   body: string;
@@ -27,6 +27,7 @@ interface TestimonyCardProps {
   isAnswered: boolean;
   isPublic?: boolean;
   edit?: boolean;
+  onDelete?: (id: string) => void;
 }
 
 const PrayerRequestCard = ({
@@ -38,6 +39,7 @@ const PrayerRequestCard = ({
   isAnswered,
   isPublic,
   edit,
+  onDelete,
 }: TestimonyCardProps) => {
   const [showPrayer, setShowPrayer] = useState(false);
   const [prayerAnswered, setPrayerAnswered] = useState(isAnswered);
@@ -69,16 +71,12 @@ const PrayerRequestCard = ({
       .then((response) => console.log(response.data));
   };
 
-  const handleRemove = () => {
-    axios
-      .delete(`${BACKEND_URL}/api/v1/prayers/${id}`, { withCredentials: true })
-      .then((response) => {
-        console.log(response.data);
-        setShowPrayer(false);
-      });
+  const handleDelete = () => {
+    if (onDelete) onDelete(id);
   };
+
   return (
-    <div className="bg-white overflow-hidden rounded-md shadow-md border transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl max-w-[18rem]">
+    <div className="bg-white overflow-hidden rounded-md border transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl w-[18rem]">
       <div className="p-4 h-60 flex flex-col gap-3">
         <div>
           <div
@@ -182,7 +180,7 @@ const PrayerRequestCard = ({
               </Button>
             )}
             {edit ? (
-              <Button variant="ghost" onClick={handleRemove}>
+              <Button variant="ghost" onClick={handleDelete}>
                 Remove
               </Button>
             ) : null}
