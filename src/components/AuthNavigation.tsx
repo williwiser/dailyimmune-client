@@ -338,7 +338,7 @@ const AuthNavigation = () => {
 
                 <DropdownMenuContent className="p-2">
                   <DropdownMenuItem asChild>
-                    <Link to="profile">
+                    <Link to="profile/me">
                       <div className="flex gap-2">
                         <User />
                         <span>Profile</span>
@@ -547,7 +547,7 @@ const AuthNavigation = () => {
                 <Link
                   className="flex justify-between items-center size-full p-4"
                   onClick={() => setShowMenu(false)}
-                  to="/dashboard/profile"
+                  to="/dashboard/profile/me"
                 >
                   <div className="flex pl-10 gap-4 items-center">
                     <User />

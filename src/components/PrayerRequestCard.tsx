@@ -1,22 +1,7 @@
 import { Edit2, Globe2, Lock } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { useState } from "react";
 import axios from "axios";
-import { Button } from "./ui/button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCheckToSlot,
-  faClose,
-  faHeart,
-  faPray,
-} from "@fortawesome/free-solid-svg-icons";
+import { PrayerModal } from "./PrayerModal";
 
 interface TestimonyCardProps {
   id: string;
@@ -129,64 +114,21 @@ const PrayerRequestCard = ({
           </button>
         </div>
       </div>
-      <Dialog open={showPrayer} onOpenChange={setShowPrayer}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{subject}</DialogTitle>
-            <DialogDescription>
-              <span
-                className={`${
-                  prayerAnswered
-                    ? "bg-lime-400/50 border border-lime-600 text-lime-900"
-                    : "bg-amber-400/50 border border-amber-600 text-amber-900"
-                } text-xs py-1 px-1.5 rounded-full font-semibold w-fit inline-flex justify-center items-center mb-3 mt-1`}
-              >
-                {prayerAnswered ? "Answered" : "Still needs prayer"}
-              </span>
-              <p className="italic">Submitted by {author}</p>
-            </DialogDescription>
-          </DialogHeader>
-          <hr />
-          <div>
-            <p className="text-gray-500 mb-4">{body}</p>
-            <div className="flex justify-between">
-              <p className="text-xs">
-                <FontAwesomeIcon icon={faHeart} className="text-gray-500" />{" "}
-                <span className="text-gray-500">{prayingCount} Praying</span>
-              </p>
-              <p className="text-xs text-gray-500">
-                {new Date(edited).toLocaleDateString()}
-              </p>
-            </div>
-          </div>
-          <DialogFooter>
-            {edit ? (
-              prayerAnswered ? (
-                <Button onClick={handleAnsweredPrayer}>
-                  <FontAwesomeIcon icon={faPray} /> Still need prayer
-                </Button>
-              ) : (
-                <Button onClick={handleAnsweredPrayer}>
-                  <FontAwesomeIcon icon={faCheckToSlot} /> Answered
-                </Button>
-              )
-            ) : prayingForYou ? (
-              <Button onClick={handlePrayingForYou}>
-                <FontAwesomeIcon icon={faClose} /> Remove from prayer list
-              </Button>
-            ) : (
-              <Button onClick={handlePrayingForYou}>
-                <FontAwesomeIcon icon={faHeart} /> Praying for you
-              </Button>
-            )}
-            {edit ? (
-              <Button variant="ghost" onClick={handleDelete}>
-                Remove
-              </Button>
-            ) : null}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <PrayerModal
+        open={showPrayer}
+        onOpenChange={setShowPrayer}
+        id={id}
+        subject={subject}
+        body={body}
+        author={author}
+        edited={edited}
+        prayingCount={prayingCount}
+        prayerAnswered={prayerAnswered}
+        onDelete={handleDelete}
+        onAnsweredPrayer={handleAnsweredPrayer}
+        onPrayingForYou={handlePrayingForYou}
+        edit
+      />
     </div>
   );
 };

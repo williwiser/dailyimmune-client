@@ -27,6 +27,7 @@ import Dashboard from "./pages/Dash2";
 import MyTestimonies from "./pages/MyTestimonies";
 import MyPrayerRequests from "./pages/MyPrayerRequests";
 import { Events } from "./pages/Events";
+import ManageProfile from "./pages/ManageProfile";
 
 const router = createBrowserRouter([
   {
@@ -71,6 +72,7 @@ const router = createBrowserRouter([
           },
           { path: "testimonies/:id/:slug", element: <Article /> },
           { path: "prayers", element: <PrayerRequests /> },
+          { path: "profile/:id", element: <Profile /> },
         ],
       },
       {
@@ -92,7 +94,7 @@ const router = createBrowserRouter([
           { path: "testimonies/new", element: <ArticleEditor /> },
           { path: "testimonies/:id/edit", element: <ArticleEditor /> },
           { path: "prayer", element: <SubmitPrayerRequest /> },
-          { path: "profile", element: <Profile /> },
+          { path: "profile/me", element: <ManageProfile /> },
         ],
       },
       { path: "/signup", element: <SignUp /> },

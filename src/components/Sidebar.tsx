@@ -34,7 +34,7 @@ const Sidebar = () => {
           <p className="text-sm text-gray-500">{user?.email}</p>
 
           <Button
-            onClick={() => navigate("/dashboard/profile")}
+            onClick={() => navigate("/dashboard/profile/me")}
             className="inline-flex gap-2 mt-4 w-full"
             variant="outline"
           >

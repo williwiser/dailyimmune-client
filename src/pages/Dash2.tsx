@@ -18,6 +18,7 @@ import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import { slugify } from "@/utils/slugify";
+import { PrayerModal } from "@/components/PrayerModal";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -39,7 +40,7 @@ type Testimony = {
 interface PrayerRequest {
   id: string;
   subject: string;
-  body: string;
+  body?: string;
   updatedAt: Date;
   requester: User;
   isAnswered: boolean;
@@ -48,6 +49,16 @@ interface PrayerRequest {
 }
 
 const Dashboard: React.FC = () => {
+  const [showPrayerModal, setShowPrayerModal] = useState(false);
+  const [selectedPrayer, setSelectedPrayer] = useState<PrayerRequest>({
+    id: "",
+    subject: "",
+    body: "",
+    updatedAt: new Date(),
+    requester: { id: "", firstName: "", lastName: "" },
+    isAnswered: false,
+    isPublic: false,
+  });
   const [, setTestimonies] = useState<Testimony[]>([]);
   const [, setPrayerRequests] = useState<PrayerRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -56,6 +67,7 @@ const Dashboard: React.FC = () => {
     type: string;
     authorName: string;
     authorPhoto?: string;
+    authorId: string;
     createdAt: string;
     content: string;
     thumbnail?: string;
@@ -70,12 +82,7 @@ const Dashboard: React.FC = () => {
   const [, setDrafts] = useState<Testimony[]>([]);
 
   const { user } = useAuth();
-  // const truncateText = (text: string, wordLimit: number) => {
-  //   const words = text.split(" ");
-  //   if (words.length <= wordLimit) return text;
 
-  //   return words.slice(0, wordLimit).join(" ") + "...";
-  // };
   useEffect(() => {
     axios
       .get(`${BACKEND_URL}/api/v1/testimonies/drafts?page=1&limit=4`, {
@@ -119,144 +126,20 @@ const Dashboard: React.FC = () => {
   ) : (
     <div className="min-h-screen g-[#eae7dd]">
       <div className="max-w-7xl mx-auto space-y-2">
-        {/*
-            {testimonies.length === 0 && drafts.length === 0 ? (
-              <div className="bg-white p-6 rounded-md border border-stone-300">
-                <h2 className="text-2xl font-bold text-[#3b3b19]">
-                  My Testimonies
-                </h2>
-                <p className=" text-[#747474] mt-6">
-                  Your testimonies will appear here.
-                </p>
-              </div>
-            ) : null}
-            
-            {drafts.length === 0 ? null : (
-              <div>
-                <h2 className="text-2xl font-bold text-[#3b3b19]">My Drafts</h2>
-                <ScrollArea className="block md:hidden w-full overflow-y-visible">
-                  <div className="flex mt-6 gap-6 w-max">
-                    {drafts.map((draft) => (
-                      <TestimonyCard
-                        key={draft.id}
-                        id={parseInt(draft.id)}
-                        thumbnail={draft.thumbnail}
-                        title={draft.title}
-                        body={truncateText(draft.body, 15)}
-                        edited={draft.updatedAt}
-                        author={`${draft.user.firstName} ${draft.user.lastName}`}
-                        status={draft.status}
-                        edit={draft.user.id == user?.id}
-                      />
-                    ))}
-                  </div>
-                  <br />
-                  <ScrollBar orientation="horizontal" />
-                </ScrollArea>
-
-                <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 mt-6 gap-6 w-full">
-                  {drafts.map((testimony) => (
-                    <TestimonyCard
-                      key={testimony.id}
-                      id={parseInt(testimony.id)}
-                      thumbnail={testimony.thumbnail}
-                      title={testimony.title}
-                      body={truncateText(testimony.body, 15)}
-                      edited={testimony.updatedAt}
-                      author={`${testimony.user.firstName} ${testimony.user.lastName}`}
-                      status={testimony.status}
-                      edit={testimony.user.id == user?.id}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-           
-            {testimonies.length === 0 ? null : (
-              <div>
-                <h2 className="text-2xl font-bold text-[#3b3b19]">
-                  My Testimonies
-                </h2>
-                <ScrollArea className="block md:hidden w-full overflow-y-visible">
-                  <div className="flex mt-6 gap-6 w-max">
-                    {testimonies.map((testimony) => (
-                      <TestimonyCard
-                        key={testimony.id}
-                        id={parseInt(testimony.id)}
-                        thumbnail={testimony.thumbnail}
-                        title={testimony.title}
-                        body={truncateText(testimony.body, 15)}
-                        edited={testimony.updatedAt}
-                        author={`${testimony.user.firstName} ${testimony.user.lastName}`}
-                        status={testimony.status}
-                        edit={testimony.user.id == user?.id}
-                      />
-                    ))}
-                  </div>
-                  <br />
-                  <ScrollBar orientation="horizontal" />
-                </ScrollArea>
-
-                <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 mt-6 gap-6 w-full">
-                  {testimonies.map((testimony) => (
-                    <TestimonyCard
-                      key={testimony.id}
-                      id={parseInt(testimony.id)}
-                      thumbnail={testimony.thumbnail}
-                      title={testimony.title}
-                      body={truncateText(testimony.body, 15)}
-                      edited={testimony.updatedAt}
-                      author={`${testimony.user.firstName} ${testimony.user.lastName}`}
-                      status={testimony.status}
-                      edit={testimony.user.id == user?.id}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {prayerRequests.length === 0 ? null : (
-              <div>
-                <h2 className="text-2xl font-bold text-[#3b3b19]">
-                  My Prayer Requests
-                </h2>
-                <ScrollArea className="block md:hidden w-full overflow-y-visible">
-                  <div className="flex mt-6 gap-6 w-max">
-                    {prayerRequests.map((prayerRequest) => (
-                      <PrayerRequestCard
-                        key={prayerRequest.id}
-                        id={parseInt(prayerRequest.id)}
-                        subject={prayerRequest.subject}
-                        body={truncateText(prayerRequest.body, 15)}
-                        isAnswered={prayerRequest.isAnswered}
-                        author={`${prayerRequest.requester.firstName} ${prayerRequest.requester.lastName}`}
-                        edited={prayerRequest.updatedAt}
-                        isPublic={prayerRequest.isPublic}
-                        edit
-                      />
-                    ))}
-                  </div>
-                  <br />
-                  <ScrollBar orientation="horizontal" />
-                </ScrollArea>
-
-                <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 mt-6 gap-6 w-full">
-                  {prayerRequests.map((prayerRequest) => (
-                    <PrayerRequestCard
-                      key={prayerRequest.id}
-                      id={parseInt(prayerRequest.id)}
-                      subject={prayerRequest.subject}
-                      body={truncateText(prayerRequest.body, 15)}
-                      isAnswered={prayerRequest.isAnswered}
-                      author={`${prayerRequest.requester.firstName} ${prayerRequest.requester.lastName}`}
-                      edited={prayerRequest.updatedAt}
-                      isPublic={prayerRequest.isPublic}
-                      edit
-                    />
-                  ))}
-                </div>
-              </div>
-            )} */}
+        <PrayerModal
+          open={showPrayerModal}
+          onOpenChange={setShowPrayerModal}
+          id={selectedPrayer.id}
+          subject={selectedPrayer.subject}
+          body={selectedPrayer.body}
+          author={`${selectedPrayer.requester.firstName} ${selectedPrayer.requester.lastName}`}
+          edited={selectedPrayer.updatedAt}
+          prayingCount={0}
+          prayerAnswered={selectedPrayer.isAnswered}
+          // onDelete={handleDelete}
+          // onAnsweredPrayer={handleAnsweredPrayer}
+          // onPrayingForYou={handlePrayingForYou}
+        />
 
         {/* Recent Activity and Testimonies Side by Side */}
 
@@ -294,18 +177,7 @@ const Dashboard: React.FC = () => {
 
                 <div className="space-y-4">
                   {feed.map((activity) => (
-                    <Link
-                      to={
-                        activity.type === "testimony"
-                          ? `/testimonies/${
-                              activity.id.split("-")[1]
-                            }/${slugify(activity.content)}`
-                          : activity.type === "prayerRequest"
-                          ? "/prayers"
-                          : "/"
-                      }
-                      className="flex flex-col p-4 border-b g-[#eae7dd] hover:bg-gray-50 transition-colors duration-200 sm:h-56"
-                    >
+                    <div className="flex flex-col p-4 border-b g-[#eae7dd]transition-colors duration-200 sm:h-56">
                       <div className="flex gap-2 mb-2">
                         <Avatar className="cursor-pointer size-10">
                           <AvatarImage
@@ -318,9 +190,14 @@ const Dashboard: React.FC = () => {
                         </Avatar>
                         <div>
                           <p className="text-[#3b3b19] text-sm">
-                            <span className="font-semibold">
-                              {activity.authorName}
-                            </span>{" "}
+                            <Link
+                              to={`/profile/${activity.authorId}`}
+                              className="hover:underline"
+                            >
+                              <span className="font-semibold">
+                                {activity.authorName}
+                              </span>
+                            </Link>{" "}
                             {activity.type === "prayerRequest" && (
                               <span className="text-gray-500 italic">
                                 submitted a prayer request
@@ -338,13 +215,48 @@ const Dashboard: React.FC = () => {
                         <div className="flex-1">
                           <div className="flex flex-col mb-1 h-full">
                             {activity.type === "prayerRequest" ? (
-                              <h1 className="font-bold text-lg mb-1 ">
-                                Prayer Request: {activity.content}
-                              </h1>
+                              <button
+                                onClick={() => {
+                                  setSelectedPrayer({
+                                    id: activity.id.split("-")[1],
+                                    subject: activity.content,
+                                    isAnswered: false,
+                                    body: activity.extra?.body,
+                                    updatedAt: new Date(activity.createdAt),
+                                    isPublic: true,
+                                    requester: {
+                                      id: activity.authorId,
+                                      firstName:
+                                        activity.authorName.split(" ")[0],
+                                      lastName:
+                                        activity.authorName.split(" ")[1],
+                                    },
+                                  });
+                                  setShowPrayerModal(true);
+                                }}
+                                className="hover:underline hover:text-gray-700 transition-all duration-200 cursor-pointer text-left"
+                              >
+                                <h1 className="font-bold text-lg mb-1 ">
+                                  Prayer Request: {activity.content}
+                                </h1>
+                              </button>
                             ) : activity.type === "testimony" ? (
-                              <h1 className="font-bold text-lg mb-1">
-                                {activity.content}
-                              </h1>
+                              <Link
+                                to={
+                                  activity.type === "testimony"
+                                    ? `/testimonies/${
+                                        activity.id.split("-")[1]
+                                      }/${slugify(activity.content)}`
+                                    : activity.type === "prayerRequest"
+                                    ? "/prayers"
+                                    : "/"
+                                }
+                                className="hover:underline hover:text-gray-700 transition-all duration-200"
+                              >
+                                <h1 className="font-bold text-lg mb-1">
+                                  {activity.content}
+                                </h1>
+                              </Link>
                             ) : null}
 
                             <p className="mb-4 sm:mb-0 text-sm text-gray-500 text-pretty">
@@ -372,18 +284,44 @@ const Dashboard: React.FC = () => {
                             />
                           </div>
                         ) : activity.thumbnail ? (
-                          <img
-                            src={activity.thumbnail}
-                            className="w-full h-full sm:w-28 sm:h-28 object-cover rounded-md"
-                          />
+                          <Link
+                            to={
+                              activity.type === "testimony"
+                                ? `/testimonies/${
+                                    activity.id.split("-")[1]
+                                  }/${slugify(activity.content)}`
+                                : activity.type === "prayerRequest"
+                                ? "/prayers"
+                                : "/"
+                            }
+                            className="hover:underline hover:text-gray-700 transition-all duration-200"
+                          >
+                            <img
+                              src={activity.thumbnail}
+                              className="w-full h-full sm:w-28 sm:h-28 object-cover rounded-md"
+                            />
+                          </Link>
                         ) : (
-                          <img
-                            src="/placeholder.jpg"
-                            className="w-full h-full sm:w-28 sm:h-28 object-cover rounded-md"
-                          />
+                          <Link
+                            to={
+                              activity.type === "testimony"
+                                ? `/testimonies/${
+                                    activity.id.split("-")[1]
+                                  }/${slugify(activity.content)}`
+                                : activity.type === "prayerRequest"
+                                ? "/prayers"
+                                : "/"
+                            }
+                            className="hover:underline hover:text-gray-700 transition-all duration-200"
+                          >
+                            <img
+                              src="/placeholder.jpg"
+                              className="w-full h-full sm:w-28 sm:h-28 object-cover rounded-md"
+                            />
+                          </Link>
                         )}
                       </div>
-                    </Link>
+                    </div>
                   ))}
                 </div>
                 <div className="mt-6 text-center">

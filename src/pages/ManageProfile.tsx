@@ -4,12 +4,13 @@ import Container from "@/layouts/Container";
 import Header from "@/layouts/Header";
 import Section from "@/layouts/Section";
 import axios from "axios";
+import { Edit2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-const Profile = () => {
+const ManageProfile = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState({
     id: "",
@@ -24,7 +25,7 @@ const Profile = () => {
   const [joined, setJoined] = useState("");
   useEffect(() => {
     axios
-      .get(`${BACKEND_URL}/api/v1/users/profile/${id}`, {
+      .get(`${BACKEND_URL}/api/v1/users/me`, {
         withCredentials: true,
       })
       .then((response) => {
@@ -41,7 +42,11 @@ const Profile = () => {
   }, [id]);
   return (
     <div>
-      <Header className="bg-[url(/vines.webp)] bg-stone-100 bg-contain" />
+      <Header
+        title="Profile"
+        desc="Manage your profile, testimonies, and messages"
+        className="bg-stone-100 bg-cover"
+      />
       {isLoading ? (
         <Loader />
       ) : (
@@ -49,12 +54,18 @@ const Profile = () => {
           <header>
             <Container>
               <div className="flex flex-col md:flex-row items-center gap-4">
-                <Avatar className="cursor-pointer size-36 rounded-full border">
-                  <AvatarImage src={user?.profilePhoto} />
-                  <AvatarFallback className="text-5xl text-gray-500">
-                    {user?.firstName[0]}
-                  </AvatarFallback>
-                </Avatar>
+                <div className="relative">
+                  <Avatar className="cursor-pointer size-36 rounded-full border">
+                    <AvatarImage src={user?.profilePhoto} />
+                    <AvatarFallback className="text-5xl text-gray-500">
+                      {user?.firstName[0]}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <button className="absolute bg-gray-700 rounded-full bottom-0 right-0 p-2 hover:bg-gray-500 duration-200 transition-all cursor-pointer">
+                    <Edit2 color="white" />
+                  </button>
+                </div>
                 <div className="flex flex-col text-center md:text-left gap-2">
                   <h1 className="text-3xl font-bold">{`${user?.firstName} ${user?.lastName}`}</h1>
                   <p className="text-gray-500 italic">{`Joined ${joined}`}</p>
@@ -69,4 +80,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default ManageProfile;
