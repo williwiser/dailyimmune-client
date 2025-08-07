@@ -32,13 +32,19 @@ const Navigation = () => {
 
   return (
     <nav
-      className={`fixed w-full z-20 text-lg text-[#747474] transition-all duration-300 ${
-        isScrolled ? "shadow-sm bg-white" : "shadow-none"
+      className={`fixed w-full z-20 text-lg transition-all duration-300 ${
+        isScrolled
+          ? "shadow-sm bg-white text-[#747474]"
+          : "text-white shadow-none"
       }`}
     >
       <Container>
         <div className="flex justify-between items-center md:grid md:grid-cols-3">
-          <img src="logo_trimmed.webp" className="h-16" alt="logo" />
+          <img
+            src={isScrolled ? "logo_trimmed.webp" : "logo_white.png"}
+            className="h-16"
+            alt="logo"
+          />
           <ul className="hidden md:flex justify-center gap-6">
             <li>
               <Link to="/">Home</Link>

@@ -31,7 +31,9 @@ export const Events = () => {
             onChange={handleSearch}
           />
         </div>
-        <div className="mt-6">Events</div>
+        <div className="mt-6">
+          <p className="text-gray-500 px-4">No events</p>
+        </div>
       </div>
     </div>
   );

@@ -45,6 +45,7 @@ const Article = () => {
   const id = params.id;
   const { user } = useAuth();
   const [liked, setLiked] = useState(false);
+  const [likes, setLikes] = useState(0);
   const [testimony, setTestimony] = useState<Testimony>({
     id: "",
     title: "",
@@ -89,6 +90,7 @@ const Article = () => {
   const toggleLiked = () => {
     if (isLoggedIn) {
       setLiked((prev) => !prev);
+      setLikes((prev) => (liked ? prev - 1 : prev + 1));
       axios
         .patch(
           `${BACKEND_URL}/api/v1/testimonies/${id}/${
@@ -118,8 +120,9 @@ const Article = () => {
       .then((response) => {
         setIsLoading(false);
         setTestimony(response.data);
+        setLikes(testimony.likes);
       });
-  }, [id]);
+  }, [id, testimony.likes]);
   console.log(testimony.thumbnail);
   return (
     <div>
@@ -183,7 +186,7 @@ const Article = () => {
                     className="transition-all duration-300 fade-in-10 checked:scale-110"
                   />
                 </button>
-                <div className="flex gap-1 bg-gray-100 p-2 rounded-md">
+                <div className="flex gap-2 bg-gray-100 p-2 rounded-md">
                   <motion.button
                     onClick={toggleLiked}
                     initial={false}
@@ -209,9 +212,7 @@ const Article = () => {
                       className="transition-all duration-300 fade-in-10 checked:scale-110"
                     />
                   </motion.button>{" "}
-                  <span>
-                    {testimony.likes} {testimony.likes === 1 ? "like" : "likes"}
-                  </span>
+                  <span className="text-gray-500">{likes}</span>
                 </div>
               </div>
             </div>

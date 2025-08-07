@@ -132,7 +132,7 @@ const AuthNavigation = () => {
       .then((response) => {
         setNotifications(response.data);
       });
-  });
+  }, []);
 
   const handleNotificationCount = async () => {
     setUnreadCount(0);
@@ -279,6 +279,13 @@ const AuthNavigation = () => {
                                         className="mr-4"
                                       />
                                     );
+                                  case "message":
+                                    return (
+                                      <FontAwesomeIcon
+                                        icon={faMessage}
+                                        className="mr-4"
+                                      />
+                                    );
                                   case "comment":
                                     return (
                                       <FontAwesomeIcon
@@ -303,7 +310,7 @@ const AuthNavigation = () => {
                                 }
                               })()}
                               <div>
-                                <p className="font-semibold text-sm">
+                                <p className="font-semibold text-xs">
                                   {notification.title}
                                 </p>
 

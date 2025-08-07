@@ -87,7 +87,7 @@ const SignUp = () => {
       <button
         className={`${
           isLoadingGoogle ? "bg-gray-100" : ""
-        } px-4 py-2 rounded-md border inline-flex justify-center items-center border-gray-300 hover:bg-[#3B3B1A] hover:border-[#3B3B1A] hover:text-white transition duration-200 cursor-pointer`}
+        } px-4 py-2 rounded-md border inline-flex justify-center items-center border-gray-300 hover:bg-[#3B3B1A] hover:border-[#3B3B1A] hover:text-white transition duration-200 cursor-pointers`}
         onClick={handleGoogleLogIn}
         disabled={isLoadingGoogle}
       >

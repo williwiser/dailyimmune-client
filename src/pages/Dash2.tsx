@@ -43,7 +43,7 @@ interface PrayerRequest {
   body?: string;
   updatedAt: Date;
   requester: User;
-  isAnswered: boolean;
+  isAnswered?: boolean;
   isPublic: boolean;
   // add other properties if needed
 }
@@ -73,7 +73,7 @@ const Dashboard: React.FC = () => {
     thumbnail?: string;
     extra?: {
       body?: string;
-      [key: string]: unknown;
+      isAnswered?: boolean;
     };
   };
 
@@ -136,9 +136,6 @@ const Dashboard: React.FC = () => {
           edited={selectedPrayer.updatedAt}
           prayingCount={0}
           prayerAnswered={selectedPrayer.isAnswered}
-          // onDelete={handleDelete}
-          // onAnsweredPrayer={handleAnsweredPrayer}
-          // onPrayingForYou={handlePrayingForYou}
         />
 
         {/* Recent Activity and Testimonies Side by Side */}
@@ -220,7 +217,7 @@ const Dashboard: React.FC = () => {
                                   setSelectedPrayer({
                                     id: activity.id.split("-")[1],
                                     subject: activity.content,
-                                    isAnswered: false,
+                                    isAnswered: activity.extra?.isAnswered,
                                     body: activity.extra?.body,
                                     updatedAt: new Date(activity.createdAt),
                                     isPublic: true,

@@ -28,6 +28,9 @@ import MyTestimonies from "./pages/MyTestimonies";
 import MyPrayerRequests from "./pages/MyPrayerRequests";
 import { Events } from "./pages/Events";
 import ManageProfile from "./pages/ManageProfile";
+import SocketTest from "./pages/SocketTest";
+import { SocketProvider } from "./context/SocketProvider";
+import MySavedTestimonies from "./pages/MySavedTestimonies";
 
 const router = createBrowserRouter([
   {
@@ -81,9 +84,10 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <Dashboard /> },
           { path: "testimonies/me", element: <MyTestimonies /> },
-          { path: "testimonies/saved", element: <MyTestimonies /> },
+          { path: "testimonies/saved", element: <MySavedTestimonies /> },
           { path: "prayer-requests/me", element: <MyPrayerRequests /> },
           { path: "events/me", element: <Events /> },
+          { path: "socket", element: <SocketTest /> },
         ],
       },
       {
@@ -107,11 +111,13 @@ const router = createBrowserRouter([
 
 const App = () => {
   return (
-    <GoogleOAuthProvider clientId="10720018217-esrs5ojfien6rbceu9rvn210s6um0uvk.apps.googleusercontent.com">
-      <AuthProvider>
-        <RouterProvider router={router} />
-      </AuthProvider>
-    </GoogleOAuthProvider>
+    <SocketProvider>
+      <GoogleOAuthProvider clientId="10720018217-esrs5ojfien6rbceu9rvn210s6um0uvk.apps.googleusercontent.com">
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
+      </GoogleOAuthProvider>
+    </SocketProvider>
   );
 };
 
