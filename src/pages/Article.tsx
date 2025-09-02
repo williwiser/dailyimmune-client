@@ -1,5 +1,4 @@
 import Container from "@/layouts/Container";
-import Header from "@/layouts/Header";
 import { Toaster, toast } from "sonner";
 import axios from "axios";
 import { motion } from "framer-motion";
@@ -127,9 +126,12 @@ const Article = () => {
   return (
     <div>
       <Toaster />
-      <Header
-        title=""
-        className={`bg-stone-100 bg-[url(${testimony.thumbnail})]  bg-cover h-56`}
+      <header
+        className={`bg-stone-100 bg-cover h-56`}
+        style={{
+          backgroundImage: `url('${testimony.thumbnail}')`,
+          backgroundSize: "cover",
+        }}
       />
       {isLoading ? (
         <Loader />

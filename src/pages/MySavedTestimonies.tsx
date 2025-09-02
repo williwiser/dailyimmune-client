@@ -1,5 +1,5 @@
 import TestimonyCard from "@/components/TestimonyCard";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faBookmark, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { useAuth } from "@/context/useAuth";
@@ -50,12 +50,9 @@ const MySavedTestimonies = () => {
   };
   useEffect(() => {
     axios
-      .get(
-        `${BACKEND_URL}/api/v1/testimonies?authorId=${user?.id}&page=1&limit=10`,
-        {
-          withCredentials: true,
-        }
-      )
+      .get(`${BACKEND_URL}/api/v1/testimonies/saved?page=1&limit=12`, {
+        withCredentials: true,
+      })
       .then((response) => {
         setTestimonies(response.data);
       });
@@ -75,7 +72,17 @@ const MySavedTestimonies = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           {testimonies.length === 0 ? (
-            <p className="text-gray-500 px-4">No saved testimonies</p>
+            <div className="flex flex-col items-center justify-center py-12 px-6 col-span-3 bg-white rounded-md border">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <FontAwesomeIcon icon={faBookmark} />
+              </div>
+              <p className="text-gray-500 font-medium">
+                No saved testimonies here
+              </p>
+              <p className="text-gray-400 text-sm mt-1">
+                Your saved testimonies will appear here.
+              </p>
+            </div>
           ) : (
             testimonies.map((testimony: Testimony) => (
               <div className="flex justify-center">

@@ -3,6 +3,7 @@ import Container from "../layouts/Container";
 import { formatDistanceToNow } from "date-fns";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faAward,
   faBars,
   faChevronDown,
   faChevronUp,
@@ -49,6 +50,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import axios from "axios";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import BadgeDialog from "./BadgeDialog";
+import { useSocket } from "@/context/useSocket";
+import { toast, Toaster } from "sonner";
 
 interface Notification {
   id: string;
@@ -73,13 +77,16 @@ const AuthNavigation = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showBadgeDialog, setShowBadgeDialog] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
+  const [newBadge, setNewBadge] = useState<Notification | null>(null);
   const [blockData, setBlockData] = useState<BlockData>({
     reason: "",
     comment: "",
   });
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
+  const { socket } = useSocket();
 
   const handleSignOut = async () => {
     axios
@@ -134,6 +141,15 @@ const AuthNavigation = () => {
       });
   }, []);
 
+  useEffect(() => {
+    notifications.forEach((notif) => {
+      if (notif.type === "badge" && notif.isRead === false) {
+        setShowBadgeDialog(true);
+        setNewBadge(notif);
+      }
+    });
+  }, [notifications]);
+
   const handleNotificationCount = async () => {
     setUnreadCount(0);
     axios
@@ -150,8 +166,48 @@ const AuthNavigation = () => {
       });
   };
 
+  useEffect(() => {
+    socket.on(
+      "receive-message",
+      ({ sender, message, roomId, senderId, recipientId }) => {
+        console.log("📩 Message received from:", sender);
+        console.log("💬 Message:", message);
+        console.log(
+          "roomId:",
+          roomId,
+          "senderId:",
+          senderId,
+          "recipientId:",
+          recipientId
+        );
+        toast(
+          <div className="flex gap-2 items-center">
+            <Avatar className="cursor-pointer">
+              <AvatarImage src={sender.profilePhoto} />
+              <AvatarFallback>{sender.firstName[0]}</AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-semibold">
+                {sender.firstName} {sender.lastName}
+              </p>
+              <p>{message}</p>
+            </div>
+          </div>
+        );
+        // If you have state for messages, you can update it here
+        // setMessages(prev => [...prev, { sender, message }]);
+      }
+    );
+  });
+
   return (
     <>
+      <Toaster />
+      <BadgeDialog
+        open={showBadgeDialog}
+        onOpenChange={setShowBadgeDialog}
+        badgeNotification={newBadge}
+      />
       <AlertDialog open={isBlocked} onOpenChange={setIsBlocked}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -187,7 +243,7 @@ const AuthNavigation = () => {
               <ul>
                 <ul className="hidden md:flex justify-center gap-6">
                   <li>
-                    <Link to="/">Dashboard</Link>
+                    <Link to="/">Home</Link>
                   </li>
                   <li>
                     <DropdownMenu modal={false}>
@@ -276,6 +332,14 @@ const AuthNavigation = () => {
                                     return (
                                       <FontAwesomeIcon
                                         icon={faHeart}
+                                        className="mr-4"
+                                      />
+                                    );
+
+                                  case "badge":
+                                    return (
+                                      <FontAwesomeIcon
+                                        icon={faAward}
                                         className="mr-4"
                                       />
                                     );

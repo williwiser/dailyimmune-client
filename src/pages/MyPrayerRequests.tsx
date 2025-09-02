@@ -1,9 +1,10 @@
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faHeart, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { useAuth } from "@/context/useAuth";
 import { useEffect, useState, type ChangeEvent } from "react";
 import PrayerRequestCard from "@/components/PrayerRequestCard";
+import { Link } from "react-router";
 
 type User = {
   id: string;
@@ -83,7 +84,23 @@ const MyPrayerRequests = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           {prayerRequests.length === 0 ? (
-            <p className="text-gray-500 px-4 w-full">No Prayer Requests</p>
+            <div className="flex flex-col items-center justify-center py-12 px-6 col-span-3 bg-white rounded-md border">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <FontAwesomeIcon icon={faHeart} />
+              </div>
+              <p className="text-gray-500 font-medium">
+                No prayer requests here
+              </p>
+              <p className="text-gray-400 text-sm mt-1">
+                <Link
+                  to={`/dashboard/prayer`}
+                  className="font-semibold underline"
+                >
+                  Click here
+                </Link>{" "}
+                to submit a prayer request.
+              </p>
+            </div>
           ) : (
             prayerRequests.map((prayerRequest: PrayerRequest) => (
               <div className="flex justify-center">

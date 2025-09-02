@@ -1,24 +1,15 @@
 import React, { useEffect, useState } from "react";
-import {
-  Heart,
-  MessageCircle,
-  Clock,
-  PenSquare,
-  Bookmark,
-  Share2,
-} from "lucide-react";
+import { Heart, MessageCircle, PenSquare } from "lucide-react";
 import { Link } from "react-router";
 import SlideIn from "@/components/SlideIn";
 import { useAuth } from "@/context/useAuth";
-import { formatDistanceToNow } from "date-fns";
 import axios from "axios";
 import Loader from "@/components/Loader";
 import { Avatar } from "@radix-ui/react-avatar";
 import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart } from "@fortawesome/free-solid-svg-icons";
-import { slugify } from "@/utils/slugify";
 import { PrayerModal } from "@/components/PrayerModal";
+import { Toaster } from "sonner";
+import FeedList from "@/components/FeedList";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -26,16 +17,6 @@ type User = {
   id: string;
   firstName: string;
   lastName: string;
-};
-type Testimony = {
-  id: string;
-  title: string;
-  body: string;
-  thumbnail: string;
-  updatedAt: Date;
-  user: User;
-  status: string;
-  // add other properties if needed
 };
 interface PrayerRequest {
   id: string;
@@ -50,7 +31,7 @@ interface PrayerRequest {
 
 const Dashboard: React.FC = () => {
   const [showPrayerModal, setShowPrayerModal] = useState(false);
-  const [selectedPrayer, setSelectedPrayer] = useState<PrayerRequest>({
+  const [selectedPrayer] = useState<PrayerRequest>({
     id: "",
     subject: "",
     body: "",
@@ -59,8 +40,6 @@ const Dashboard: React.FC = () => {
     isAnswered: false,
     isPublic: false,
   });
-  const [, setTestimonies] = useState<Testimony[]>([]);
-  const [, setPrayerRequests] = useState<PrayerRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   type FeedActivity = {
     id: string;
@@ -77,54 +56,27 @@ const Dashboard: React.FC = () => {
     };
   };
 
-  const [feed, setFeed] = useState<FeedActivity[]>([]);
-
-  const [, setDrafts] = useState<Testimony[]>([]);
+  const [, setFeed] = useState<FeedActivity[]>([]);
 
   const { user } = useAuth();
 
   useEffect(() => {
+    setIsLoading(true);
     axios
-      .get(`${BACKEND_URL}/api/v1/testimonies/drafts?page=1&limit=4`, {
-        withCredentials: true,
+      .get(`${BACKEND_URL}/api/v1/feed?page=1&limit=7`)
+      .then((response) => {
+        setFeed(response.data);
       })
-      .then((response) => {
-        setDrafts(response.data);
-        console.log("drafts: " + response.data);
+      .finally(() => {
+        setIsLoading(false);
       });
-
-    axios.get(`${BACKEND_URL}/api/v1/feed?page=1&limit=7`).then((response) => {
-      setFeed(response.data);
-    });
-
-    axios
-      .get(
-        `${BACKEND_URL}/api/v1/testimonies?authorId=${user?.id}&page=1&limit=4`,
-        {
-          withCredentials: true,
-        }
-      )
-      .then((response) => {
-        setTestimonies(response.data);
-        console.log(response.data);
-      });
-
-    axios
-      .get(`${BACKEND_URL}/api/v1/prayers/me?&page=1&limit=4`, {
-        withCredentials: true,
-      })
-      .then((response) => {
-        setPrayerRequests(response.data);
-        console.log(response.data);
-      });
-
-    setIsLoading(false);
-  }, [user?.id]);
+  }, [user]);
 
   return isLoading ? (
     <Loader />
   ) : (
     <div className="min-h-screen g-[#eae7dd]">
+      <Toaster />
       <div className="max-w-7xl mx-auto space-y-2">
         <PrayerModal
           open={showPrayerModal}
@@ -163,7 +115,7 @@ const Dashboard: React.FC = () => {
               </div>
             </SlideIn>
             <hr className="w-full my-4 border-gray-300"></hr>
-            <SlideIn direction="up" delay={0.3}>
+            {/* <SlideIn direction="up" delay={0.3}>
               <div className=" bg-white rounded-md p-6 border border-gray-200">
                 <div className="flex items-center mb-6">
                   <Clock className="w-6 h-6 mr-3 text-[#747474]" />
@@ -175,39 +127,44 @@ const Dashboard: React.FC = () => {
                 <div className="space-y-4">
                   {feed.map((activity) => (
                     <div className="flex flex-col p-4 border-b g-[#eae7dd]transition-colors duration-200 sm:h-56">
-                      <div className="flex gap-2 mb-2">
-                        <Avatar className="cursor-pointer size-10">
-                          <AvatarImage
-                            src={activity.authorPhoto}
-                            className="rounded-full"
-                          />
-                          <AvatarFallback>
-                            {activity.authorName[0]}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="text-[#3b3b19] text-sm">
-                            <Link
-                              to={`/profile/${activity.authorId}`}
-                              className="hover:underline"
-                            >
-                              <span className="font-semibold">
-                                {activity.authorName}
-                              </span>
-                            </Link>{" "}
-                            {activity.type === "prayerRequest" && (
-                              <span className="text-gray-500 italic">
-                                submitted a prayer request
-                              </span>
-                            )}
-                          </p>
-                          <span className="text-sm text-[#747474]">
-                            {formatDistanceToNow(new Date(activity.createdAt), {
-                              addSuffix: true,
-                            })}
-                          </span>
+                      {activity.type !== "event" && (
+                        <div className="flex gap-2 mb-2">
+                          <Avatar className="cursor-pointer size-10">
+                            <AvatarImage
+                              src={activity.authorPhoto}
+                              className="rounded-full"
+                            />
+                            <AvatarFallback>
+                              {activity.authorName[0]}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="text-[#3b3b19] text-sm">
+                              <Link
+                                to={`/profile/${activity.authorId}`}
+                                className="hover:underline"
+                              >
+                                <span className="font-semibold">
+                                  {activity.authorName}
+                                </span>
+                              </Link>{" "}
+                              {activity.type === "prayerRequest" && (
+                                <span className="text-gray-500 italic">
+                                  submitted a prayer request
+                                </span>
+                              )}
+                            </p>
+                            <span className="text-sm text-[#747474]">
+                              {formatDistanceToNow(
+                                new Date(activity.createdAt),
+                                {
+                                  addSuffix: true,
+                                }
+                              )}
+                            </span>
+                          </div>
                         </div>
-                      </div>
+                      )}
                       <div className="flex flex-col sm:flex-row justify-between gap-4">
                         <div className="flex-1">
                           <div className="flex flex-col mb-1 h-full">
@@ -246,6 +203,8 @@ const Dashboard: React.FC = () => {
                                       }/${slugify(activity.content)}`
                                     : activity.type === "prayerRequest"
                                     ? "/prayers"
+                                    : activity.type === "event"
+                                    ? `/events/${activity.id.split("-")[1]}/`
                                     : "/"
                                 }
                                 className="hover:underline hover:text-gray-700 transition-all duration-200"
@@ -254,28 +213,92 @@ const Dashboard: React.FC = () => {
                                   {activity.content}
                                 </h1>
                               </Link>
+                            ) : activity.type === "event" ? (
+                              <div className="flex flex-col gap-1">
+                                <span className="bg-stone-400 text-white text-xs font-light px-2 py-1 rounded-md w-fit">
+                                  UPCOMING EVENT
+                                </span>
+                                <Link
+                                  to={
+                                    activity.type === "event"
+                                      ? `/events/${
+                                          activity.id.split("-")[1]
+                                        }/${slugify(activity.content)}`
+                                      : activity.type === "prayerRequest"
+                                      ? "/prayers"
+                                      : "/"
+                                  }
+                                  className="flex gap-2 items-center hover:underline hover:text-gray-700 transition-all duration-200 mb-1"
+                                >
+                                  <Calendar size={16} />
+                                  <h1 className="font-bold text-lg">
+                                    {activity.content}
+                                  </h1>
+                                </Link>
+                              </div>
                             ) : null}
-
-                            <p className="mb-4 sm:mb-0 text-sm text-gray-500 text-pretty">
+                            {activity.type === "event" && (
+                              <span className="text-sm text-gray-500 italic mb-1">
+                                hosted by {activity.authorName}{" "}
+                              </span>
+                            )}
+                            <p className="mb-4 sm:mb-0 text-sm text-gray-500 text-pretty flex-1">
                               {activity.extra?.body}
                             </p>
                           </div>
                           <div className="flex gap-4 mt-auto">
-                            <button className="cursor-pointer text-gray-400 hover:text-gray-600 transition-all duration-200">
-                              <Heart size={16} />
+                            <button
+                              onClick={() => toggleLike(activity.id)}
+                              className={`cursor-pointer ${
+                                likedItems[activity.id]
+                                  ? "text-red-500"
+                                  : "text-gray-400"
+                              } hover:text-red-600  transition-all duration-200`}
+                            >
+                              <Heart
+                                size={16}
+                                fill={likedItems[activity.id] ? "red" : "none"}
+                              />
                             </button>
-                            <button className="cursor-pointer text-gray-400 hover:text-gray-600 transition-all duration-200">
-                              <Bookmark size={16} />
+                            <button
+                              onClick={() => toggleSaved(activity.id)}
+                              className={`cursor-pointer ${
+                                savedItems[activity.id]
+                                  ? "text-yellow-400"
+                                  : "text-gray-400"
+                              } hover:text-yellow-500  transition-all duration-200`}
+                            >
+                              <Bookmark
+                                size={16}
+                                fill={
+                                  savedItems[activity.id]
+                                    ? "oklch(85.2% 0.199 91.936)"
+                                    : "none"
+                                }
+                              />
                             </button>
-                            <button className="cursor-pointer text-gray-400 hover:text-gray-600 transition-all duration-200">
-                              <Share2 size={16} />
-                            </button>
+                            {activity.type === "testimony" ? (
+                              <button
+                                onClick={() => handleShare(activity)}
+                                className="cursor-pointer text-gray-400 hover:text-gray-600 transition-all duration-200"
+                              >
+                                <Share2 size={16} />
+                              </button>
+                            ) : null}
                           </div>
                         </div>
                         {activity.type === "prayerRequest" ? (
                           <div className="hidden sm:flex justify-center items-center bg-stone-200 size-full sm:size-28 rounded-md">
                             <FontAwesomeIcon
                               icon={faHeart}
+                              className="text-2xl"
+                              color="#44403b"
+                            />
+                          </div>
+                        ) : activity.type === "event" ? (
+                          <div className="hidden sm:flex justify-center items-center bg-stone-200 size-full sm:size-28 rounded-md">
+                            <FontAwesomeIcon
+                              icon={faCalendar}
                               className="text-2xl"
                               color="#44403b"
                             />
@@ -327,7 +350,8 @@ const Dashboard: React.FC = () => {
                   </button>
                 </div>
               </div>
-            </SlideIn>
+            </SlideIn> */}
+            <FeedList />
           </div>
 
           {/* Recent Testimonies - Compact version */}

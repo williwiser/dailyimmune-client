@@ -352,13 +352,13 @@ const ArticleEditor = () => {
           <DialogContent className="flex flex-col justify-center items-center [&>button:last-child]:hidden">
             <DialogHeader>
               <DialogTitle className="text-center text-4xl playfair-display-600 text-[#747474]">
-                You article has been published!
+                You article has been submitted for review!
               </DialogTitle>
             </DialogHeader>
             <DialogDescription className="flex justify-center text-center w-full">
               <p className="max-w-sm w-full ">
-                Thank you for sharing your story. Your words have the power to
-                inspire, encourage, and point others to God's grace.
+                Thank you for sharing your story. Your article is pending review
+                and will be published by our administrator(s).
               </p>
             </DialogDescription>
             <DialogFooter>

@@ -19,7 +19,6 @@ const DashboardLayout = () => {
         </SafeArea>
       </Container>
       <Footer />
-
       <FloatingChatWidget />
     </div>
   );

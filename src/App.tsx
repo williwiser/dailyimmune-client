@@ -9,6 +9,9 @@ import Shop from "./pages/Shop";
 import About from "./pages/About";
 import Prayer from "./pages/Prayer";
 import Forum from "./pages/Forum";
+import { StreamTheme } from "@stream-io/video-react-sdk";
+
+import "@stream-io/video-react-sdk/dist/css/styles.css";
 //import Dashboard from "./pages/Dashboard";
 import VerifyToken from "./pages/VerifyToken";
 import ActivationLink from "./pages/ActivationLink";
@@ -31,6 +34,9 @@ import ManageProfile from "./pages/ManageProfile";
 import SocketTest from "./pages/SocketTest";
 import { SocketProvider } from "./context/SocketProvider";
 import MySavedTestimonies from "./pages/MySavedTestimonies";
+import EventInfo from "./pages/EventInfo";
+import LiveStream from "./pages/LiveStream";
+import WatchStream from "./pages/WatchStream";
 
 const router = createBrowserRouter([
   {
@@ -101,6 +107,14 @@ const router = createBrowserRouter([
           { path: "profile/me", element: <ManageProfile /> },
         ],
       },
+      {
+        element: <LoggedInLayout />,
+        children: [
+          { path: "events/:id", element: <EventInfo /> },
+          { path: "livestream/:id", element: <LiveStream /> },
+          { path: "livestream/watch/:id", element: <WatchStream /> },
+        ],
+      },
       { path: "/signup", element: <SignUp /> },
       { path: "/login", element: <LogIn /> },
       { path: "/activate", element: <VerifyToken /> },
@@ -111,13 +125,15 @@ const router = createBrowserRouter([
 
 const App = () => {
   return (
-    <SocketProvider>
-      <GoogleOAuthProvider clientId="10720018217-esrs5ojfien6rbceu9rvn210s6um0uvk.apps.googleusercontent.com">
-        <AuthProvider>
-          <RouterProvider router={router} />
-        </AuthProvider>
-      </GoogleOAuthProvider>
-    </SocketProvider>
+    <StreamTheme style={{ fontFamily: "sans-serif", color: "black" }}>
+      <SocketProvider>
+        <GoogleOAuthProvider clientId="10720018217-esrs5ojfien6rbceu9rvn210s6um0uvk.apps.googleusercontent.com">
+          <AuthProvider>
+            <RouterProvider router={router} />
+          </AuthProvider>
+        </GoogleOAuthProvider>
+      </SocketProvider>
+    </StreamTheme>
   );
 };
 

@@ -31,8 +31,13 @@ const Sidebar = () => {
           <h1 className="text-lg font-semibold">
             {user?.firstName} {user?.lastName}
           </h1>
-          <p className="text-sm text-gray-500">{user?.email}</p>
 
+          <p className="text-sm text-gray-500 mb-2">{user?.email}</p>
+          {(user?.role === "SUPERADMIN" || user?.role === "ADMIN") && (
+            <span className="text-xs text-stone-700 bg-stone-200 rounded-md py-1 px-2 mb-4 z-30 bottom-0">
+              {user?.role}
+            </span>
+          )}
           <Button
             onClick={() => navigate("/dashboard/profile/me")}
             className="inline-flex gap-2 mt-4 w-full"
@@ -78,7 +83,7 @@ const Sidebar = () => {
               className="flex gap-2 items-center text-sm"
             >
               <FontAwesomeIcon icon={faCalendar} />
-              <span className="text-sm">Events</span>
+              <span className="text-sm">Upcoming Events</span>
             </Link>
           </li>
         </ul>

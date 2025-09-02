@@ -24,6 +24,25 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       setIsConnected(true);
     });
 
+    socket.on(
+      "receive-message",
+      ({ sender, message, roomId, senderId, recipientId }) => {
+        console.log("📩 Message received from:", sender);
+        console.log("💬 Message:", message);
+        console.log(
+          "roomId:",
+          roomId,
+          "senderId:",
+          senderId,
+          "recipientId:",
+          recipientId
+        );
+
+        // If you have state for messages, you can update it here
+        // setMessages(prev => [...prev, { sender, message }]);
+      }
+    );
+
     socket.on("disconnect", () => {
       console.log("❌ Socket disconnected");
       setIsConnected(false);
@@ -43,6 +62,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       socket.off("disconnect");
       socket.off("test");
       socket.off("message");
+      socket.off("receive-message");
     };
   }, []);
 
