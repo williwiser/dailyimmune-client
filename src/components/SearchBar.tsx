@@ -53,7 +53,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       <div
         className={`
         relative flex items-center
-        bg-white border-1 rounded-lg
+        bg-white border-1 rounded-full
         transition-all duration-200 ease-in-out
         ${isFocused ? "border-blue-500 shadow-lg" : "border-gray-300"}
         ${disabled ? "opacity-50 cursor-not-allowed" : "hover:border-gray-400"}

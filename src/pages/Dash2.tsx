@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Heart, MessageCircle, PenSquare } from "lucide-react";
+import { Heart, PenSquare } from "lucide-react";
 import { Link } from "react-router";
 import SlideIn from "@/components/SlideIn";
 import { useAuth } from "@/context/useAuth";
 import axios from "axios";
 import Loader from "@/components/Loader";
-import { Avatar } from "@radix-ui/react-avatar";
-import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { PrayerModal } from "@/components/PrayerModal";
 import { Toaster } from "sonner";
 import FeedList from "@/components/FeedList";
+import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
+import { slugify } from "@/utils/slugify";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -18,28 +17,20 @@ type User = {
   firstName: string;
   lastName: string;
 };
-interface PrayerRequest {
+
+interface Testimony {
   id: string;
-  subject: string;
-  body?: string;
+  title: string;
+  body: string;
+  thumbnail: string;
   updatedAt: Date;
-  requester: User;
-  isAnswered?: boolean;
-  isPublic: boolean;
+  user: User;
+  status: string;
+  likes: number;
   // add other properties if needed
 }
-
 const Dashboard: React.FC = () => {
-  const [showPrayerModal, setShowPrayerModal] = useState(false);
-  const [selectedPrayer] = useState<PrayerRequest>({
-    id: "",
-    subject: "",
-    body: "",
-    updatedAt: new Date(),
-    requester: { id: "", firstName: "", lastName: "" },
-    isAnswered: false,
-    isPublic: false,
-  });
+  const [staffPicks, setStaffPicks] = useState<Testimony[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   type FeedActivity = {
     id: string;
@@ -72,285 +63,50 @@ const Dashboard: React.FC = () => {
       });
   }, [user]);
 
+  useEffect(() => {
+    axios
+      .get(`${BACKEND_URL}/api/v1/testimonies/staff-picks?page=1&limit=3`)
+      .then((response) => {
+        setStaffPicks(response.data);
+      });
+  }, []);
+
+  const truncateText = (text: string, wordLimit: number) => {
+    const words = text.split(" ");
+    if (words.length <= wordLimit) return text;
+
+    return words.slice(0, wordLimit).join(" ") + "...";
+  };
+
   return isLoading ? (
     <Loader />
   ) : (
     <div className="min-h-screen g-[#eae7dd]">
       <Toaster />
       <div className="max-w-7xl mx-auto space-y-2">
-        <PrayerModal
-          open={showPrayerModal}
-          onOpenChange={setShowPrayerModal}
-          id={selectedPrayer.id}
-          subject={selectedPrayer.subject}
-          body={selectedPrayer.body}
-          author={`${selectedPrayer.requester.firstName} ${selectedPrayer.requester.lastName}`}
-          edited={selectedPrayer.updatedAt}
-          prayingCount={0}
-          prayerAnswered={selectedPrayer.isAnswered}
-        />
-
         {/* Recent Activity and Testimonies Side by Side */}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Recent Community Activity - Takes more space */}
           <div className="lg:col-span-2">
             {/* Welcome Section with Verse of the Day */}
-            <SlideIn direction="down" className="mb-2">
+            <SlideIn direction="down">
               <div className="flex flex-col gap-2 text-[#747474] md:bg-none bg-white border bg-size-[13rem] bg-no-repeat bg-bottom-right md:bg-right rounded-md p-6">
-                <div className="flex flex-col md:flex-row gap-2 w-full">
-                  <Avatar className="size-10 hidden">
-                    <AvatarImage src={user?.profilePhoto} />
-                    <AvatarFallback>{user?.firstName[0]}</AvatarFallback>
-                  </Avatar>
+                <div className="flex flex-col gap-2 w-full">
                   <Link
                     to="/dashboard/testimonies/new"
                     className="w-full border rounded-full bg-gray-50 hover:bg-gray-100 transition-all duration-200"
                   >
                     <div className="inline-flex gap-2 text-gray-500 px-6 py-2 w-full">
-                      <PenSquare /> <span>Share your testimony</span>
+                      <PenSquare />{" "}
+                      <span>What's your testimony, {user?.firstName}?</span>
                     </div>
                   </Link>
                 </div>
               </div>
             </SlideIn>
             <hr className="w-full my-4 border-gray-300"></hr>
-            {/* <SlideIn direction="up" delay={0.3}>
-              <div className=" bg-white rounded-md p-6 border border-gray-200">
-                <div className="flex items-center mb-6">
-                  <Clock className="w-6 h-6 mr-3 text-[#747474]" />
-                  <h2 className="text-2xl font-bold text-[#3b3b19]">
-                    Recent Community Activity
-                  </h2>
-                </div>
 
-                <div className="space-y-4">
-                  {feed.map((activity) => (
-                    <div className="flex flex-col p-4 border-b g-[#eae7dd]transition-colors duration-200 sm:h-56">
-                      {activity.type !== "event" && (
-                        <div className="flex gap-2 mb-2">
-                          <Avatar className="cursor-pointer size-10">
-                            <AvatarImage
-                              src={activity.authorPhoto}
-                              className="rounded-full"
-                            />
-                            <AvatarFallback>
-                              {activity.authorName[0]}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="text-[#3b3b19] text-sm">
-                              <Link
-                                to={`/profile/${activity.authorId}`}
-                                className="hover:underline"
-                              >
-                                <span className="font-semibold">
-                                  {activity.authorName}
-                                </span>
-                              </Link>{" "}
-                              {activity.type === "prayerRequest" && (
-                                <span className="text-gray-500 italic">
-                                  submitted a prayer request
-                                </span>
-                              )}
-                            </p>
-                            <span className="text-sm text-[#747474]">
-                              {formatDistanceToNow(
-                                new Date(activity.createdAt),
-                                {
-                                  addSuffix: true,
-                                }
-                              )}
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                      <div className="flex flex-col sm:flex-row justify-between gap-4">
-                        <div className="flex-1">
-                          <div className="flex flex-col mb-1 h-full">
-                            {activity.type === "prayerRequest" ? (
-                              <button
-                                onClick={() => {
-                                  setSelectedPrayer({
-                                    id: activity.id.split("-")[1],
-                                    subject: activity.content,
-                                    isAnswered: activity.extra?.isAnswered,
-                                    body: activity.extra?.body,
-                                    updatedAt: new Date(activity.createdAt),
-                                    isPublic: true,
-                                    requester: {
-                                      id: activity.authorId,
-                                      firstName:
-                                        activity.authorName.split(" ")[0],
-                                      lastName:
-                                        activity.authorName.split(" ")[1],
-                                    },
-                                  });
-                                  setShowPrayerModal(true);
-                                }}
-                                className="hover:underline hover:text-gray-700 transition-all duration-200 cursor-pointer text-left"
-                              >
-                                <h1 className="font-bold text-lg mb-1 ">
-                                  Prayer Request: {activity.content}
-                                </h1>
-                              </button>
-                            ) : activity.type === "testimony" ? (
-                              <Link
-                                to={
-                                  activity.type === "testimony"
-                                    ? `/testimonies/${
-                                        activity.id.split("-")[1]
-                                      }/${slugify(activity.content)}`
-                                    : activity.type === "prayerRequest"
-                                    ? "/prayers"
-                                    : activity.type === "event"
-                                    ? `/events/${activity.id.split("-")[1]}/`
-                                    : "/"
-                                }
-                                className="hover:underline hover:text-gray-700 transition-all duration-200"
-                              >
-                                <h1 className="font-bold text-lg mb-1">
-                                  {activity.content}
-                                </h1>
-                              </Link>
-                            ) : activity.type === "event" ? (
-                              <div className="flex flex-col gap-1">
-                                <span className="bg-stone-400 text-white text-xs font-light px-2 py-1 rounded-md w-fit">
-                                  UPCOMING EVENT
-                                </span>
-                                <Link
-                                  to={
-                                    activity.type === "event"
-                                      ? `/events/${
-                                          activity.id.split("-")[1]
-                                        }/${slugify(activity.content)}`
-                                      : activity.type === "prayerRequest"
-                                      ? "/prayers"
-                                      : "/"
-                                  }
-                                  className="flex gap-2 items-center hover:underline hover:text-gray-700 transition-all duration-200 mb-1"
-                                >
-                                  <Calendar size={16} />
-                                  <h1 className="font-bold text-lg">
-                                    {activity.content}
-                                  </h1>
-                                </Link>
-                              </div>
-                            ) : null}
-                            {activity.type === "event" && (
-                              <span className="text-sm text-gray-500 italic mb-1">
-                                hosted by {activity.authorName}{" "}
-                              </span>
-                            )}
-                            <p className="mb-4 sm:mb-0 text-sm text-gray-500 text-pretty flex-1">
-                              {activity.extra?.body}
-                            </p>
-                          </div>
-                          <div className="flex gap-4 mt-auto">
-                            <button
-                              onClick={() => toggleLike(activity.id)}
-                              className={`cursor-pointer ${
-                                likedItems[activity.id]
-                                  ? "text-red-500"
-                                  : "text-gray-400"
-                              } hover:text-red-600  transition-all duration-200`}
-                            >
-                              <Heart
-                                size={16}
-                                fill={likedItems[activity.id] ? "red" : "none"}
-                              />
-                            </button>
-                            <button
-                              onClick={() => toggleSaved(activity.id)}
-                              className={`cursor-pointer ${
-                                savedItems[activity.id]
-                                  ? "text-yellow-400"
-                                  : "text-gray-400"
-                              } hover:text-yellow-500  transition-all duration-200`}
-                            >
-                              <Bookmark
-                                size={16}
-                                fill={
-                                  savedItems[activity.id]
-                                    ? "oklch(85.2% 0.199 91.936)"
-                                    : "none"
-                                }
-                              />
-                            </button>
-                            {activity.type === "testimony" ? (
-                              <button
-                                onClick={() => handleShare(activity)}
-                                className="cursor-pointer text-gray-400 hover:text-gray-600 transition-all duration-200"
-                              >
-                                <Share2 size={16} />
-                              </button>
-                            ) : null}
-                          </div>
-                        </div>
-                        {activity.type === "prayerRequest" ? (
-                          <div className="hidden sm:flex justify-center items-center bg-stone-200 size-full sm:size-28 rounded-md">
-                            <FontAwesomeIcon
-                              icon={faHeart}
-                              className="text-2xl"
-                              color="#44403b"
-                            />
-                          </div>
-                        ) : activity.type === "event" ? (
-                          <div className="hidden sm:flex justify-center items-center bg-stone-200 size-full sm:size-28 rounded-md">
-                            <FontAwesomeIcon
-                              icon={faCalendar}
-                              className="text-2xl"
-                              color="#44403b"
-                            />
-                          </div>
-                        ) : activity.thumbnail ? (
-                          <Link
-                            to={
-                              activity.type === "testimony"
-                                ? `/testimonies/${
-                                    activity.id.split("-")[1]
-                                  }/${slugify(activity.content)}`
-                                : activity.type === "prayerRequest"
-                                ? "/prayers"
-                                : "/"
-                            }
-                            className="hover:underline hover:text-gray-700 transition-all duration-200"
-                          >
-                            <img
-                              src={activity.thumbnail}
-                              className="w-full h-full sm:w-28 sm:h-28 object-cover rounded-md"
-                            />
-                          </Link>
-                        ) : (
-                          <Link
-                            to={
-                              activity.type === "testimony"
-                                ? `/testimonies/${
-                                    activity.id.split("-")[1]
-                                  }/${slugify(activity.content)}`
-                                : activity.type === "prayerRequest"
-                                ? "/prayers"
-                                : "/"
-                            }
-                            className="hover:underline hover:text-gray-700 transition-all duration-200"
-                          >
-                            <img
-                              src="/placeholder.jpg"
-                              className="w-full h-full sm:w-28 sm:h-28 object-cover rounded-md"
-                            />
-                          </Link>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-6 text-center">
-                  <button className="bg-[#3b3b19] text-white px-6 py-2 rounded-md hover:bg-[#4a4a22] transition-colors duration-200">
-                    View All Activity
-                  </button>
-                </div>
-              </div>
-            </SlideIn> */}
             <FeedList />
           </div>
 
@@ -365,73 +121,36 @@ const Dashboard: React.FC = () => {
               </div>
 
               <div className="space-y-4">
-                <div className="border-l-4 border-[#3b3b19] pl-3">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-semibold text-[#3b3b19] text-sm">
-                      Maria L.
-                    </span>
-                    <span className="text-xs text-[#747474]">1 day ago</span>
+                {staffPicks.map((staffPick) => (
+                  <div className="border-l-4 border-[#3b3b19] pl-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-semibold text-[#3b3b19] text-sm">
+                        {staffPick.user.firstName} {staffPick.user.lastName[0]}.
+                      </span>
+                      <span className="text-xs text-[#747474]">
+                        {formatDistanceToNow(new Date(staffPick.updatedAt), {
+                          addSuffix: true,
+                        })}
+                      </span>
+                    </div>
+                    <Link
+                      to={`/testimonies/${staffPick.id}/${slugify(
+                        staffPick.title
+                      )}`}
+                      className="text-sm font-medium text-[#3b3b19] mb-1 hover:text-[#61612e] hover:underline transition-all duration-200"
+                    >
+                      {staffPick.title}
+                    </Link>
+                    <p className="text-[#747474] text-xs leading-relaxed line-clamp-2">
+                      {truncateText(staffPick.body, 20)}
+                    </p>
+                    <div className="mt-2 flex items-center text-xs text-[#747474]">
+                      <Heart className="w-3 h-3 mr-1" />
+                      <span>{staffPick.likes}</span>
+                    </div>
                   </div>
-                  <h3 className="text-sm font-medium text-[#3b3b19] mb-1">
-                    God's Provision in Financial Crisis
-                  </h3>
-                  <p className="text-[#747474] text-xs leading-relaxed line-clamp-2">
-                    "I lost my job three months ago and was struggling to pay
-                    rent. After much prayer, I received an unexpected call..."
-                  </p>
-                  <div className="mt-2 flex items-center text-xs text-[#747474]">
-                    <Heart className="w-3 h-3 mr-1" />
-                    <span>24</span>
-                    <MessageCircle className="w-3 h-3 ml-3 mr-1" />
-                    <span>8</span>
-                  </div>
-                </div>
-
-                <div className="border-l-4 border-[#3b3b19] pl-3">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-semibold text-[#3b3b19] text-sm">
-                      David K.
-                    </span>
-                    <span className="text-xs text-[#747474]">2 days ago</span>
-                  </div>
-                  <h3 className="text-sm font-medium text-[#3b3b19] mb-1">
-                    Healing from Depression
-                  </h3>
-                  <p className="text-[#747474] text-xs leading-relaxed line-clamp-2">
-                    "After months of darkness, I found hope through this
-                    community's prayers and God's love..."
-                  </p>
-                  <div className="mt-2 flex items-center text-xs text-[#747474]">
-                    <Heart className="w-3 h-3 mr-1" />
-                    <span>31</span>
-                    <MessageCircle className="w-3 h-3 ml-3 mr-1" />
-                    <span>12</span>
-                  </div>
-                </div>
-
-                <div className="border-l-4 border-[#3b3b19] pl-3">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-semibold text-[#3b3b19] text-sm">
-                      Grace M.
-                    </span>
-                    <span className="text-xs text-[#747474]">3 days ago</span>
-                  </div>
-                  <h3 className="text-sm font-medium text-[#3b3b19] mb-1">
-                    Restored Marriage
-                  </h3>
-                  <p className="text-[#747474] text-xs leading-relaxed line-clamp-2">
-                    "My husband and I were on the brink of divorce. Through
-                    counseling here and persistent prayer..."
-                  </p>
-                  <div className="mt-2 flex items-center text-xs text-[#747474]">
-                    <Heart className="w-3 h-3 mr-1" />
-                    <span>18</span>
-                    <MessageCircle className="w-3 h-3 ml-3 mr-1" />
-                    <span>6</span>
-                  </div>
-                </div>
+                ))}{" "}
               </div>
-
               <div className="mt-6 text-center">
                 <Link
                   to="/testimonies"

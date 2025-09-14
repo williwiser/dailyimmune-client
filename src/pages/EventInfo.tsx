@@ -89,7 +89,10 @@ const EventInfo = () => {
             {/* Host Information */}
             <div className="flex items-center gap-3 mb-6">
               <Avatar className="cursor-pointer size-10 shadow-sm">
-                <AvatarImage src={event.host.profilePhoto} />
+                <AvatarImage
+                  src={event.host.profilePhoto}
+                  className="object-cover"
+                />
                 <AvatarFallback>{event.host.firstName[0]}</AvatarFallback>
               </Avatar>
 
@@ -199,10 +202,10 @@ const EventInfo = () => {
                     })
                   }
                   className="cursor-pointer bg-stone-700 hover:bg-stone-800 text-white px-8 py-3 font-medium rounded-md hover:shadow-xl transition-all duration-200 flex-1 sm:flex-initial"
-                  disabled={
-                    new Date(event.date).toLocaleDateString() !==
-                    new Date().toLocaleDateString()
-                  }
+                  // disabled={
+                  //   new Date(event.date).toLocaleDateString() !==
+                  //   new Date().toLocaleDateString()
+                  // }
                 >
                   Join Live Stream
                 </Button>

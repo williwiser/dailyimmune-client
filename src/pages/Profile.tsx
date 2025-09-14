@@ -134,7 +134,10 @@ const Profile = () => {
             <div className="flex flex-col md:flex-row items-center gap-6">
               <div className="relative">
                 <Avatar className="size-40 border-4 border-white/20 shadow-2xl">
-                  <AvatarImage src={user?.profilePhoto} />
+                  <AvatarImage
+                    src={user?.profilePhoto}
+                    className="object-cover"
+                  />
                   <AvatarFallback className="text-6xl bg-white/10 text-stone-800">
                     {user?.firstName[0]}
                   </AvatarFallback>

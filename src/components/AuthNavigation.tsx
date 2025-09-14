@@ -1,28 +1,34 @@
-import { Link } from "react-router";
+import { Link, NavLink } from "react-router";
 import Container from "../layouts/Container";
 import { formatDistanceToNow } from "date-fns";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faAward,
   faBars,
+  faBible,
   faChevronDown,
   faChevronUp,
   faClose,
   faDotCircle,
   faHeart,
+  faHome,
   faMessage,
   faPray,
   faReceipt,
+  faShoppingBag,
   faUser,
+  faUserGear,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import {
   Bell,
+  Calendar,
   Heart,
   HelpCircleIcon,
   LayoutDashboard,
   LogOut,
   MessageCircle,
+  Plus,
   ReceiptText,
   ShoppingBag,
   User,
@@ -68,6 +74,21 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 interface BlockData {
   reason: string;
   comment: string;
+}
+
+interface User {
+  id: string;
+  firstName: string;
+  lastName: string;
+  profilePhoto: string;
+}
+
+interface ReceiveMessageProps {
+  sender: User;
+  message: string;
+  roomId: string;
+  senderId: string;
+  recipientId: string;
 }
 
 const AuthNavigation = () => {
@@ -167,37 +188,45 @@ const AuthNavigation = () => {
   };
 
   useEffect(() => {
-    socket.on(
-      "receive-message",
-      ({ sender, message, roomId, senderId, recipientId }) => {
-        console.log("📩 Message received from:", sender);
-        console.log("💬 Message:", message);
-        console.log(
-          "roomId:",
-          roomId,
-          "senderId:",
-          senderId,
-          "recipientId:",
-          recipientId
-        );
-        toast(
-          <div className="flex gap-2 items-center">
-            <Avatar className="cursor-pointer">
-              <AvatarImage src={sender.profilePhoto} />
-              <AvatarFallback>{sender.firstName[0]}</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="font-semibold">
-                {sender.firstName} {sender.lastName}
-              </p>
-              <p>{message}</p>
-            </div>
+    const handleReceiveMessage = ({
+      sender,
+      message,
+      roomId,
+      senderId,
+      recipientId,
+    }: ReceiveMessageProps) => {
+      console.log("📩 Message received from:", sender);
+      console.log("💬 Message:", message);
+      console.log(
+        "roomId:",
+        roomId,
+        "senderId:",
+        senderId,
+        "recipientId:",
+        recipientId
+      );
+      toast(
+        <div className="flex gap-2 items-center">
+          <Avatar className="cursor-pointer">
+            <AvatarImage src={sender.profilePhoto} className="object-cover" />
+            <AvatarFallback>{sender.firstName[0]}</AvatarFallback>
+          </Avatar>
+          <div>
+            <p className="font-semibold">
+              {sender.firstName} {sender.lastName}
+            </p>
+            <p>{message}</p>
           </div>
-        );
-        // If you have state for messages, you can update it here
-        // setMessages(prev => [...prev, { sender, message }]);
-      }
-    );
+        </div>
+      );
+      // If you have state for messages, you can update it here
+      // setMessages(prev => [...prev, { sender, message }]);
+    };
+    socket.on("receive-message", handleReceiveMessage);
+
+    return () => {
+      socket.off("receive-message", handleReceiveMessage);
+    };
   });
 
   return (
@@ -238,61 +267,78 @@ const AuthNavigation = () => {
         <Container>
           <div className="flex justify-between items-center">
             <div className="flex items-center">
-              <img src="/logo_trimmed.webp" className="h-16" alt="logo" />
+              <img src="/logo_trimmed.webp" className="h-14" alt="logo" />
               <div className="hidden md:block border-r-2 h-[2.3rem] mx-6"></div>
               <ul>
-                <ul className="hidden md:flex justify-center gap-6">
+                <ul className="hidden md:flex justify-center gap-8 text-sm">
                   <li>
-                    <Link to="/">Home</Link>
+                    <NavLink
+                      to="/dashboard"
+                      className={({ isActive }) =>
+                        `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
+                          isActive ? "text-green-500" : ""
+                        }`
+                      }
+                      end
+                    >
+                      <FontAwesomeIcon icon={faHome} />
+                      <span>Home</span>
+                    </NavLink>
                   </li>
                   <li>
-                    <DropdownMenu modal={false}>
-                      <DropdownMenuTrigger className="flex items-center gap-1 cursor-pointer">
-                        <span>Community</span>
-                        {"   "}
-                        <FontAwesomeIcon
-                          icon={faChevronDown}
-                          className="text-[0.5em]"
-                        />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="flex flex-col gap-4 bg-white border-none p-2 h-max w-full">
-                        <div className="flex flex-col h-full justify-between gap-5">
-                          <DropdownMenuItem asChild>
-                            <Link to="/testimonies">
-                              <div>
-                                <p className="font-semibold">Testimonies</p>
-                                <p className="text-gray-500 max-w-[10rem]">
-                                  Share and read inspiring faith-based stories
-                                </p>
-                              </div>
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem asChild>
-                            <Link to="/prayers">
-                              <div>
-                                <p className="font-semibold">Prayer Requests</p>
-                                <p className="text-gray-500 max-w-[10rem]">
-                                  Submit and pray for community needs
-                                </p>
-                              </div>
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem asChild>
-                            <Link to="/forum">
-                              <div>
-                                <p className="font-semibold">Forum</p>
-                                <p className="text-gray-500 max-w-[10rem]">
-                                  Engage in faith based discussions
-                                </p>
-                              </div>
-                            </Link>
-                          </DropdownMenuItem>
-                        </div>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <NavLink
+                      to="/testimonies"
+                      className={({ isActive }) =>
+                        `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
+                          isActive ? "text-green-500" : ""
+                        }`
+                      }
+                      end
+                    >
+                      <FontAwesomeIcon icon={faHeart} />
+                      <span>Testimonies</span>
+                    </NavLink>
                   </li>
                   <li>
-                    <Link to="/shop">Shop</Link>
+                    <NavLink
+                      to="/prayers"
+                      className={({ isActive }) =>
+                        `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
+                          isActive ? "text-green-500" : ""
+                        }`
+                      }
+                      end
+                    >
+                      <FontAwesomeIcon icon={faPray} />
+                      <span>Prayers</span>
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/devotionals"
+                      className={({ isActive }) =>
+                        `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
+                          isActive ? "text-green-500" : ""
+                        }`
+                      }
+                      end
+                    >
+                      <FontAwesomeIcon icon={faBible} />
+                      <span>Devotionals</span>
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/shop"
+                      className={({ isActive }) =>
+                        `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
+                          isActive ? "text-green-500" : ""
+                        }`
+                      }
+                    >
+                      <FontAwesomeIcon icon={faShoppingBag} />
+                      <span>Shop</span>
+                    </NavLink>
                   </li>
                 </ul>
               </ul>
@@ -309,7 +355,7 @@ const AuthNavigation = () => {
                   >
                     <Bell className="w-5 h-5 text-gray-600 hover:text-gray-800 cursor-pointer transition-colors" />
                     {unreadCount > 0 && (
-                      <span className="absolute -top-2 -right-2 text-xs bg-red-600 text-white size-4 flex items-center justify-center rounded-full">
+                      <span className="absolute -top-2 -right-2 text-xs bg-red-600 text-white size-5 border-2 border-white flex items-center justify-center rounded-full">
                         {unreadCount > 9 ? "9+" : unreadCount}
                       </span>
                     )}
@@ -397,12 +443,45 @@ const AuthNavigation = () => {
                   </div>
                 </DropdownMenuContent>
               </DropdownMenu>
+              {user?.role === "ADMIN" || user?.role === "SUPERADMIN" ? (
+                <DropdownMenu modal={false}>
+                  <DropdownMenuTrigger>
+                    <FontAwesomeIcon
+                      icon={faUserGear}
+                      className="cursor-pointer hover:text-gray-700 duration-200 transition-all"
+                      title="Admin Actions"
+                    />
+                  </DropdownMenuTrigger>
 
-              <HelpCircleIcon className="w-5 h-5 text-gray-600 hover:text-blue-600 cursor-pointer transition-colors" />
+                  <DropdownMenuContent className="p-2">
+                    <DropdownMenuItem asChild>
+                      <Link to="/dashboard/devotionals/new">
+                        <div className="flex gap-2">
+                          <Plus />
+                          <span>New Devotional</span>
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/dashboard/events/me">
+                        <div className="flex gap-2">
+                          <Calendar />
+                          <span>Manage Events</span>
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <HelpCircleIcon className="w-5 h-5 text-gray-600 hover:text-blue-600 cursor-pointer transition-colors" />
+              )}
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger>
-                  <Avatar className="cursor-pointer">
-                    <AvatarImage src={user?.profilePhoto} />
+                  <Avatar className="cursor-pointer border">
+                    <AvatarImage
+                      src={user?.profilePhoto}
+                      className="object-cover"
+                    />
                     <AvatarFallback>{user?.firstName[0]}</AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>

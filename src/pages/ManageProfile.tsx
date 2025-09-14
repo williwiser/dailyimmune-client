@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import Container from "@/layouts/Container";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import { Link } from "react-router";
 import {
   Heart,
@@ -15,9 +15,23 @@ import {
   Clock,
 } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAward, faPen } from "@fortawesome/free-solid-svg-icons";
+import { faAward, faFileImage, faPen } from "@fortawesome/free-solid-svg-icons";
 import { slugify } from "@/utils/slugify";
 import { useAuth } from "@/context/useAuth";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import PulseLoader from "react-spinners/PulseLoader";
+import { toast, Toaster } from "sonner";
+import { fetchUser } from "@/utils/fetchUser";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -58,11 +72,12 @@ interface User {
   lastName: string;
   email: string;
   bio: string;
-  profilePhoto: string;
+  profilePhoto?: string;
   createdAt: Date;
   badges: Badge[];
   testimonies: Testimony[];
   prayerRequests: PrayerRequest[];
+  role: string;
 }
 
 const ManageProfile = () => {
@@ -79,11 +94,15 @@ const ManageProfile = () => {
     badges: [],
     testimonies: [],
     prayerRequests: [],
+    role: "user",
   });
   const [badges, setBadges] = useState<Badge[]>([]);
   const [testimonies, setTestimonies] = useState<Testimony[]>([]);
   const [prayerRequests, setPrayerRequests] = useState<PrayerRequest[]>([]);
+  const [profilePhoto, setProfilePhoto] = useState<string>();
+  const [photoLoading, setPhotoLoading] = useState(false);
   const [joined, setJoined] = useState("");
+  const { setUser } = useAuth();
 
   useEffect(() => {
     axios
@@ -91,14 +110,43 @@ const ManageProfile = () => {
       .then((response) => {
         console.log(response.data);
         setMe(response.data);
+        if (me.profilePhoto) setProfilePhoto(me.profilePhoto);
       });
-  }, [user?.id]);
+  }, [user?.id, me.profilePhoto]);
 
   const truncateText = (text: string, wordLimit: number) => {
     const words = text.split(" ");
     if (words.length <= wordLimit) return text;
 
     return words.slice(0, wordLimit).join(" ") + "...";
+  };
+
+  const handlePhotoChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    let newPhoto = null;
+    if (e.target.files) newPhoto = e.target.files[0];
+    try {
+      setPhotoLoading(true);
+      const response = await axios.patch(
+        `${BACKEND_URL}/api/v1/users/profile/edit`,
+        { profilePhoto: newPhoto },
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log(response.data.profilePhoto);
+      toast.success("Profile photo changed successfully!");
+      setProfilePhoto(response.data.profilePhoto);
+      const loggedUser = await fetchUser();
+      setUser({ ...loggedUser, profilePhoto: response.data.profilePhoto });
+    } catch (error) {
+      console.log(error);
+      toast.error("Oops, something went wrong. Please try again later.");
+    } finally {
+      setPhotoLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -130,6 +178,7 @@ const ManageProfile = () => {
 
   return (
     <div className="min-h-screen bg-stone-100">
+      <Toaster />
       {/* Profile Header */}
       <section className="relative bg-stone-200 text-stone-800">
         <Container>
@@ -137,14 +186,66 @@ const ManageProfile = () => {
             <div className="flex flex-col md:flex-row items-center gap-6">
               <div className="relative">
                 <Avatar className="size-40 border-4 border-white/20 shadow-2xl">
-                  <AvatarImage src={me?.profilePhoto} />
-                  <AvatarFallback className="text-6xl bg-white/10 text-stone-800">
+                  <AvatarImage src={profilePhoto} className="object-cover" />
+                  <AvatarFallback className="text-6xl bg-white/10 text-stone-800 object-cover">
                     {me?.firstName[0]}
                   </AvatarFallback>
                 </Avatar>
-                <div className="absolute cursor-pointer flex items-center justify-center bottom-0 right-0 bg-slate-900 hover:bg-slate-600 duration-200 transition-all p-4 shadow-md border-2 border-stone-200 rounded-full">
-                  <FontAwesomeIcon icon={faPen} className="text-white" />
-                </div>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <button className="absolute cursor-pointer flex items-center justify-center bottom-0 right-0 bg-slate-900 hover:bg-slate-600 duration-200 transition-all p-4 shadow-md border-2 border-stone-200 rounded-full">
+                      <FontAwesomeIcon icon={faPen} className="text-white" />
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Change Profile Photo</DialogTitle>
+                      <DialogDescription>
+                        Change or remove your current profile photo
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex flex-col justify-center items-center">
+                      {photoLoading ? (
+                        <div className="flex justify-center items-center size-40 border mb-4 rounded-full">
+                          <PulseLoader color="#79716b" />
+                        </div>
+                      ) : (
+                        <Avatar className="size-40 border mb-4">
+                          <AvatarImage
+                            src={profilePhoto}
+                            className="object-cover"
+                          />
+                          <AvatarFallback className="text-6xl bg-white/10 text-stone-800">
+                            {me?.firstName[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                      )}
+
+                      <label
+                        htmlFor="profile-photo"
+                        className="inline-flex items-center gap-2 p-1.5 px-4 border rounded-md text-gray-500 cursor-pointer hover:text-stone-700 hover:border-stone-300 duration-200 transition-all"
+                      >
+                        <FontAwesomeIcon icon={faFileImage} />
+                        Choose from file
+                      </label>
+
+                      <input
+                        type="file"
+                        id="profile-photo"
+                        name="profilePhoto"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handlePhotoChange}
+                      />
+                    </div>
+                    <Separator />
+                    <DialogFooter>
+                      <DialogClose>
+                        <Button>Cancel</Button>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
 
               <div className="flex-1 text-center md:text-left">

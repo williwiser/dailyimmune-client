@@ -6,7 +6,6 @@ import {
   ChevronUp,
   Plus,
   ArrowLeft,
-  Clock,
 } from "lucide-react";
 //import { useAuth } from "@/context/useAuth";
 import { useSocket } from "@/context/useSocket";
@@ -16,6 +15,7 @@ import { useAuth } from "@/context/useAuth";
 import PulseLoader from "react-spinners/PulseLoader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMessage } from "@fortawesome/free-solid-svg-icons";
+import { toast, Toaster } from "sonner";
 
 interface User {
   id: string;
@@ -47,12 +47,20 @@ interface Conversation {
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
+const truncateText = (text: string, wordLimit: number) => {
+  const words = text.split(" ");
+  if (words.length <= wordLimit) return text;
+
+  return words.slice(0, wordLimit).join(" ") + "...";
+};
+
 const FloatingChatWidget = () => {
   //const { user } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
   const [chattingWith, setChattingWith] = useState<User | undefined>(undefined);
   const [currentRoomId, setCurrentRoomId] = useState<string | null>(null);
   const { socket } = useSocket();
+  const [, setUnreadConvs] = useState<Record<string, number>>();
   const [currentView, setCurrentView] = useState("conversations"); // 'conversations' or 'chat'
   const [activeConversationId, setActiveConversationId] = useState<
     string | null
@@ -93,6 +101,14 @@ const FloatingChatWidget = () => {
       scrollToBottom();
     }
   }, [conversations, currentView]);
+
+  useEffect(() => {
+    const unreadMap = conversations.reduce((acc, conv) => {
+      if (conv.roomId) acc[conv.roomId] = conv.unread;
+      return acc;
+    }, {} as Record<string, number>);
+    setUnreadConvs(unreadMap);
+  }, [conversations]);
 
   const formatTime = (date: Date) => {
     const now = new Date();
@@ -267,22 +283,38 @@ const FloatingChatWidget = () => {
       socket.emit("join-room", roomId);
     });
 
-    socket.on("receive-message", ({ message }) => {
+    socket.on("receive-message", ({ sender, message, roomId }) => {
       const newMessage: Message = {
         id: Date.now().toString(),
         content: message,
         sender: "support",
         createdAt: new Date(),
-        read: true,
+        read: false,
       };
+      toast(
+        <div className="flex gap-2 items-center">
+          <Avatar className="border">
+            <AvatarImage src={sender.profilePhoto} className="object-cover" />
+            <AvatarFallback>{sender.firstName[0]}</AvatarFallback>
+          </Avatar>
+          <div>
+            <p className="font-semibold">
+              {sender.firstName} {sender.lastName}
+            </p>
+            <p className="text-gray-500">{truncateText(message, 10)}</p>
+          </div>
+        </div>
+      );
       setConversations((prev) =>
         prev.map((conv) => {
-          if (conv.id === activeConversationId) {
-            const updatedMessages = [...conv.messages, newMessage];
+          if (conv.id === activeConversationId) newMessage.read = true;
+          const updatedMessages = [...conv.messages, newMessage];
+          if (conv.roomId === roomId || conv.id === activeConversationId) {
             return {
               ...conv,
               messages: updatedMessages,
               latestMessage: message,
+              unread: conv.id === activeConversationId ? 0 : conv.unread + 1,
               createdAt: new Date(),
             };
           }
@@ -389,8 +421,11 @@ const FloatingChatWidget = () => {
                 className="flex items-center gap-3 p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
               >
                 {conversation.admin ? (
-                  <Avatar className="cursor-pointer size-12">
-                    <AvatarImage src={conversation.admin.profilePhoto} />
+                  <Avatar className="cursor-pointer size-12 border">
+                    <AvatarImage
+                      src={conversation.admin.profilePhoto}
+                      className="object-cover"
+                    />
                     <AvatarFallback>
                       {conversation.admin.firstName[0]}
                     </AvatarFallback>
@@ -416,7 +451,6 @@ const FloatingChatWidget = () => {
                           {conversation.unread}
                         </span>
                       )}
-                      <Clock size={12} className="text-gray-400" />
                     </div>
                   </div>
                   <p className="text-xs text-gray-600 truncate mb-1">
@@ -440,6 +474,7 @@ const FloatingChatWidget = () => {
 
   return (
     <div className="fixed bottom-5 right-3 z-50 w-80 h-96 bg-white rounded-lg shadow-xl border border-gray-200 flex flex-col overflow-hidden">
+      <Toaster />
       {/* Header */}
       <div className="bg-stone-600 text-white p-4 flex justify-between items-center">
         <div className="flex items-center space-x-2">
@@ -454,7 +489,10 @@ const FloatingChatWidget = () => {
           </button>
           {chattingWith && (
             <Avatar className="cursor-pointer">
-              <AvatarImage src={chattingWith.profilePhoto} />
+              <AvatarImage
+                src={chattingWith.profilePhoto}
+                className="object-cover"
+              />
               <AvatarFallback className="text-stone-800">
                 {chattingWith.firstName[0]}
               </AvatarFallback>

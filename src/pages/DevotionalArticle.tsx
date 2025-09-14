@@ -21,9 +21,10 @@ interface User {
   id: string;
   firstName: string;
   lastName: string;
+  profilePhoto?: string;
 }
 
-interface Testimony {
+interface Devotional {
   id: string;
   title: string;
   authorId: string;
@@ -32,20 +33,20 @@ interface Testimony {
   updatedAt?: Date;
   thumbnail?: string;
   likes: number;
-  user: User;
+  author: User;
   likedByUser: boolean;
 }
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-const Article = () => {
+const DevotionalArticle = () => {
   const params = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const id = params.id;
   const { user } = useAuth();
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(0);
-  const [testimony, setTestimony] = useState<Testimony>({
+  const [devotional, setDevotional] = useState<Devotional>({
     id: "",
     title: "",
     authorId: "",
@@ -53,7 +54,7 @@ const Article = () => {
     likes: 0,
     thumbnail: "",
     createdAt: undefined,
-    user: { id: "", firstName: "", lastName: "" },
+    author: { id: "", firstName: "", lastName: "" },
     likedByUser: false,
   });
 
@@ -65,7 +66,7 @@ const Article = () => {
   useEffect(() => {
     if (isLoggedIn)
       axios
-        .get(`${BACKEND_URL}/api/v1/testimonies/${id}`, {
+        .get(`${BACKEND_URL}/api/v1/devotional/${id}`, {
           withCredentials: true,
         })
         .then((response) => {
@@ -92,7 +93,7 @@ const Article = () => {
       setLikes((prev) => (liked ? prev - 1 : prev + 1));
       axios
         .patch(
-          `${BACKEND_URL}/api/v1/testimonies/${id}/${
+          `${BACKEND_URL}/api/v1/devotionals/${id}/${
             liked ? "unlike" : "like"
           }`,
           {},
@@ -113,25 +114,23 @@ const Article = () => {
   };
   useEffect(() => {
     axios
-      .get(`${BACKEND_URL}/api/v1/testimonies/${id}`, {
+      .get(`${BACKEND_URL}/api/v1/devotionals/${id}`, {
         withCredentials: true,
       })
       .then((response) => {
         setIsLoading(false);
-        setTestimony(response.data);
-        setLikes(testimony.likes);
+        setDevotional(response.data);
+        setLikes(devotional.likes);
       });
-  }, [id, testimony.likes]);
-  console.log(testimony.thumbnail);
+  }, [id, devotional.likes]);
+  console.log(devotional.thumbnail);
   return (
     <div>
       <Toaster />
       <header
         className={`bg-stone-100 bg-cover h-56`}
         style={{
-          backgroundImage: `url('${
-            testimony.thumbnail ? testimony.thumbnail : "/placeholder.jpg"
-          }')`,
+          backgroundImage: `url('${devotional.thumbnail}')`,
           backgroundSize: "cover",
         }}
       />
@@ -151,33 +150,33 @@ const Article = () => {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Testimony</BreadcrumbPage>
+                  <BreadcrumbPage>Devotional</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
             <div className="flex flex-col md:flex-row justify-between md:items-center w-full gap-4">
               <div className="flex flex-col gap-4">
                 <h1 className="playfair-display-600 text-5xl">
-                  {testimony.title}
+                  {devotional.title}
                 </h1>
                 <p className="text-gray-500 italic">
-                  {`by ${testimony.user.firstName} ${
-                    testimony.user.lastName
+                  {`by ${devotional.author.firstName} ${
+                    devotional.author.lastName
                   } • ${
-                    testimony.createdAt
+                    devotional.createdAt
                       ? new Intl.DateTimeFormat("en-GB", {
                           day: "2-digit",
                           month: "long",
                           year: "numeric",
-                        }).format(new Date(testimony.createdAt))
+                        }).format(new Date(devotional.createdAt))
                       : ""
                   }`}
                 </p>
               </div>
               <div className="flex gap-3">
-                {isLoggedIn && user.id === testimony.user.id ? (
+                {isLoggedIn && user.id === devotional.author.id ? (
                   <Link
-                    to={`/dashboard/testimonies/${testimony.id}/edit`}
+                    to={`/dashboard/testimonies/${devotional.id}/edit`}
                     className="p-2"
                   >
                     <Edit />
@@ -222,7 +221,7 @@ const Article = () => {
             </div>
             <hr className="my-4  border-gray-400" />
             <p className="text-gray-500 whitespace-pre-line">
-              {testimony.body}
+              {devotional.body}
             </p>
           </article>
         </Container>
@@ -231,4 +230,4 @@ const Article = () => {
   );
 };
 
-export default Article;
+export default DevotionalArticle;

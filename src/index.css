@@ -130,6 +130,10 @@
   font-style: normal;
 }
 
+.capitalize-first::first-letter {
+  text-transform: uppercase;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

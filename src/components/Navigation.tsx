@@ -42,7 +42,7 @@ const Navigation = () => {
         <div className="flex justify-between items-center md:grid md:grid-cols-3">
           <img
             src={isScrolled ? "logo_trimmed.webp" : "logo_white.png"}
-            className="h-16"
+            className="h-14"
             alt="logo"
           />
           <ul className="hidden md:flex justify-center gap-6">

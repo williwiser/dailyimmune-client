@@ -1,15 +1,13 @@
-import SearchBar from "@/components/SearchBar";
-import TestimonyCard from "@/components/TestimonyCard";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Header from "@/layouts/Header";
-import Section from "@/layouts/Section";
-import { slugify } from "@/utils/slugify";
-import axios from "axios";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
 import PulseLoader from "react-spinners/PulseLoader";
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import Section from "@/layouts/Section";
+import axios from "axios";
+import Container from "@/layouts/Container";
+import DevotionalCard from "@/components/DevotionalCard";
+import { Link } from "react-router";
+import { slugify } from "@/utils/slugify";
 
 type User = {
   id: string;
@@ -18,72 +16,47 @@ type User = {
   profilePhoto: string;
 };
 
-type Testimony = {
+type Devotional = {
   id: string;
   title: string;
   body: string;
   thumbnail: string;
   updatedAt: Date;
-  user: User;
+  author: User;
   status: string;
+  // add other properties if needed
 };
 
-const Testimonies = () => {
-  const [allTestimonies, setAllTestimonies] = useState<Testimony[]>([]);
-  const [featuredTestimony, setFeaturedTestimony] = useState<Testimony | null>(
-    null
-  );
-  const [recentTestimonies, setRecentTestimonies] = useState<Testimony[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hasMoreTestimonies, setHasMoreTestimonies] = useState(true);
+const truncateText = (text: string, wordLimit: number) => {
+  const words = text.split(" ");
+  if (words.length <= wordLimit) return text;
 
-  const truncateText = (text: string, wordLimit: number) => {
-    const words = text.split(" ");
-    if (words.length <= wordLimit) return text;
-    return words.slice(0, wordLimit).join(" ") + "...";
-  };
+  return words.slice(0, wordLimit).join(" ") + "...";
+};
 
-  const loadTestimonies = async (page: number = 1, append: boolean = false) => {
-    try {
-      setIsLoading(!append);
-      const response = await axios.get(
-        `${BACKEND_URL}/api/v1/testimonies?page=${page}&limit=24`,
-        { withCredentials: true }
-      );
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-      const testimonies = response.data;
+const Devotionals = () => {
+  const [devotionals, setDevotionals] = useState<Devotional[]>([]);
+  const [featuredDevotional, setFeaturedDevotional] = useState<Devotional>();
 
-      if (page === 1) {
-        setAllTestimonies(testimonies);
-
-        // Set featured testimony (most recent)
-        if (testimonies.length > 0) {
-          setFeaturedTestimony(testimonies[0]);
-          setRecentTestimonies(testimonies.slice(1));
-        }
-      } else {
-        setAllTestimonies((prev) => [...prev, ...testimonies]);
-        setRecentTestimonies((prev) => [...prev, ...testimonies]);
-      }
-
-      setHasMoreTestimonies(testimonies.length === 24);
-    } catch (error) {
-      console.error("Error fetching testimonies:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleLoadMore = () => {
-    const nextPage = currentPage + 1;
-    setCurrentPage(nextPage);
-    loadTestimonies(nextPage, true);
-  };
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    loadTestimonies();
+    setIsLoading(true);
+    axios
+      .get(`${BACKEND_URL}/api/v1/devotionals`)
+      .then((response) => {
+        setDevotionals(response.data);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, []);
+
+  useEffect(() => {
+    setFeaturedDevotional(devotionals[0]);
+  }, [devotionals]);
 
   const EmptyState = () => (
     <div className="text-center py-20 bg-gray-50 rounded-xl border border-gray-200">
@@ -104,7 +77,7 @@ const Testimonies = () => {
           </svg>
         </div>
         <h3 className="text-xl font-semibold text-gray-700 mb-3">
-          No Testimonies Yet
+          No Devotionals Yet
         </h3>
         <p className="text-gray-500">
           Be the first to share your testimony and inspire others in our
@@ -114,7 +87,7 @@ const Testimonies = () => {
     </div>
   );
 
-  const FeaturedTestimony = ({ testimony }: { testimony: Testimony }) => (
+  const FeaturedDevotional = ({ devotional }: { devotional: Devotional }) => (
     <div className="rounded-2xl flex items-center justify-center overflow-hidden mb-12 ">
       <img
         src="/placeholder.jpg"
@@ -132,35 +105,41 @@ const Testimonies = () => {
                 >
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </svg>
-                Featured Story
+                Featured Devotional
               </div>
               <h2 className="text-3xl lg:text-4xl font-bold mb-4">
-                {testimony.title}
+                {devotional.title}
               </h2>
               <p className="text-xl text-gray-500 leading-relaxed mb-6 max-w-3xl">
-                {truncateText(testimony.body, 50)}
+                {truncateText(devotional.body, 50)}
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-2 text-gray-500">
                 <Avatar className="size-10 border">
-                  <AvatarImage src={testimony.user.profilePhoto}></AvatarImage>
-                  <AvatarFallback>{testimony.user.firstName[0]}</AvatarFallback>
+                  <AvatarImage
+                    src={devotional.author.profilePhoto}
+                  ></AvatarImage>
+                  <AvatarFallback>
+                    {devotional.author.firstName[0]}
+                  </AvatarFallback>
                 </Avatar>
                 <div>
                   <p className="font-medium">
-                    {testimony.user.firstName} {testimony.user.lastName}
+                    {devotional.author.firstName} {devotional.author.lastName}
                   </p>
                   <p className="text-sm opacity-75">
-                    {new Date(testimony.updatedAt).toLocaleDateString()}
+                    {new Date(devotional.updatedAt).toLocaleDateString()}
                   </p>
                 </div>
               </div>
 
               <Link
-                to={`/testimonies/${testimony.id}/${slugify(testimony.title)}`}
-                className="inline-flex items-center px-6 py-3 bg-white text-stone-600 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                to={`/devotionals/${devotional.id}/${slugify(
+                  devotional.title
+                )}`}
+                className="cursor-pointer inline-flex items-center px-6 py-3 bg-white text-stone-600 rounded-lg font-medium hover:bg-gray-100 transition-colors"
               >
                 Read Full Story
                 <svg
@@ -187,28 +166,22 @@ const Testimonies = () => {
   return (
     <>
       <Header
-        title="Testimonies"
-        desc="Read powerful stories of how God is transforming lives in our community."
-      >
-        <div className="flex justify-center items-center mt-8 w-full">
-          <div className="w-full max-w-xl">
-            <SearchBar />
-          </div>
-        </div>
-      </Header>
-      <Section className="bg-stone-100">
-        {featuredTestimony && (
-          <FeaturedTestimony testimony={featuredTestimony} />
-        )}
-      </Section>
+        title="Devotionals"
+        desc="Find strength and inspiration for your faith journey through scripture and reflections."
+      />
 
+      {featuredDevotional && (
+        <Container>
+          <FeaturedDevotional devotional={featuredDevotional} />
+        </Container>
+      )}
       <Section className="py-8 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {isLoading && allTestimonies.length === 0 ? (
+          {isLoading && devotionals.length === 0 ? (
             <div className="flex justify-center items-center py-20">
               <PulseLoader color="#3b82f6" size={12} />
             </div>
-          ) : allTestimonies.length === 0 ? (
+          ) : devotionals.length === 0 ? (
             <EmptyState />
           ) : (
             <div className="space-y-8">
@@ -216,7 +189,7 @@ const Testimonies = () => {
               <div className="rounded-2xl">
                 <div className="text-center mb-10">
                   <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">
-                    Recent Stories
+                    Recent Devotionals
                   </h2>
                   <p className="text-gray-600 max-w-2xl mx-auto">
                     Discover more inspiring testimonies from our community
@@ -227,20 +200,20 @@ const Testimonies = () => {
                 {/* Desktop View - Horizontal Scroll */}
                 <div className="hidden lg:grid mb-6">
                   <div className="grid gap-3 grid-cols-3">
-                    {recentTestimonies.map((testimony: Testimony, index) => (
+                    {devotionals.map((devotional: Devotional, index) => (
                       <div
-                        key={testimony.id}
+                        key={devotional.id}
                         className="flex-shrink-0 w-80 transform transition-all duration-300 hover:scale-[1.02]"
                         style={{ animationDelay: `${index * 100}ms` }}
                       >
-                        <TestimonyCard
-                          id={testimony.id}
-                          thumbnail={testimony.thumbnail}
-                          title={testimony.title}
-                          body={truncateText(testimony.body, 15)}
-                          edited={testimony.updatedAt}
-                          author={`${testimony.user.firstName} ${testimony.user.lastName}`}
-                          status={testimony.status}
+                        <DevotionalCard
+                          id={devotional.id}
+                          thumbnail={devotional.thumbnail}
+                          title={devotional.title}
+                          body={truncateText(devotional.body, 15)}
+                          edited={devotional.updatedAt}
+                          author={`${devotional.author.firstName} ${devotional.author.lastName}`}
+                          status={devotional.status}
                         />
                       </div>
                     ))}
@@ -250,64 +223,25 @@ const Testimonies = () => {
                 {/* Mobile/Tablet View - Grid Layout */}
                 <div className="lg:hidden">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-                    {recentTestimonies.map((testimony: Testimony, index) => (
+                    {devotionals.map((devotional: Devotional, index) => (
                       <div
-                        key={testimony.id}
+                        key={devotional.id}
                         className="transform transition-all duration-300 hover:scale-[1.02]"
                         style={{ animationDelay: `${index * 100}ms` }}
                       >
-                        <TestimonyCard
-                          id={testimony.id}
-                          thumbnail={testimony.thumbnail}
-                          title={testimony.title}
-                          body={truncateText(testimony.body, 15)}
-                          edited={testimony.updatedAt}
-                          author={`${testimony.user.firstName} ${testimony.user.lastName}`}
-                          status={testimony.status}
+                        <DevotionalCard
+                          id={devotional.id}
+                          thumbnail={devotional.thumbnail}
+                          title={devotional.title}
+                          body={truncateText(devotional.body, 15)}
+                          edited={devotional.updatedAt}
+                          author={`${devotional.author.firstName} ${devotional.author.lastName}`}
+                          status={devotional.status}
                         />
                       </div>
                     ))}
                   </div>
                 </div>
-
-                {/* Load More Button */}
-                {hasMoreTestimonies && (
-                  <div className="text-center pt-6">
-                    <button
-                      onClick={handleLoadMore}
-                      disabled={isLoading}
-                      className="inline-flex items-center px-8 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isLoading ? (
-                        <>
-                          <PulseLoader
-                            color="#ffffff"
-                            size={8}
-                            className="mr-2"
-                          />
-                          Loading...
-                        </>
-                      ) : (
-                        <>
-                          Load More Stories
-                          <svg
-                            className="ml-2 w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                            />
-                          </svg>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                )}
               </div>
 
               {/* Statistics Section */}
@@ -315,7 +249,7 @@ const Testimonies = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                   <div className="space-y-2">
                     <div className="text-3xl font-bold text-blue-600">
-                      {allTestimonies.length}+
+                      {devotionals.length}+
                     </div>
                     <div className="text-gray-600 font-medium">
                       Stories Shared
@@ -329,8 +263,8 @@ const Testimonies = () => {
                     <div className="text-3xl font-bold text-green-600">
                       {
                         new Set(
-                          allTestimonies.map(
-                            (t) => `${t.user.firstName} ${t.user.lastName}`
+                          devotionals.map(
+                            (t) => `${t.author.firstName} ${t.author.lastName}`
                           )
                         ).size
                       }
@@ -346,7 +280,7 @@ const Testimonies = () => {
 
                   <div className="space-y-2">
                     <div className="text-3xl font-bold text-purple-600">
-                      {Math.ceil(allTestimonies.length / 30)}+
+                      {Math.ceil(devotionals.length / 30)}+
                     </div>
                     <div className="text-gray-600 font-medium">
                       Months Active
@@ -365,4 +299,4 @@ const Testimonies = () => {
   );
 };
 
-export default Testimonies;
+export default Devotionals;

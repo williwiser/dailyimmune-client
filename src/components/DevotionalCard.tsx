@@ -39,7 +39,7 @@ interface TestimonyCardProps {
   onDelete?: (id: string) => void;
 }
 
-const TestimonyCard = ({
+const DevotionalCard = ({
   id,
   thumbnail,
   title,
@@ -99,7 +99,7 @@ const TestimonyCard = ({
               <span className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2.5 rounded-full text-gray-700 hover:bg-white hover:shadow-md transition-all duration-200 group/edit">
                 <Edit3
                   size={16}
-                  className="group-hover/edit:text-blue-600 transition-colors"
+                  className="group-hover/edit:text-stone-600 transition-colors"
                 />
               </span>
             </Link>
@@ -179,7 +179,7 @@ const TestimonyCard = ({
               </span>
             </div>
             <Link
-              to={`/testimonies/${id}/${slugify(title)}`}
+              to={`/devotionals/${id}/${slugify(title)}`}
               className="inline-flex items-center px-4 py-2 text-sm font-semibold text-stone-600 hover:text-stone-700 hover:bg-blue-50 rounded-lg transition-all duration-200 group/read"
             >
               Read more
@@ -204,4 +204,4 @@ const TestimonyCard = ({
   );
 };
 
-export default TestimonyCard;
+export default DevotionalCard;

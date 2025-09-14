@@ -5,6 +5,7 @@ import { useAuth } from "@/context/useAuth";
 import { useEffect, useState, type ChangeEvent } from "react";
 import PrayerRequestCard from "@/components/PrayerRequestCard";
 import { Link } from "react-router";
+import { Separator } from "@/components/ui/separator";
 
 type User = {
   id: string;
@@ -35,21 +36,6 @@ const MyPrayerRequests = () => {
     return words.slice(0, wordLimit).join(" ") + "...";
   };
 
-  const handleRemove = (prayerRequestId: string) => {
-    axios
-      .delete(`${BACKEND_URL}/api/v1/prayers/${prayerRequestId}`, {
-        withCredentials: true,
-      })
-      .then(() => {
-        setPrayerRequests((prev) =>
-          prev.filter(
-            (prayerRequest: PrayerRequest) =>
-              prayerRequest.id !== prayerRequestId
-          )
-        );
-      });
-  };
-
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     axios
@@ -72,6 +58,13 @@ const MyPrayerRequests = () => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
       <div className=" lg:col-span-2">
+        <div className="px-4 pt-6">
+          <h1 className="text-3xl font-semibold text-stone-600 mb-1">
+            My Prayer Requests
+          </h1>
+          <p className="text-gray-500">Manage your prayer requests</p>
+        </div>
+        <Separator className="my-6" />
         <div className="flex gap-4 items-center bg-white border rounded-md">
           <FontAwesomeIcon icon={faSearch} className="pl-4 text-gray-500" />
           <input
@@ -109,11 +102,9 @@ const MyPrayerRequests = () => {
                   id={prayerRequest.id}
                   subject={prayerRequest.subject}
                   body={truncateText(prayerRequest.body, 15)}
-                  edited={prayerRequest.updatedAt}
+                  updatedAt={prayerRequest.updatedAt}
                   author={`${prayerRequest.requester.firstName} ${prayerRequest.requester.lastName}`}
                   isAnswered={prayerRequest.isAnswered}
-                  edit
-                  onDelete={handleRemove}
                 />
               </div>
             ))

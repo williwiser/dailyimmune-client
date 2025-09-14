@@ -1,4 +1,3 @@
-import TestimonyCard from "@/components/TestimonyCard";
 import { faEarth, faPen, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
@@ -8,6 +7,7 @@ import { toast } from "sonner";
 import { Link } from "react-router";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
+import DevotionalCard from "@/components/DevotionalCard";
 import PulseLoader from "react-spinners/PulseLoader";
 import { Separator } from "@/components/ui/separator";
 
@@ -15,23 +15,24 @@ type User = {
   id: string;
   firstName: string;
   lastName: string;
+  profilePhoto: string;
 };
 
-type Testimony = {
+type Devotional = {
   id: string;
   title: string;
   body: string;
   thumbnail: string;
   updatedAt: Date;
-  user: User;
+  author: User;
   status: string;
   // add other properties if needed
 };
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-const MyTestimonies = () => {
-  const [testimonies, setTestimonies] = useState([]);
+const MyDevotionals = () => {
+  const [devotionals, setDevotionals] = useState([]);
   const [drafts, setDrafts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -46,18 +47,18 @@ const MyTestimonies = () => {
 
   const handleDelete = (postId: string) => {
     axios
-      .delete(`${BACKEND_URL}/api/v1/testimonies/${postId}`, {
+      .delete(`${BACKEND_URL}/api/v1/devotionals/${postId}`, {
         withCredentials: true,
       })
       .then(() => {
-        setTestimonies((prev) =>
-          prev.filter((post: Testimony) => post.id !== postId)
+        setDevotionals((prev) =>
+          prev.filter((post: Devotional) => post.id !== postId)
         );
-        toast.success("Testimony removed successfully");
+        toast.success("Devotional removed successfully");
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Testimony could not be deleted");
+        toast.error("Devotional could not be deleted");
       });
   };
 
@@ -67,13 +68,13 @@ const MyTestimonies = () => {
     setIsLoading(true);
     axios
       .get(
-        `${BACKEND_URL}/api/v1/testimonies/me/search?q=${query}&page=1&limit=12`,
+        `${BACKEND_URL}/api/v1/devotionals/me/search?q=${query}&page=1&limit=12`,
         {
           withCredentials: true,
         }
       )
       .then((response) => {
-        setTestimonies(response.data);
+        setDevotionals(response.data);
       })
       .finally(() => {
         setIsLoading(false);
@@ -81,36 +82,33 @@ const MyTestimonies = () => {
   };
   useEffect(() => {
     axios
-      .get(
-        `${BACKEND_URL}/api/v1/testimonies?authorId=${user?.id}&page=1&limit=10`,
-        {
-          withCredentials: true,
-        }
-      )
+      .get(`${BACKEND_URL}/api/v1/devotionals/me?page=1&limit=10`, {
+        withCredentials: true,
+      })
       .then((response) => {
-        setTestimonies(response.data);
+        setDevotionals(response.data);
       });
   }, [user?.id]);
 
   useEffect(() => {
     axios
-      .get(`${BACKEND_URL}/api/v1/drafts?&page=1&limit=10`, {
+      .get(`${BACKEND_URL}/api/v1/devotionals/me/drafts?&page=1&limit=10`, {
         withCredentials: true,
       })
       .then((response) => {
         setDrafts(response.data);
       });
   }, []);
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
       <div className=" lg:col-span-2">
         <div className="px-4 pt-6">
           <h1 className="text-3xl font-semibold text-stone-600 mb-1">
-            My Testimonies
+            My Devotionals
           </h1>
           <p className="text-gray-500">
-            Manage your draft and published testimonies
+            Your devotionals will appear here. NB: Only admins can access this
+            feature
           </p>
         </div>
         <Separator className="my-6" />
@@ -120,7 +118,7 @@ const MyTestimonies = () => {
             type="text"
             value={searchQuery}
             className="w-full pr-4 py-2 focus:outline-none"
-            placeholder="Search testimonies..."
+            placeholder="Search devotionals..."
             onChange={handleSearch}
           />
         </div>
@@ -153,29 +151,29 @@ const MyTestimonies = () => {
                       <FontAwesomeIcon icon={faPen} />
                     </div>
                     <p className="text-gray-500 font-medium">
-                      No testimonies available
+                      No devotionals available
                     </p>
                     <p className="text-gray-400 text-sm mt-1">
                       <Link
-                        to={`/dashboard/testimonies/new`}
+                        to={`/dashboard/devotionals/new`}
                         className="font-semibold underline"
                       >
                         Click here
                       </Link>{" "}
-                      to create a new testimony.
+                      to create a new devotional.
                     </p>
                   </div>
                 ) : (
-                  drafts.map((draft: Testimony) => (
+                  drafts.map((draft: Devotional) => (
                     <div className="flex justify-center">
-                      <TestimonyCard
+                      <DevotionalCard
                         key={draft.id}
                         id={draft.id}
                         thumbnail={draft.thumbnail}
                         title={draft.title}
                         body={truncateText(draft.body, 15)}
                         edited={draft.updatedAt}
-                        author={`${draft.user.firstName} ${draft.user.lastName}`}
+                        author={`${draft.author.firstName} ${draft.author.lastName}`}
                         status={draft.status}
                         edit
                         onDelete={handleDelete}
@@ -187,77 +185,77 @@ const MyTestimonies = () => {
             </TabPanel>
             <TabPanel>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-                {testimonies.length === 0 ? (
+                {devotionals.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 px-6 col-span-3 bg-white rounded-md border">
                     <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                       <FontAwesomeIcon icon={faPen} />
                     </div>
                     <p className="text-gray-500 font-medium">
-                      No testimonies available
+                      No devotionals available
                     </p>
                     <p className="text-gray-400 text-sm mt-1">
                       <Link
-                        to={`/dashboard/testimonies/new`}
+                        to={`/dashboard/devotionals/new`}
                         className="font-semibold underline"
                       >
                         Click here
                       </Link>{" "}
-                      to create a new testimony.
+                      to create a new devotional.
                     </p>
                   </div>
                 ) : (
-                  testimonies.map((testimony: Testimony) => (
+                  devotionals.map((devotional: Devotional) => (
                     <div className="flex justify-center">
-                      <TestimonyCard
-                        key={testimony.id}
-                        id={testimony.id}
-                        thumbnail={testimony.thumbnail}
-                        title={testimony.title}
-                        body={truncateText(testimony.body, 15)}
-                        edited={testimony.updatedAt}
-                        author={`${testimony.user.firstName} ${testimony.user.lastName}`}
-                        status={testimony.status}
+                      <DevotionalCard
+                        key={devotional.id}
+                        id={devotional.id}
+                        thumbnail={devotional.thumbnail}
+                        title={devotional.title}
+                        body={truncateText(devotional.body, 15)}
+                        edited={devotional.updatedAt}
+                        author={`${devotional.author.firstName} ${devotional.author.lastName}`}
+                        status={devotional.status}
                         edit
                         onDelete={handleDelete}
                       />
                     </div>
                   ))
                 )}
-              </div>
+              </div>{" "}
             </TabPanel>
           </Tabs>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-            {testimonies.length === 0 ? (
+            {devotionals.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 px-6 col-span-3 bg-white rounded-md border">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                   <FontAwesomeIcon icon={faPen} />
                 </div>
                 <p className="text-gray-500 font-medium">
-                  No testimonies available
+                  No devotionals available
                 </p>
                 <p className="text-gray-400 text-sm mt-1">
                   <Link
-                    to={`/dashboard/testimonies/new`}
+                    to={`/dashboard/devotionals/new`}
                     className="font-semibold underline"
                   >
                     Click here
                   </Link>{" "}
-                  to create a new testimony.
+                  to create a new devotional.
                 </p>
               </div>
             ) : (
-              testimonies.map((testimony: Testimony) => (
+              devotionals.map((devotional: Devotional) => (
                 <div className="flex justify-center">
-                  <TestimonyCard
-                    key={testimony.id}
-                    id={testimony.id}
-                    thumbnail={testimony.thumbnail}
-                    title={testimony.title}
-                    body={truncateText(testimony.body, 15)}
-                    edited={testimony.updatedAt}
-                    author={`${testimony.user.firstName} ${testimony.user.lastName}`}
-                    status={testimony.status}
+                  <DevotionalCard
+                    key={devotional.id}
+                    id={devotional.id}
+                    thumbnail={devotional.thumbnail}
+                    title={devotional.title}
+                    body={truncateText(devotional.body, 15)}
+                    edited={devotional.updatedAt}
+                    author={`${devotional.author.firstName} ${devotional.author.lastName}`}
+                    status={devotional.status}
                     edit
                     onDelete={handleDelete}
                   />
@@ -271,4 +269,4 @@ const MyTestimonies = () => {
   );
 };
 
-export default MyTestimonies;
+export default MyDevotionals;

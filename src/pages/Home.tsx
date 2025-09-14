@@ -1,6 +1,6 @@
 import Container from "@/layouts/Container";
 import Section from "@/layouts/Section";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRight,
@@ -13,20 +13,29 @@ import {
 import CommunityCard from "@/components/CommunityCard";
 import { ArrowRight, BookOpen, Calendar, Heart, User } from "lucide-react";
 import SlideIn from "@/components/SlideIn";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { slugify } from "@/utils/slugify";
+
+type User = {
+  id: string;
+  firstName: string;
+  lastName: string;
+};
 
 interface Testimony {
-  id: number;
+  id: string;
   title: string;
-  author: string;
-  date: string;
-  preview: string;
-  readTime: string;
-  category: string;
-  image: string;
+  body: string;
+  thumbnail?: string;
+  updatedAt: Date;
+  user: User;
+  status: string;
+  // add other properties if needed
 }
 
 interface DailyEncouragement {
-  id: number;
+  id: string;
   title: string;
   verse: string;
   reference: string;
@@ -37,7 +46,20 @@ interface DailyEncouragement {
   image: string;
 }
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 const Home = () => {
+  const [testimonies, setTestimonies] = useState<Testimony[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    axios
+      .get(`${BACKEND_URL}/api/v1/testimonies/staff-picks?page=1&limit=4`)
+      .then((response) => {
+        setTestimonies(response.data);
+      });
+  }, []);
+
   const communityFeatures = [
     {
       icon: faComment,
@@ -71,60 +93,9 @@ const Home = () => {
     },
   ];
 
-  const testimonies: Testimony[] = [
-    {
-      id: 1,
-      title: "From Darkness to Light: My Journey of Healing",
-      author: "Sarah Johnson",
-      date: "May 15, 2025",
-      preview:
-        "After losing my job and facing the darkest period of my life, I discovered how God's grace carried me through. What seemed like the end became a beautiful new beginning...",
-      readTime: "5 min read",
-      category: "Healing",
-      image:
-        "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop",
-    },
-    {
-      id: 2,
-      title: "Restored Marriage: A Miracle of Forgiveness",
-      author: "Michael & Lisa Chen",
-      date: "May 12, 2025",
-      preview:
-        "Our marriage was on the brink of divorce. Through prayer, counseling, and God's incredible mercy, we discovered a love deeper than we ever imagined possible...",
-      readTime: "7 min read",
-      category: "Marriage",
-      image:
-        "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=400&h=250&fit=crop",
-    },
-    {
-      id: 3,
-      title: "Finding Purpose After Loss",
-      author: "David Rodriguez",
-      date: "May 8, 2025",
-      preview:
-        "When I lost my father, I questioned everything. Through this testimony, I want to share how God used my grief to birth a ministry that's now touching hundreds of lives...",
-      readTime: "6 min read",
-      category: "Purpose",
-      image:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=250&fit=crop",
-    },
-    {
-      id: 4,
-      title: "Overcoming Addiction: God's Power to Transform",
-      author: "Rebecca Martinez",
-      date: "May 5, 2025",
-      preview:
-        "For years, addiction controlled my life. Today, I celebrate 2 years of freedom through Christ. This is my story of redemption and the hope that's available to everyone...",
-      readTime: "8 min read",
-      category: "Freedom",
-      image:
-        "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=250&fit=crop",
-    },
-  ];
-
   const encouragements: DailyEncouragement[] = [
     {
-      id: 1,
+      id: "1",
       title: "Finding Strength in Weakness",
       verse:
         "But he said to me, 'My grace is sufficient for you, for my power is made perfect in weakness.'",
@@ -138,7 +109,7 @@ const Home = () => {
         "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&h=250&fit=crop",
     },
     {
-      id: 2,
+      id: "2",
       title: "Walking by Faith, Not by Sight",
       verse: "For we walk by faith, not by sight.",
       reference: "2 Corinthians 5:7",
@@ -151,7 +122,7 @@ const Home = () => {
         "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop",
     },
     {
-      id: 3,
+      id: "3",
       title: "Perfect Peace in God's Presence",
       verse:
         "You will keep in perfect peace those whose minds are steadfast, because they trust in you.",
@@ -165,7 +136,7 @@ const Home = () => {
         "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop",
     },
     {
-      id: 4,
+      id: "4",
       title: "Never Alone in the Valley",
       verse:
         "Even though I walk through the darkest valley, I will fear no evil, for you are with me.",
@@ -179,9 +150,16 @@ const Home = () => {
         "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=250&fit=crop",
     },
   ];
-  const handleReadMore = (id: number) => {
+  const handleReadMore = (id: string, title: string) => {
     // In a real app, this would navigate to the full testimony post
-    console.log(`Navigate to testimony ${id}`);
+    navigate(`/testimonies/${id}/${slugify(title)}`);
+  };
+
+  const truncateText = (text: string, wordLimit: number) => {
+    const words = text.split(" ");
+    if (words.length <= wordLimit) return text;
+
+    return words.slice(0, wordLimit).join(" ") + "...";
   };
 
   return (
@@ -257,51 +235,69 @@ const Home = () => {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Featured Testimony */}
-          <div className="mb-12">
-            <div className="bg-white rounded-md  overflow-hidden border border-gray-100">
-              <div className="md:flex">
-                <div className="md:w-1/2">
-                  <img
-                    src={testimonies[0].image}
-                    alt={testimonies[0].title}
-                    className="w-full h-64 md:h-full object-cover"
-                  />
-                </div>
-                <div className="md:w-1/2 p-8 md:p-12">
-                  <div className="flex items-center mb-4">
-                    <span className="bg-stone-100 text-stone-800 px-3 py-1 rounded-full text-sm font-medium">
-                      {testimonies[0].category}
-                    </span>
-                    <span className="text-gray-400 mx-2">•</span>
-                    <span className="text-gray-500 text-sm">
-                      {testimonies[0].readTime}
-                    </span>
+          {testimonies[0] && (
+            <div className="mb-12">
+              <div className="bg-white rounded-md  overflow-hidden border border-gray-100">
+                <div className="md:flex">
+                  <div className="md:w-1/2">
+                    <img
+                      src={
+                        testimonies[0].thumbnail
+                          ? testimonies[0].thumbnail
+                          : "/placeholder.jpg"
+                      }
+                      alt={testimonies[0].title}
+                      className="w-full h-64 md:h-full object-cover"
+                    />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                    {testimonies[0].title}
-                  </h3>
-                  <p className="text-gray-600 mb-6 leading-relaxed">
-                    {testimonies[0].preview}
-                  </p>
-                  <div className="flex flex-col md:flex-row gap-5 md:gap-0 items-center justify-between">
-                    <div className="flex items-center text-gray-500 text-sm">
-                      <User className="w-4 h-4 mr-2" />
-                      <span className="mr-4">{testimonies[0].author}</span>
-                      <Calendar className="w-4 h-4 mr-2" />
-                      <span>{testimonies[0].date}</span>
+                  <div className="md:w-1/2 p-8 md:p-12">
+                    <div className="flex items-center mb-4">
+                      <span className="bg-stone-100 text-stone-800 px-3 py-1 rounded-full text-sm font-medium">
+                        Faith
+                      </span>
+                      <span className="text-gray-400 mx-2">•</span>
+                      <span className="text-gray-500 text-sm">
+                        {Math.ceil(testimonies[0].body.length / 200)} min read
+                      </span>
                     </div>
-                    <button
-                      onClick={() => handleReadMore(testimonies[0].id)}
-                      className="inline-flex w-full md:w-fit justify-center items-center bg-[#3B3B1A] text-white px-6 py-3 rounded-md font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
-                    >
-                      Read More
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </button>
+                    <h3 className="text-2xl font-bold text-gray-800 mb-4">
+                      {testimonies[0].title}
+                    </h3>
+                    <p className="text-gray-600 mb-6 leading-relaxed">
+                      {truncateText(testimonies[0].body, 20)}
+                    </p>
+                    <div className="flex flex-col md:flex-row gap-5 md:gap-0 items-center justify-between">
+                      <div className="flex items-center text-gray-500 text-sm">
+                        <User className="w-4 h-4 mr-2" />
+                        <span className="mr-4">
+                          {testimonies[0].user.firstName}{" "}
+                          {testimonies[0].user.lastName}
+                        </span>
+                        <Calendar className="w-4 h-4 mr-2" />
+                        <span>
+                          {new Date(
+                            testimonies[0].updatedAt
+                          ).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() =>
+                          handleReadMore(
+                            testimonies[0].id,
+                            testimonies[0].title
+                          )
+                        }
+                        className="inline-flex w-full md:w-fit justify-center items-center bg-[#3B3B1A] text-white px-6 py-3 rounded-md font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                      >
+                        Read More
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Other Testimonies Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -312,13 +308,17 @@ const Home = () => {
               >
                 <div className="relative">
                   <img
-                    src={testimony.image}
+                    src={
+                      testimony.thumbnail
+                        ? testimony.thumbnail
+                        : "/placeholder.jpg"
+                    }
                     alt={testimony.title}
                     className="w-full h-48 object-cover"
                   />
                   <div className="absolute top-4 left-4">
                     <span className="bg-white/90 backdrop-blur-sm text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
-                      {testimony.category}
+                      Faith
                     </span>
                   </div>
                 </div>
@@ -329,26 +329,32 @@ const Home = () => {
                   </h3>
 
                   <p className="text-gray-600 mb-4 leading-relaxed line-clamp-3">
-                    {testimony.preview}
+                    {truncateText(testimony.body, 20)}
                   </p>
 
                   <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                     <div className="flex items-center">
                       <User className="w-4 h-4 mr-1" />
-                      <span>{testimony.author}</span>
+                      <span>
+                        {testimony.user.firstName} {testimony.user.lastName}
+                      </span>
                     </div>
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 mr-1" />
-                      <span>{testimony.date}</span>
+                      <span>
+                        {new Date(testimony.updatedAt).toLocaleDateString()}
+                      </span>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <span className="text-[#3B3B1A] text-sm font-medium">
-                      {testimony.readTime}
+                      {Math.ceil(testimony.body.length / 200)} min read
                     </span>
                     <button
-                      onClick={() => handleReadMore(testimony.id)}
+                      onClick={() =>
+                        handleReadMore(testimony.id, testimony.title)
+                      }
                       className="inline-flex items-center text-[#3B3B1A] hover:text-blue-700 font-semibold text-sm transition-colors duration-200"
                     >
                       Read More
@@ -425,7 +431,12 @@ const Home = () => {
                       <span>{encouragements[0].readTime}</span>
                     </div>
                     <button
-                      onClick={() => handleReadMore(encouragements[0].id)}
+                      onClick={() =>
+                        handleReadMore(
+                          encouragements[0].id,
+                          encouragements[0].title
+                        )
+                      }
                       className="inline-flex w-full md:w-fit justify-center items-center bg-[#3B3B1A] text-white px-6 py-3 rounded-md font-semibold hover:from-amber-600 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 shadow-lg"
                     >
                       Read Full Devotion
@@ -494,7 +505,9 @@ const Home = () => {
                     </div>
 
                     <button
-                      onClick={() => handleReadMore(encouragement.id)}
+                      onClick={() =>
+                        handleReadMore(encouragement.id, encouragement.title)
+                      }
                       className="inline-flex items-center text-[#3B3B1A] hover:text-amber-700 font-semibold text-sm transition-colors duration-200 w-full justify-center py-2 border rounded-md hover:bg-amber-50"
                     >
                       Read Devotion

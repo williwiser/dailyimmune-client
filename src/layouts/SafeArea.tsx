@@ -6,7 +6,7 @@ interface SafeAreaProps {
 }
 
 const SafeArea = ({ className, children }: SafeAreaProps) => {
-  return <div className={`size-full pt-24 ${className}`}>{children}</div>;
+  return <div className={`size-full pt-20 ${className}`}>{children}</div>;
 };
 
 export default SafeArea;

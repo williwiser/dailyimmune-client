@@ -4,7 +4,7 @@ import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
 import LogIn from "./pages/LogIn";
 import Testimonies from "./pages/Testimonies";
-import Encouragement from "./pages/Encouragement";
+import Encouragement from "./pages/Devotionals";
 import Shop from "./pages/Shop";
 import About from "./pages/About";
 import Prayer from "./pages/Prayer";
@@ -37,6 +37,10 @@ import MySavedTestimonies from "./pages/MySavedTestimonies";
 import EventInfo from "./pages/EventInfo";
 import LiveStream from "./pages/LiveStream";
 import WatchStream from "./pages/WatchStream";
+import DevotionalEditor from "./pages/DevotionalEditor";
+import MyDevotionals from "./pages/MyDevotionals";
+import DevotionalArticle from "./pages/DevotionalArticle";
+import Devotionals from "./pages/Devotionals";
 
 const router = createBrowserRouter([
   {
@@ -53,10 +57,6 @@ const router = createBrowserRouter([
           {
             path: "/encouragement",
             element: <Encouragement />,
-          },
-          {
-            path: "/shop",
-            element: <Shop />,
           },
           {
             path: "/about",
@@ -79,7 +79,16 @@ const router = createBrowserRouter([
             path: "/testimonies",
             element: <Testimonies />,
           },
+          {
+            path: "/devotionals",
+            element: <Devotionals />,
+          },
+          {
+            path: "/shop",
+            element: <Shop />,
+          },
           { path: "testimonies/:id/:slug", element: <Article /> },
+          { path: "devotionals/:id/:slug", element: <DevotionalArticle /> },
           { path: "prayers", element: <PrayerRequests /> },
           { path: "profile/:id", element: <Profile /> },
         ],
@@ -93,6 +102,7 @@ const router = createBrowserRouter([
           { path: "testimonies/saved", element: <MySavedTestimonies /> },
           { path: "prayer-requests/me", element: <MyPrayerRequests /> },
           { path: "events/me", element: <Events /> },
+          { path: "devotionals/me", element: <MyDevotionals /> },
           { path: "socket", element: <SocketTest /> },
         ],
       },
@@ -103,6 +113,8 @@ const router = createBrowserRouter([
           { path: "testimonies", element: <Testimonies /> },
           { path: "testimonies/new", element: <ArticleEditor /> },
           { path: "testimonies/:id/edit", element: <ArticleEditor /> },
+          { path: "devotionals/new", element: <DevotionalEditor /> },
+          { path: "devotionals/:id/edit", element: <DevotionalEditor /> },
           { path: "prayer", element: <SubmitPrayerRequest /> },
           { path: "profile/me", element: <ManageProfile /> },
         ],
