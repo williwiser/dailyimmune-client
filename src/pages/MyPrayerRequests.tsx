@@ -75,7 +75,7 @@ const MyPrayerRequests = () => {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 mt-6">
           {prayerRequests.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 px-6 col-span-3 bg-white rounded-md border">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">

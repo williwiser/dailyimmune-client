@@ -8,24 +8,7 @@ import Container from "@/layouts/Container";
 import DevotionalCard from "@/components/DevotionalCard";
 import { Link } from "react-router";
 import { slugify } from "@/utils/slugify";
-
-type User = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  profilePhoto: string;
-};
-
-type Devotional = {
-  id: string;
-  title: string;
-  body: string;
-  thumbnail: string;
-  updatedAt: Date;
-  author: User;
-  status: string;
-  // add other properties if needed
-};
+import type Devotional from "@/types/Devotional";
 
 const truncateText = (text: string, wordLimit: number) => {
   const words = text.split(" ");

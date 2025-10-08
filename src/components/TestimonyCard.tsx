@@ -74,7 +74,7 @@ const TestimonyCard = ({
         </AlertDialogContent>
       </AlertDialog>
 
-      <div className="group flex flex-col bg-white overflow-hidden rounded-xl border border-gray-200 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-gray-100 w-[20rem] h-[26rem] cursor-pointer">
+      <div className="group flex flex-col bg-white overflow-hidden rounded-xl border border-gray-200 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-gray-100 w-full max-w-[20rem] h-[26rem] cursor-pointer">
         {/* Image Container */}
         <div className="relative overflow-hidden">
           <img

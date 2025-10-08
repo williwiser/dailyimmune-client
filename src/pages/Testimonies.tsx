@@ -226,23 +226,18 @@ const Testimonies = () => {
 
                 {/* Desktop View - Horizontal Scroll */}
                 <div className="hidden lg:grid mb-6">
-                  <div className="grid gap-3 grid-cols-3">
-                    {recentTestimonies.map((testimony: Testimony, index) => (
-                      <div
+                  <div className="grid gap-6 md:grid-cols-3 2xl:grid-cols-4">
+                    {recentTestimonies.map((testimony: Testimony) => (
+                      <TestimonyCard
                         key={testimony.id}
-                        className="flex-shrink-0 w-80 transform transition-all duration-300 hover:scale-[1.02]"
-                        style={{ animationDelay: `${index * 100}ms` }}
-                      >
-                        <TestimonyCard
-                          id={testimony.id}
-                          thumbnail={testimony.thumbnail}
-                          title={testimony.title}
-                          body={truncateText(testimony.body, 15)}
-                          edited={testimony.updatedAt}
-                          author={`${testimony.user.firstName} ${testimony.user.lastName}`}
-                          status={testimony.status}
-                        />
-                      </div>
+                        id={testimony.id}
+                        thumbnail={testimony.thumbnail}
+                        title={testimony.title}
+                        body={truncateText(testimony.body, 15)}
+                        edited={testimony.updatedAt}
+                        author={`${testimony.user.firstName} ${testimony.user.lastName}`}
+                        status={testimony.status}
+                      />
                     ))}
                   </div>
                 </div>

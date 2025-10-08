@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import Container from "../layouts/Container";
 import {
   DropdownMenu,
@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 const Navigation = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,15 +34,23 @@ const Navigation = () => {
   return (
     <nav
       className={`fixed w-full z-20 text-lg transition-all duration-300 ${
-        isScrolled
+        isScrolled || showMenu
           ? "shadow-sm bg-white text-[#747474]"
-          : "text-white shadow-none"
+          : location.pathname === "/"
+          ? "text-white"
+          : "bg-white text-[#747474] shadow-none"
       }`}
     >
       <Container>
         <div className="flex justify-between items-center md:grid md:grid-cols-3">
           <img
-            src={isScrolled ? "logo_trimmed.webp" : "logo_white.png"}
+            src={
+              isScrolled
+                ? "logo_trimmed.webp"
+                : location.pathname === "/"
+                ? "logo_white.png"
+                : "logo_trimmed.webp"
+            }
             className="h-14"
             alt="logo"
           />
@@ -126,7 +135,7 @@ const Navigation = () => {
             <li>
               <Link
                 to="/signup"
-                className="px-4 py-2 rounded-md border border-[#3B3B1A] bg-[#3B3B1A] text-white"
+                className="px-4 py-2 rounded-md border border-[#585841] bg-[#585841] text-white"
               >
                 Sign Up
               </Link>

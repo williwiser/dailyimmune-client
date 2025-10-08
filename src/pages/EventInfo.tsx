@@ -53,6 +53,21 @@ const EventInfo = () => {
     duration: "2 hours",
   });
 
+  const handleStartStream = async () => {
+    try {
+      await axios.post(
+        `${BACKEND_URL}/api/v1/events/${id}/start`,
+        {},
+        { withCredentials: true }
+      );
+      navigate(`/livestream/${event.id}`);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      navigate(`/livestream/${event.id}`);
+    }
+  };
+
   useEffect(() => {
     axios.get(`${BACKEND_URL}/api/v1/events/${id}`).then((response) => {
       setEvent(response.data);
@@ -182,9 +197,7 @@ const EventInfo = () => {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => navigate(`/livestream/${event.id}`)}
-                      >
+                      <AlertDialogAction onClick={handleStartStream}>
                         Start Livestream
                       </AlertDialogAction>
                     </AlertDialogFooter>
