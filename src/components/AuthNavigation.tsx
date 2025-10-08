@@ -353,7 +353,7 @@ const AuthNavigation = () => {
                 </li>
               </ul>
 
-              <div className="flex">
+              <div className="flex justify-end">
                 <div className="hidden md:block border-r-2 h-[2.3rem] mx-6"></div>
                 <div className="hidden md:flex items-center justify-end space-x-4 mr-3">
                   {user?.role === "ADMIN" || user?.role === "SUPERADMIN" ? (
@@ -397,7 +397,7 @@ const AuthNavigation = () => {
                     <HelpCircleIcon className="w-5 h-5 text-gray-600 hover:text-blue-600 cursor-pointer transition-colors" />
                   )}
                 </div>
-                <div className="flex gap-4">
+                <div className="flex justify-end gap-4 w-full">
                   <DropdownMenu modal={false}>
                     <DropdownMenuTrigger
                       className="flex items-center gap-1 cursor-pointer"
