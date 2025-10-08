@@ -71,7 +71,7 @@ const Devotionals = () => {
   );
 
   const FeaturedDevotional = ({ devotional }: { devotional: Devotional }) => (
-    <div className="rounded-2xl flex flex-col md:flex-row gap-6 items-center justify-center overflow-hidden mb-12 ">
+    <div className="rounded-2xl flex flex-col md:flex-row gap-6 items-center justify-center overflow-hidden mb-12 px-8">
       <img
         src="/placeholder.jpg"
         className="size-96 object-cover rounded-2xl"

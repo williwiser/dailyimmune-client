@@ -105,7 +105,7 @@ const Dashboard: React.FC = () => {
           <div className="lg:col-span-2">
             {/* Welcome Section with Verse of the Day */}
             <SlideIn direction="down">
-              <div className="flex flex-col gap-2 text-[#747474] md:bg-none bg-white border bg-size-[13rem] bg-no-repeat bg-bottom-right md:bg-right rounded-md p-6">
+              <div className="flex flex-col gap-2 text-[#747474] md:bg-none bg-white border bg-size-[13rem] bg-no-repeat bg-bottom-right md:bg-right md:rounded-md p-6">
                 <div className="flex flex-col gap-2 w-full">
                   <Link
                     to="/dashboard/testimonies/new"
@@ -157,7 +157,7 @@ const Dashboard: React.FC = () => {
 
           {/* Recent Testimonies - Compact version */}
           <SlideIn direction="up" delay={0.5} className="h-full">
-            <div className="bg-white rounded-md p-6 border border-gray-200">
+            <div className="bg-white md:rounded-md p-6 border border-gray-200">
               <div className="flex items-center mb-6">
                 <Heart className="w-6 h-6 mr-3 text-[#747474]" />
                 <h2 className="text-xl font-bold text-[#3b3b19]">

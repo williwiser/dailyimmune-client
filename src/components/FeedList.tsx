@@ -746,7 +746,7 @@ const FeedList = () => {
   }, [hasMore]);
 
   return (
-    <div className="p-6 rounded-md border bg-white">
+    <div className="p-6 md:rounded-md border bg-white">
       <div className="flex items-center mb-3">
         <Clock className="w-6 h-6 mr-3 text-[#747474]" />
         <h2 className="text-xl font-bold text-[#3b3b19]">

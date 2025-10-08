@@ -55,13 +55,13 @@ const PrayerRequests = () => {
       />
       {isLoading ? (
         <Section>
-          <div className="flex justify-center items-center">
+          <div className="flex justify-center items-center px-8">
             <PulseLoader color="#79716b" />
           </div>
         </Section>
       ) : (
         <Section>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 ">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 px-8">
             {prayerRequests.map((prayerRequest: PrayerRequest) => (
               <div
                 key={prayerRequest.id}

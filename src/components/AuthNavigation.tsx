@@ -281,287 +281,288 @@ const AuthNavigation = () => {
                 <img src="/logo_trimmed.webp" className="h-14 " alt="logo" />
               </div>
 
-              <ul>
-                <ul className="hidden md:flex justify-center gap-8 text-sm">
-                  <li>
-                    <NavLink
-                      to="/dashboard"
-                      className={({ isActive }) =>
-                        `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
-                          isActive ? "text-green-500" : ""
-                        }`
-                      }
-                      end
-                    >
-                      <FontAwesomeIcon icon={faHome} />
-                      <span>Home</span>
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/testimonies"
-                      className={({ isActive }) =>
-                        `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
-                          isActive ? "text-green-500" : ""
-                        }`
-                      }
-                      end
-                    >
-                      <FontAwesomeIcon icon={faHeart} />
-                      <span>Testimonies</span>
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/prayers"
-                      className={({ isActive }) =>
-                        `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
-                          isActive ? "text-green-500" : ""
-                        }`
-                      }
-                      end
-                    >
-                      <FontAwesomeIcon icon={faPray} />
-                      <span>Prayers</span>
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/devotionals"
-                      className={({ isActive }) =>
-                        `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
-                          isActive ? "text-green-500" : ""
-                        }`
-                      }
-                      end
-                    >
-                      <FontAwesomeIcon icon={faBible} />
-                      <span>Devotionals</span>
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/shop"
-                      className={({ isActive }) =>
-                        `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
-                          isActive ? "text-green-500" : ""
-                        }`
-                      }
-                    >
-                      <FontAwesomeIcon icon={faShoppingBag} />
-                      <span>Shop</span>
-                    </NavLink>
-                  </li>
-                </ul>
-              </ul>
-              <div className="hidden md:block border-r-2 h-[2.3rem] mx-6"></div>
-            </div>
-            <div className="hidden md:flex items-center justify-end space-x-4 mr-3">
-              {user?.role === "ADMIN" || user?.role === "SUPERADMIN" ? (
-                <DropdownMenu modal={false}>
-                  <DropdownMenuTrigger>
-                    <FontAwesomeIcon
-                      icon={faUserGear}
-                      className="cursor-pointer hover:text-gray-700 duration-200 transition-all"
-                      title="Admin Actions"
-                    />
-                  </DropdownMenuTrigger>
-
-                  <DropdownMenuContent className="p-2">
-                    <DropdownMenuItem asChild>
-                      <Link to="/dashboard/devotionals/new">
-                        <div className="flex gap-2">
-                          <Plus />
-                          <span>New Devotional</span>
-                        </div>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/dashboard/devotionals/new">
-                        <div className="flex gap-2">
-                          <Video />
-                          <span>New Video</span>
-                        </div>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/dashboard/events/me">
-                        <div className="flex gap-2">
-                          <Calendar />
-                          <span>Manage Events</span>
-                        </div>
-                      </Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <HelpCircleIcon className="w-5 h-5 text-gray-600 hover:text-blue-600 cursor-pointer transition-colors" />
-              )}
-            </div>
-            <div className="flex gap-4">
-              <DropdownMenu modal={false}>
-                <DropdownMenuTrigger
-                  className="flex items-center gap-1 cursor-pointer"
-                  asChild
-                >
-                  <button
-                    className="relative"
-                    onClick={handleNotificationCount}
+              <ul className="hidden md:flex justify-center gap-8 text-sm">
+                <li>
+                  <NavLink
+                    to="/dashboard"
+                    className={({ isActive }) =>
+                      `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
+                        isActive ? "text-green-500" : ""
+                      }`
+                    }
+                    end
                   >
-                    <Bell className="w-5 h-5 text-gray-600 hover:text-gray-800 cursor-pointer transition-colors" />
-                    {unreadCount > 0 && (
-                      <span className="absolute -top-2 -right-2 text-xs bg-red-600 text-white size-5 border-2 border-white flex items-center justify-center rounded-full">
-                        {unreadCount > 9 ? "9+" : unreadCount}
-                      </span>
-                    )}
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="flex flex-col gap-3 bg-white border-none p-4 h-max w-full">
-                  <div className="flex flex-col h-full justify-between gap-5">
-                    {notifications.length === 0 ? (
-                      <div className="flex justify-center items-center text-sm text-gray-500 text-semibold">
-                        No new notifications
-                      </div>
-                    ) : (
-                      notifications.map((notification) => {
-                        return (
-                          <DropdownMenuItem asChild>
-                            <Link to="/testimonies">
-                              {(() => {
-                                switch (notification.type) {
-                                  case "like":
-                                    return (
-                                      <FontAwesomeIcon
-                                        icon={faHeart}
-                                        className="mr-4"
-                                      />
-                                    );
+                    <FontAwesomeIcon icon={faHome} />
+                    <span>Home</span>
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/testimonies"
+                    className={({ isActive }) =>
+                      `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
+                        isActive ? "text-green-500" : ""
+                      }`
+                    }
+                    end
+                  >
+                    <FontAwesomeIcon icon={faHeart} />
+                    <span>Testimonies</span>
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/prayers"
+                    className={({ isActive }) =>
+                      `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
+                        isActive ? "text-green-500" : ""
+                      }`
+                    }
+                    end
+                  >
+                    <FontAwesomeIcon icon={faPray} />
+                    <span>Prayers</span>
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/devotionals"
+                    className={({ isActive }) =>
+                      `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
+                        isActive ? "text-green-500" : ""
+                      }`
+                    }
+                    end
+                  >
+                    <FontAwesomeIcon icon={faBible} />
+                    <span>Devotionals</span>
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/shop"
+                    className={({ isActive }) =>
+                      `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
+                        isActive ? "text-green-500" : ""
+                      }`
+                    }
+                  >
+                    <FontAwesomeIcon icon={faShoppingBag} />
+                    <span>Shop</span>
+                  </NavLink>
+                </li>
+              </ul>
 
-                                  case "badge":
-                                    return (
-                                      <FontAwesomeIcon
-                                        icon={faAward}
-                                        className="mr-4"
-                                      />
-                                    );
-                                  case "message":
-                                    return (
-                                      <FontAwesomeIcon
-                                        icon={faMessage}
-                                        className="mr-4"
-                                      />
-                                    );
-                                  case "comment":
-                                    return (
-                                      <FontAwesomeIcon
-                                        icon={faMessage}
-                                        className="mr-4"
-                                      />
-                                    );
-                                  case "admin":
-                                    return (
-                                      <FontAwesomeIcon
-                                        icon={faUser}
-                                        className="mr-4"
-                                      />
-                                    );
-                                  default:
-                                    return (
-                                      <FontAwesomeIcon
-                                        icon={faDotCircle}
-                                        className="mr-4"
-                                      />
-                                    );
-                                }
-                              })()}
-                              <div>
-                                <p className="font-semibold text-xs">
-                                  {notification.title}
-                                </p>
+              <div className="flex">
+                <div className="hidden md:block border-r-2 h-[2.3rem] mx-6"></div>
+                <div className="hidden md:flex items-center justify-end space-x-4 mr-3">
+                  {user?.role === "ADMIN" || user?.role === "SUPERADMIN" ? (
+                    <DropdownMenu modal={false}>
+                      <DropdownMenuTrigger>
+                        <FontAwesomeIcon
+                          icon={faUserGear}
+                          className="cursor-pointer hover:text-gray-700 duration-200 transition-all"
+                          title="Admin Actions"
+                        />
+                      </DropdownMenuTrigger>
 
-                                <p className="text-gray-500 text-xs max-w-[12rem]">
-                                  {notification.message}
-                                </p>
+                      <DropdownMenuContent className="p-2">
+                        <DropdownMenuItem asChild>
+                          <Link to="/dashboard/devotionals/new">
+                            <div className="flex gap-2">
+                              <Plus />
+                              <span>New Devotional</span>
+                            </div>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/dashboard/devotionals/new">
+                            <div className="flex gap-2">
+                              <Video />
+                              <span>New Video</span>
+                            </div>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/dashboard/events/me">
+                            <div className="flex gap-2">
+                              <Calendar />
+                              <span>Manage Events</span>
+                            </div>
+                          </Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : (
+                    <HelpCircleIcon className="w-5 h-5 text-gray-600 hover:text-blue-600 cursor-pointer transition-colors" />
+                  )}
+                </div>
+                <div className="flex gap-4">
+                  <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger
+                      className="flex items-center gap-1 cursor-pointer"
+                      asChild
+                    >
+                      <button
+                        className="relative"
+                        onClick={handleNotificationCount}
+                      >
+                        <Bell className="w-5 h-5 text-gray-600 hover:text-gray-800 cursor-pointer transition-colors" />
+                        {unreadCount > 0 && (
+                          <span className="absolute -top-2 -right-2 text-xs bg-red-600 text-white size-5 border-2 border-white flex items-center justify-center rounded-full">
+                            {unreadCount > 9 ? "9+" : unreadCount}
+                          </span>
+                        )}
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="flex flex-col gap-3 bg-white border-none p-4 h-max w-full">
+                      <div className="flex flex-col h-full justify-between gap-5">
+                        {notifications.length === 0 ? (
+                          <div className="flex justify-center items-center text-sm text-gray-500 text-semibold">
+                            No new notifications
+                          </div>
+                        ) : (
+                          notifications.map((notification) => {
+                            return (
+                              <DropdownMenuItem asChild>
+                                <Link to="/testimonies">
+                                  {(() => {
+                                    switch (notification.type) {
+                                      case "like":
+                                        return (
+                                          <FontAwesomeIcon
+                                            icon={faHeart}
+                                            className="mr-4"
+                                          />
+                                        );
 
-                                <span className="text-gray-500 text-xs max-w-[12rem] italic">
-                                  {formatDistanceToNow(
-                                    new Date(notification.createdAt),
-                                    { addSuffix: true }
-                                  )}
-                                </span>
-                              </div>
-                            </Link>
-                          </DropdownMenuItem>
-                        );
-                      })
-                    )}
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <DropdownMenu modal={false}>
-                <DropdownMenuTrigger>
-                  <Avatar className="cursor-pointer border">
-                    <AvatarImage
-                      src={user?.profilePhoto}
-                      className="object-cover"
-                    />
-                    <AvatarFallback>{user?.firstName[0]}</AvatarFallback>
-                  </Avatar>
-                </DropdownMenuTrigger>
+                                      case "badge":
+                                        return (
+                                          <FontAwesomeIcon
+                                            icon={faAward}
+                                            className="mr-4"
+                                          />
+                                        );
+                                      case "message":
+                                        return (
+                                          <FontAwesomeIcon
+                                            icon={faMessage}
+                                            className="mr-4"
+                                          />
+                                        );
+                                      case "comment":
+                                        return (
+                                          <FontAwesomeIcon
+                                            icon={faMessage}
+                                            className="mr-4"
+                                          />
+                                        );
+                                      case "admin":
+                                        return (
+                                          <FontAwesomeIcon
+                                            icon={faUser}
+                                            className="mr-4"
+                                          />
+                                        );
+                                      default:
+                                        return (
+                                          <FontAwesomeIcon
+                                            icon={faDotCircle}
+                                            className="mr-4"
+                                          />
+                                        );
+                                    }
+                                  })()}
+                                  <div>
+                                    <p className="font-semibold text-xs">
+                                      {notification.title}
+                                    </p>
 
-                <DropdownMenuContent className="p-2">
-                  <DropdownMenuItem asChild>
-                    <Link to="profile/me">
-                      <div className="flex gap-2">
-                        <User />
-                        <span>Profile</span>
+                                    <p className="text-gray-500 text-xs max-w-[12rem]">
+                                      {notification.message}
+                                    </p>
+
+                                    <span className="text-gray-500 text-xs max-w-[12rem] italic">
+                                      {formatDistanceToNow(
+                                        new Date(notification.createdAt),
+                                        { addSuffix: true }
+                                      )}
+                                    </span>
+                                  </div>
+                                </Link>
+                              </DropdownMenuItem>
+                            );
+                          })
+                        )}
                       </div>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="profile">
-                      <div className="flex gap-2">
-                        <ReceiptText />
-                        <span>Orders</span>
-                      </div>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link to="profile">
-                      <div className="flex gap-2">
-                        <MessageCircle />
-                        <span>Messages</span>
-                      </div>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <AlertDialog>
-                      <AlertDialogTrigger className="text-sm w-full text-left pl-2 cursor-pointer hover:bg-stone-100 rounded-sm">
-                        Sign Out
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Logging out will end your current session. Don't
-                            worry though, we'll be here when you return!
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            className="bg-[#3b3b19]"
-                            onClick={handleSignOut}
-                          >
-                            Continue
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger>
+                      <Avatar className="cursor-pointer border">
+                        <AvatarImage
+                          src={user?.profilePhoto}
+                          className="object-cover"
+                        />
+                        <AvatarFallback>{user?.firstName[0]}</AvatarFallback>
+                      </Avatar>
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent className="p-2">
+                      <DropdownMenuItem asChild>
+                        <Link to="profile/me">
+                          <div className="flex gap-2">
+                            <User />
+                            <span>Profile</span>
+                          </div>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="profile">
+                          <div className="flex gap-2">
+                            <ReceiptText />
+                            <span>Orders</span>
+                          </div>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Link to="profile">
+                          <div className="flex gap-2">
+                            <MessageCircle />
+                            <span>Messages</span>
+                          </div>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <AlertDialog>
+                          <AlertDialogTrigger className="text-sm w-full text-left pl-2 cursor-pointer hover:bg-stone-100 rounded-sm">
+                            Sign Out
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Logging out will end your current session. Don't
+                                worry though, we'll be here when you return!
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                className="bg-[#3b3b19]"
+                                onClick={handleSignOut}
+                              >
+                                Continue
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
             </div>
           </div>
         </Container>
