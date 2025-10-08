@@ -9,6 +9,10 @@ import { Toaster } from "sonner";
 import FeedList from "@/components/FeedList";
 import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
 import { slugify } from "@/utils/slugify";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFileVideo, faFileWaveform } from "@fortawesome/free-solid-svg-icons";
+import VideoUploadModal from "@/components/VideoUploadModal";
+import AudioUploadModal from "@/components/AudioUploadModal";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -31,6 +35,8 @@ interface Testimony {
 }
 const Dashboard: React.FC = () => {
   const [staffPicks, setStaffPicks] = useState<Testimony[]>([]);
+  const [openVideoModal, setOpenVideoModal] = useState(false);
+  const [openAudioModal, setOpenAudioModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   type FeedActivity = {
     id: string;
@@ -83,6 +89,14 @@ const Dashboard: React.FC = () => {
   ) : (
     <div className="min-h-screen g-[#eae7dd]">
       <Toaster />
+      <VideoUploadModal
+        open={openVideoModal}
+        onOpenChange={setOpenVideoModal}
+      />
+      <AudioUploadModal
+        open={openAudioModal}
+        onOpenChange={setOpenAudioModal}
+      />
       <div className="max-w-7xl mx-auto space-y-2">
         {/* Recent Activity and Testimonies Side by Side */}
 
@@ -99,9 +113,40 @@ const Dashboard: React.FC = () => {
                   >
                     <div className="inline-flex gap-2 text-gray-500 px-6 py-2 w-full">
                       <PenSquare />{" "}
-                      <span>What's your testimony, {user?.firstName}?</span>
+                      <span>
+                        What's your testimony
+                        <span className="hidden md:inline">
+                          , {user?.firstName}
+                        </span>
+                        ?
+                      </span>
                     </div>
                   </Link>
+                  {user?.role === "ADMIN" ||
+                    (user?.role === "SUPERADMIN" && (
+                      <div className="px-4 flex gap-8 mt-4">
+                        <button
+                          className="cursor-pointer w-fit text-sm"
+                          onClick={() => setOpenVideoModal(true)}
+                        >
+                          <FontAwesomeIcon
+                            icon={faFileVideo}
+                            className="text-stone-500"
+                          />{" "}
+                          Upload Video
+                        </button>
+                        <button
+                          className="cursor-pointer w-fit text-sm"
+                          onClick={() => setOpenAudioModal(true)}
+                        >
+                          <FontAwesomeIcon
+                            icon={faFileWaveform}
+                            className="text-stone-500"
+                          />{" "}
+                          Upload Audio
+                        </button>
+                      </div>
+                    ))}
                 </div>
               </div>
             </SlideIn>

@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
+import ReactPlayer from "react-player";
 import { Link } from "react-router";
 import { slugify } from "@/utils/slugify";
 import {
@@ -22,7 +23,6 @@ import {
   faCopy,
 } from "@fortawesome/free-solid-svg-icons";
 import PulseLoader from "react-spinners/PulseLoader";
-import { Button } from "./ui/button";
 import { PrayerModal } from "./PrayerModal";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -41,6 +41,8 @@ type FeedActivity = {
     body?: string;
     isAnswered?: boolean;
     date?: Date;
+    caption?: string;
+    url?: string;
   };
   isSaved?: boolean;
 };
@@ -184,7 +186,7 @@ const FeedList = () => {
               to={`/testimonies/${activity.id.split("-")[1]}/${slugify(
                 activity.content
               )}`}
-              className="font-bold text-3xl hover:text-gray-500 transition-all duration-200 mb-2"
+              className="font-bold text-3xl hover:text-gray-500 transition-all duration-200 mb-2 text-wrap"
             >
               {activity.content}
             </Link>
@@ -381,16 +383,15 @@ const FeedList = () => {
             <span className="bg-gray-100 text-stone-500 text-sm mb-2 w-fit px-4 py-0.5 rounded-full">
               &bull; Prayer Request
             </span>
-            <Button
-              variant={"link"}
-              className="p-0 w-fit hover:no-underline cursor-pointer font-bold text-3xl hover:text-gray-500 transition-all duration-200 mb-2"
+            <button
+              className="p-0 w-fit hover:no-underline cursor-pointer font-bold text-3xl hover:text-gray-500 transition-all duration-200 mb-2 text-wrap text-left"
               onClick={() => {
                 setActivePrayerId(activity.id.split("-")[1]);
                 setShowModal(true);
               }}
             >
               {activity.content}
-            </Button>
+            </button>
             <p className="text-gray-500 mb-4">{activity.extra?.body}</p>
             {activity.thumbnail && (
               <img
@@ -412,6 +413,203 @@ const FeedList = () => {
                   className="inline"
                 />
                 <span className="text-sm"> View</span>
+              </button>
+            </div>
+          </div>
+        );
+      case "video":
+        return (
+          <div className="flex flex-col py-6">
+            <div className="flex gap-2 items-center mb-4">
+              <Avatar className="border">
+                <AvatarImage
+                  src={activity.authorPhoto}
+                  className="object-cover"
+                />
+                <AvatarFallback>{activity.authorName[0]}</AvatarFallback>
+              </Avatar>
+              <div className="text-gray-500 text-sm">
+                <p>
+                  <Link
+                    to={`/profile/${activity.authorId}`}
+                    className="font-semibold"
+                  >
+                    {activity.authorName}
+                  </Link>{" "}
+                  <span className="italic">shared a video</span>
+                </p>
+                <p>
+                  {formatDistanceToNow(new Date(activity.createdAt), {
+                    addSuffix: true,
+                  })}
+                </p>
+              </div>
+            </div>
+            <h1 className="p-0 w-fit hover:no-underline cursor-pointer font-bold text-3xl hover:text-gray-500 transition-all duration-200 mb-4 text-wrap text-left">
+              {activity.content}
+            </h1>
+            <div className="flex justify-center items-center w-full">
+              <div className="relative w-full max-w-3xl aspect-video rounded-xl overflow-hidden shadow-lg">
+                <ReactPlayer
+                  src={activity.extra?.url}
+                  width="100%"
+                  height="100%"
+                  controls
+                />
+              </div>
+            </div>
+
+            <p className="text-gray-500 my-4">{activity.extra?.caption}</p>
+            <div className="flex gap-4 mt-4">
+              <button
+                onClick={() => toggleLike(activity.id)}
+                className={`cursor-pointer ${
+                  likedItems[activity.id] ? "text-red-500" : "text-gray-400"
+                } hover:text-red-600  transition-all duration-200`}
+              >
+                <Heart
+                  size={16}
+                  fill={likedItems[activity.id] ? "red" : "none"}
+                  className="inline"
+                />
+                <span className="text-sm"> Like</span>
+              </button>
+              <button
+                onClick={() => toggleSaved(activity)}
+                className={`cursor-pointer ${
+                  savedItems[activity.id] ? "text-yellow-400" : "text-gray-400"
+                } hover:text-yellow-500  transition-all duration-200`}
+              >
+                {savedItems[activity.id] ? (
+                  <BookmarkMinusIcon
+                    size={16}
+                    fill={
+                      savedItems[activity.id]
+                        ? "oklch(85.2% 0.199 91.936)"
+                        : "none"
+                    }
+                    className="inline"
+                  />
+                ) : (
+                  <Bookmark
+                    size={16}
+                    fill={
+                      savedItems[activity.id]
+                        ? "oklch(85.2% 0.199 91.936)"
+                        : "none"
+                    }
+                    className="inline"
+                  />
+                )}
+                <span className="text-sm">
+                  {" "}
+                  {savedItems[activity.id] ? "Unsave" : "Save"}
+                </span>
+              </button>
+
+              <button
+                onClick={() => handleShare(activity)}
+                className="cursor-pointer text-gray-400 hover:text-gray-600 transition-all duration-200"
+              >
+                <Share2 size={16} className="inline" />
+                <span className="text-sm"> Share</span>
+              </button>
+            </div>
+          </div>
+        );
+      case "audio":
+        return (
+          <div className="flex flex-col py-6">
+            <div className="flex gap-2 items-center mb-4">
+              <Avatar className="border">
+                <AvatarImage
+                  src={activity.authorPhoto}
+                  className="object-cover"
+                />
+                <AvatarFallback>{activity.authorName[0]}</AvatarFallback>
+              </Avatar>
+              <div className="text-gray-500 text-sm">
+                <p>
+                  <Link
+                    to={`/profile/${activity.authorId}`}
+                    className="font-semibold"
+                  >
+                    {activity.authorName}
+                  </Link>{" "}
+                  <span className="italic">shared an audio</span>
+                </p>
+                <p>
+                  {formatDistanceToNow(new Date(activity.createdAt), {
+                    addSuffix: true,
+                  })}
+                </p>
+              </div>
+            </div>
+            <h1 className="p-0 w-fit hover:no-underline cursor-pointer font-bold text-3xl hover:text-gray-500 transition-all duration-200 mb-4 text-wrap text-left">
+              {activity.content}
+            </h1>
+            <div className="flex justify-center items-center w-full">
+              <audio
+                src={activity.extra?.url}
+                controls
+                className="w-full h-10 rounded-full"
+              />
+            </div>
+
+            <p className="text-gray-500 my-4">{activity.extra?.caption}</p>
+            <div className="flex gap-4 mt-4">
+              <button
+                onClick={() => toggleLike(activity.id)}
+                className={`cursor-pointer ${
+                  likedItems[activity.id] ? "text-red-500" : "text-gray-400"
+                } hover:text-red-600  transition-all duration-200`}
+              >
+                <Heart
+                  size={16}
+                  fill={likedItems[activity.id] ? "red" : "none"}
+                  className="inline"
+                />
+                <span className="text-sm"> Like</span>
+              </button>
+              <button
+                onClick={() => toggleSaved(activity)}
+                className={`cursor-pointer ${
+                  savedItems[activity.id] ? "text-yellow-400" : "text-gray-400"
+                } hover:text-yellow-500  transition-all duration-200`}
+              >
+                {savedItems[activity.id] ? (
+                  <BookmarkMinusIcon
+                    size={16}
+                    fill={
+                      savedItems[activity.id]
+                        ? "oklch(85.2% 0.199 91.936)"
+                        : "none"
+                    }
+                    className="inline"
+                  />
+                ) : (
+                  <Bookmark
+                    size={16}
+                    fill={
+                      savedItems[activity.id]
+                        ? "oklch(85.2% 0.199 91.936)"
+                        : "none"
+                    }
+                    className="inline"
+                  />
+                )}
+                <span className="text-sm">
+                  {" "}
+                  {savedItems[activity.id] ? "Unsave" : "Save"}
+                </span>
+              </button>
+
+              <button
+                onClick={() => handleShare(activity)}
+                className="cursor-pointer text-gray-400 hover:text-gray-600 transition-all duration-200"
+              >
+                <Share2 size={16} className="inline" />
+                <span className="text-sm"> Share</span>
               </button>
             </div>
           </div>

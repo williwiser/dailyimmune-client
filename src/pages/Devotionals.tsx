@@ -88,7 +88,7 @@ const Devotionals = () => {
   );
 
   const FeaturedDevotional = ({ devotional }: { devotional: Devotional }) => (
-    <div className="rounded-2xl flex items-center justify-center overflow-hidden mb-12 ">
+    <div className="rounded-2xl flex flex-col md:flex-row gap-6 items-center justify-center overflow-hidden mb-12 ">
       <img
         src="/placeholder.jpg"
         className="size-96 object-cover rounded-2xl"
@@ -120,6 +120,7 @@ const Devotionals = () => {
                 <Avatar className="size-10 border">
                   <AvatarImage
                     src={devotional.author.profilePhoto}
+                    className="object-cover"
                   ></AvatarImage>
                   <AvatarFallback>
                     {devotional.author.firstName[0]}

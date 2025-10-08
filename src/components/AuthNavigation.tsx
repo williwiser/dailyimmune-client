@@ -6,15 +6,17 @@ import {
   faAward,
   faBars,
   faBible,
+  faBookmark,
+  faCalendar,
   faChevronDown,
   faChevronUp,
   faClose,
   faDotCircle,
+  faEdit,
   faHeart,
   faHome,
   faMessage,
   faPray,
-  faReceipt,
   faShoppingBag,
   faUser,
   faUserGear,
@@ -25,14 +27,13 @@ import {
   Calendar,
   Heart,
   HelpCircleIcon,
-  LayoutDashboard,
-  LogOut,
   MessageCircle,
   Plus,
   ReceiptText,
   ShoppingBag,
   User,
   Users,
+  Video,
 } from "lucide-react";
 import { useAuth } from "@/context/useAuth";
 import { useNavigate } from "react-router";
@@ -94,13 +95,14 @@ interface ReceiveMessageProps {
 const AuthNavigation = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [showCommunityMenu, setShowCommunityMenu] = useState(false);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
+
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showBadgeDialog, setShowBadgeDialog] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
   const [newBadge, setNewBadge] = useState<Notification | null>(null);
+  //const [showSidebar, setShowSidebar] = useState(false);
   const [blockData, setBlockData] = useState<BlockData>({
     reason: "",
     comment: "",
@@ -266,9 +268,19 @@ const AuthNavigation = () => {
       >
         <Container>
           <div className="flex justify-between items-center">
-            <div className="flex items-center">
-              <img src="/logo_trimmed.webp" className="h-14" alt="logo" />
-              <div className="hidden md:block border-r-2 h-[2.3rem] mx-6"></div>
+            <div className="md:flex grid grid-cols-3 items-center w-full">
+              <div className="flex pl-2">
+                <button
+                  className="md:hidden"
+                  onClick={() => setShowMenu(!showMenu)}
+                >
+                  <FontAwesomeIcon icon={showMenu ? faClose : faBars} />
+                </button>
+              </div>
+              <div className="flex items-center justify-center md:justify-start w-full">
+                <img src="/logo_trimmed.webp" className="h-14 " alt="logo" />
+              </div>
+
               <ul>
                 <ul className="hidden md:flex justify-center gap-8 text-sm">
                   <li>
@@ -342,8 +354,51 @@ const AuthNavigation = () => {
                   </li>
                 </ul>
               </ul>
+              <div className="hidden md:block border-r-2 h-[2.3rem] mx-6"></div>
             </div>
-            <div className="hidden md:flex items-center justify-end space-x-4">
+            <div className="hidden md:flex items-center justify-end space-x-4 mr-3">
+              {user?.role === "ADMIN" || user?.role === "SUPERADMIN" ? (
+                <DropdownMenu modal={false}>
+                  <DropdownMenuTrigger>
+                    <FontAwesomeIcon
+                      icon={faUserGear}
+                      className="cursor-pointer hover:text-gray-700 duration-200 transition-all"
+                      title="Admin Actions"
+                    />
+                  </DropdownMenuTrigger>
+
+                  <DropdownMenuContent className="p-2">
+                    <DropdownMenuItem asChild>
+                      <Link to="/dashboard/devotionals/new">
+                        <div className="flex gap-2">
+                          <Plus />
+                          <span>New Devotional</span>
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/dashboard/devotionals/new">
+                        <div className="flex gap-2">
+                          <Video />
+                          <span>New Video</span>
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/dashboard/events/me">
+                        <div className="flex gap-2">
+                          <Calendar />
+                          <span>Manage Events</span>
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <HelpCircleIcon className="w-5 h-5 text-gray-600 hover:text-blue-600 cursor-pointer transition-colors" />
+              )}
+            </div>
+            <div className="flex gap-4">
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger
                   className="flex items-center gap-1 cursor-pointer"
@@ -361,7 +416,7 @@ const AuthNavigation = () => {
                     )}
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="flex flex-col gap-4 bg-white border-none p-4 h-max w-full">
+                <DropdownMenuContent className="flex flex-col gap-3 bg-white border-none p-4 h-max w-full">
                   <div className="flex flex-col h-full justify-between gap-5">
                     {notifications.length === 0 ? (
                       <div className="flex justify-center items-center text-sm text-gray-500 text-semibold">
@@ -443,38 +498,6 @@ const AuthNavigation = () => {
                   </div>
                 </DropdownMenuContent>
               </DropdownMenu>
-              {user?.role === "ADMIN" || user?.role === "SUPERADMIN" ? (
-                <DropdownMenu modal={false}>
-                  <DropdownMenuTrigger>
-                    <FontAwesomeIcon
-                      icon={faUserGear}
-                      className="cursor-pointer hover:text-gray-700 duration-200 transition-all"
-                      title="Admin Actions"
-                    />
-                  </DropdownMenuTrigger>
-
-                  <DropdownMenuContent className="p-2">
-                    <DropdownMenuItem asChild>
-                      <Link to="/dashboard/devotionals/new">
-                        <div className="flex gap-2">
-                          <Plus />
-                          <span>New Devotional</span>
-                        </div>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/dashboard/events/me">
-                        <div className="flex gap-2">
-                          <Calendar />
-                          <span>Manage Events</span>
-                        </div>
-                      </Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <HelpCircleIcon className="w-5 h-5 text-gray-600 hover:text-blue-600 cursor-pointer transition-colors" />
-              )}
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger>
                   <Avatar className="cursor-pointer border">
@@ -540,12 +563,6 @@ const AuthNavigation = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <button
-              className="md:hidden"
-              onClick={() => setShowMenu(!showMenu)}
-            >
-              <FontAwesomeIcon icon={showMenu ? faClose : faBars} />
-            </button>
           </div>
         </Container>
 
@@ -554,7 +571,7 @@ const AuthNavigation = () => {
         <div
           className={`${
             showMenu ? "fixed" : "hidden"
-          } md:hidden w-full bg-gray-500 text-white h-full`}
+          } md:hidden w-full bg-gray-800 text-white h-full`}
         >
           <ul className="text-lg font-semibold">
             <li>
@@ -563,13 +580,12 @@ const AuthNavigation = () => {
                 onClick={() => {
                   setShowMenu(false);
                   setShowCommunityMenu(false);
-                  setShowProfileMenu(false);
                 }}
                 to="/dashboard"
               >
                 <div className="flex gap-4 items-center">
-                  <LayoutDashboard />
-                  <span>Dashboard</span>
+                  <FontAwesomeIcon icon={faHome} />
+                  <span>Home</span>
                 </div>
               </Link>
             </li>
@@ -623,11 +639,11 @@ const AuthNavigation = () => {
                 <Link
                   className="flex justify-between items-center size-full p-4"
                   onClick={() => setShowMenu(false)}
-                  to="/dashboard"
+                  to="/devotionals"
                 >
                   <div className="flex pl-10 gap-4 items-center">
-                    <MessageCircle />
-                    <span>Forum</span>
+                    <FontAwesomeIcon icon={faBible} />
+                    <span>Devotionals</span>
                   </div>
                 </Link>
               </li>
@@ -649,11 +665,37 @@ const AuthNavigation = () => {
               <Link
                 className="flex justify-between items-center size-full p-4"
                 onClick={() => setShowMenu(false)}
-                to="/signup"
+                to="/dashboard/testimonies/me"
               >
                 <div className="flex gap-4 items-center">
-                  <MessageCircle />
-                  <span>Messages</span>
+                  <FontAwesomeIcon icon={faHeart} />
+                  <span>My Testimonies</span>
+                </div>
+              </Link>
+            </li>
+            {(user?.role === "ADMIN" || user?.role === "SUPERADMIN") && (
+              <li>
+                <Link
+                  className="flex justify-between items-center size-full p-4"
+                  onClick={() => setShowMenu(false)}
+                  to="/dashboard/devotionals/me"
+                >
+                  <div className="flex gap-4 items-center">
+                    <FontAwesomeIcon icon={faBible} />
+                    <span>My Devotionals</span>
+                  </div>
+                </Link>
+              </li>
+            )}
+            <li>
+              <Link
+                className="flex justify-between items-center size-full p-4"
+                onClick={() => setShowMenu(false)}
+                to="/dashboard/prayer-requests/me"
+              >
+                <div className="flex gap-4 items-center">
+                  <FontAwesomeIcon icon={faPray} />
+                  <span>My Prayer Requests</span>
                 </div>
               </Link>
             </li>
@@ -661,74 +703,39 @@ const AuthNavigation = () => {
               <Link
                 className="flex justify-between items-center size-full p-4"
                 onClick={() => setShowMenu(false)}
-                to="/signup"
+                to="/dashboard/events/me"
               >
                 <div className="flex gap-4 items-center">
-                  <Bell />
-                  <span>Notifications</span>
+                  <FontAwesomeIcon icon={faCalendar} />
+                  <span>Upcoming Events</span>
                 </div>
               </Link>
             </li>
             <li>
-              <button
+              <Link
                 className="flex justify-between items-center size-full p-4"
-                onClick={() => setShowProfileMenu((prev) => !prev)}
+                onClick={() => setShowMenu(false)}
+                to="/dashboard/testimonies/saved"
               >
                 <div className="flex gap-4 items-center">
-                  <img
-                    src={user?.profilePhoto}
-                    className="size-7 rounded-full"
-                  />{" "}
-                  <span>{user?.firstName}</span>
+                  <FontAwesomeIcon icon={faBookmark} />
+                  <span>Saved Items</span>
                 </div>
-                <FontAwesomeIcon
-                  icon={showProfileMenu ? faChevronUp : faChevronDown}
-                  className="text-gray-600"
-                />
-              </button>
+              </Link>
             </li>
-            {/* account menu*/}
-            <ul
-              className={`${
-                showProfileMenu ? "" : "hidden"
-              } bg-gray-600 w-full`}
-            >
-              <li>
-                <Link
-                  className="flex justify-between items-center size-full p-4"
-                  onClick={() => setShowMenu(false)}
-                  to="/dashboard/profile/me"
-                >
-                  <div className="flex pl-10 gap-4 items-center">
-                    <User />
-                    <span>Profile</span>
-                  </div>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  className="flex justify-between items-center size-full p-4"
-                  onClick={() => setShowMenu(false)}
-                  to="/orders"
-                >
-                  <div className="flex pl-10 gap-4 items-center">
-                    <FontAwesomeIcon icon={faReceipt} />
-                    <span>Orders</span>
-                  </div>
-                </Link>
-              </li>
-              <li>
-                <button
-                  className="flex justify-between items-center size-full p-4"
-                  onClick={handleSignOut}
-                >
-                  <div className="flex pl-10 gap-4 items-center">
-                    <LogOut />
-                    <span>Log out</span>
-                  </div>
-                </button>
-              </li>
-            </ul>
+            <hr className="border-gray-600 border-b-2"></hr>
+            <li>
+              <Link
+                className="flex justify-between items-center size-full p-4"
+                onClick={() => setShowMenu(false)}
+                to="/dashboard/prayer"
+              >
+                <div className="flex gap-4 items-center">
+                  <FontAwesomeIcon icon={faEdit} />
+                  <span>Submit a prayer request</span>
+                </div>
+              </Link>
+            </li>
           </ul>
         </div>
       </nav>

@@ -250,7 +250,7 @@ const Home = () => {
                       className="w-full h-64 md:h-full object-cover"
                     />
                   </div>
-                  <div className="md:w-1/2 p-8 md:p-12">
+                  <div className="flex flex-col md:w-1/2 p-8 md:p-12">
                     <div className="flex items-center mb-4">
                       <span className="bg-stone-100 text-stone-800 px-3 py-1 rounded-full text-sm font-medium">
                         Faith
@@ -263,22 +263,18 @@ const Home = () => {
                     <h3 className="text-2xl font-bold text-gray-800 mb-4">
                       {testimonies[0].title}
                     </h3>
-                    <p className="text-gray-600 mb-6 leading-relaxed">
+                    <p className="flex-1 text-gray-600 mb-6 leading-relaxed">
                       {truncateText(testimonies[0].body, 20)}
                     </p>
                     <div className="flex flex-col md:flex-row gap-5 md:gap-0 items-center justify-between">
-                      <div className="flex items-center text-gray-500 text-sm">
-                        <User className="w-4 h-4 mr-2" />
-                        <span className="mr-4">
-                          {testimonies[0].user.firstName}{" "}
-                          {testimonies[0].user.lastName}
-                        </span>
-                        <Calendar className="w-4 h-4 mr-2" />
-                        <span>
-                          {new Date(
-                            testimonies[0].updatedAt
-                          ).toLocaleDateString()}
-                        </span>
+                      <div className="flex flex-col text-gray-500 text-sm">
+                        <div className="flex">
+                          <User className="w-4 h-4 mr-2" />
+                          <span className="mr-4">
+                            {testimonies[0].user.firstName}{" "}
+                            {testimonies[0].user.lastName}
+                          </span>
+                        </div>
                       </div>
                       <button
                         onClick={() =>
