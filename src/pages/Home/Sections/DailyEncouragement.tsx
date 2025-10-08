@@ -71,7 +71,7 @@ const DailyEncouragement = () => {
     <Section
       title="Daily Encouragement"
       desc="Uplifting messages to strengthen your faith journey."
-      className="py-10"
+      className="py-10 px-2"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Today's Featured Encouragement */}

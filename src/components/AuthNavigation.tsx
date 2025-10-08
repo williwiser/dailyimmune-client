@@ -266,7 +266,7 @@ const AuthNavigation = () => {
           isScrolled ? "shadow-sm " : "shadow-none"
         }`}
       >
-        <Container>
+        <Container className="px-6 md:px-8">
           <div className="flex justify-between items-center">
             <div className="md:flex grid grid-cols-3 items-center w-full">
               <div className="flex pl-2">

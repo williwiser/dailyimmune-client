@@ -29,7 +29,7 @@ const RecentTestimonies = () => {
     <Section
       title="Recent Testimonies"
       desc="Read powerful stories of how God is transforming lives in our community."
-      className="py-10 bg-gradient-to-br from-stone-50 to-stone-100"
+      className="py-10 bg-gradient-to-br from-stone-50 to-stone-100 px-2"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Featured Testimony */}

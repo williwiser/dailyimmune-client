@@ -8,7 +8,7 @@ const CTA = () => {
     <Section
       title="Join Our Community"
       desc="Receive livestream and event updates."
-      className="py-10 bg-gray-200"
+      className="py-10 bg-gray-200 px-2"
     >
       <div className="flex justify-center">
         <Link

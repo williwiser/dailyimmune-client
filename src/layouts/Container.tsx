@@ -13,7 +13,7 @@ const Container = ({
 }: ContainerProps) => {
   return (
     <div
-      className={`container mx-auto max-w-screen-2xl h-full px-8 ${
+      className={`container mx-auto max-w-screen-2xl h-full ${
         noVerticalPadding ? "" : "py-4"
       } ${className}`}
     >

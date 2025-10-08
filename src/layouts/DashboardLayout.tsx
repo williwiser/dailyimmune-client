@@ -10,7 +10,7 @@ const DashboardLayout = () => {
   return (
     <div className="w-full bg-stone-100">
       <AuthNavigation />
-      <Container>
+      <Container className="px-0">
         <SafeArea className="flex flex-col md:flex-row gap-6 my-6">
           <Sidebar />
           <main className="w-full">

@@ -41,7 +41,7 @@ const Navigation = () => {
           : "bg-white text-[#747474] shadow-none"
       }`}
     >
-      <Container>
+      <Container className="px-6 md:px-8">
         <div className="flex justify-between items-center md:grid md:grid-cols-3">
           <img
             src={
