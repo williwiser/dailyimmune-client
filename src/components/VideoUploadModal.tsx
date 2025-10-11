@@ -21,12 +21,16 @@ interface VideoUploadModalProps {
 }
 
 interface FormData {
-  caption?: string;
+  title: string;
+  caption: string;
   videoUpload?: File;
 }
 const VideoUploadModal = ({ open, onOpenChange }: VideoUploadModalProps) => {
   const [selectedVideo, setSelectedVideo] = useState<File>();
-  const [formData, setFormData] = useState<FormData>({});
+  const [formData, setFormData] = useState<FormData>({
+    title: "",
+    caption: "",
+  });
   const [isLoading, setIsLoading] = useState(false);
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) setSelectedVideo(e.target.files[0]);
@@ -63,32 +67,69 @@ const VideoUploadModal = ({ open, onOpenChange }: VideoUploadModalProps) => {
         <form
           id="video-form"
           onSubmit={handleSubmit}
-          className="flex flex-col gap-4"
+          className="flex flex-col space-y-4"
         >
-          <label
-            htmlFor="video-upload"
-            className="inline-flex items-center gap-2 p-1.5 px-4 border rounded-md text-gray-500 cursor-pointer hover:text-stone-700 hover:border-stone-300 duration-200 transition-all"
-          >
-            <FontAwesomeIcon icon={faFileVideo} />
-            {selectedVideo ? selectedVideo.name : "Choose from file"}
-          </label>
+          <div className="space-y-2">
+            <label
+              htmlFor="title"
+              className="text-sm font-medium text-gray-700"
+            >
+              Title
+            </label>
 
-          <input
-            type="file"
-            id="video-upload"
-            name="videoUpload"
-            accept="video/*"
-            className="hidden"
-            onChange={handleFileChange}
-          />
+            <input
+              id="title"
+              name="title"
+              placeholder="Add a title (optional)"
+              className="w-full p-1.5 px-4 border rounded-md text-gray-700 placeholder:text-gray-400 hover:border-gray-400 focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-200 duration-200 transition-all"
+              onChange={handleChange}
+              value={formData.title}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label
+              htmlFor="video-upload"
+              className="text-sm font-medium text-gray-700 mb-1"
+            >
+              Video Upload
+            </label>
+            <label
+              htmlFor="video-upload"
+              className="w-full p-1.5 px-4 border rounded-md text-gray-500 cursor-pointer hover:text-stone-700 hover:border-stone-300 duration-200 transition-all"
+            >
+              <FontAwesomeIcon icon={faFileVideo} />
+              {selectedVideo ? selectedVideo.name : " Choose from file"}
+            </label>
 
-          <textarea
-            id="caption"
-            name="caption"
-            placeholder="Caption (optional)"
-            className="inline-flex items-center gap-2 p-1.5 px-4 border rounded-md text-gray-500 hover:text-stone-700 hover:border-stone-300 duration-200 transition-all h-60 resize-none"
-            onChange={handleChange}
-          />
+            <input
+              type="file"
+              id="video-upload"
+              name="videoUpload"
+              accept="video/*"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label
+              htmlFor="caption"
+              className="text-sm font-medium text-gray-700"
+            >
+              Caption
+            </label>
+            <textarea
+              id="caption"
+              name="caption"
+              placeholder="Add a caption to your video (optional)"
+              className="w-full p-1.5 px-4 border rounded-md text-gray-700 placeholder:text-gray-400 hover:border-gray-400 focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-200 duration-200 transition-all h-24 resize-none"
+              onChange={handleChange}
+              value={formData.caption}
+            />
+            <p className="text-xs text-gray-500">
+              {formData.caption.length} characters
+            </p>
+          </div>
         </form>
         <Separator />
         <DialogFooter>

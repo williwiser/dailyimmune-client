@@ -27,7 +27,7 @@ import {
   AlertDialogTitle,
 } from "./ui/alert-dialog";
 
-interface TestimonyCardProps {
+interface DevotionalCardProps {
   id: string;
   thumbnail?: string;
   title: string;
@@ -49,7 +49,7 @@ const DevotionalCard = ({
   author,
   edit,
   onDelete,
-}: TestimonyCardProps) => {
+}: DevotionalCardProps) => {
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const handleDelete = () => {
     if (onDelete) onDelete(id);
@@ -74,12 +74,12 @@ const DevotionalCard = ({
         </AlertDialogContent>
       </AlertDialog>
 
-      <div className="group flex flex-col bg-white overflow-hidden rounded-xl border border-gray-200 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-gray-100 w-[20rem] h-[26rem] cursor-pointer">
+      <div className="group flex flex-col bg-white overflow-hidden md:rounded-xl border-b md:border border-gray-200 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-gray-100 w-full md:max-w-[20rem] h-[26rem] cursor-pointer">
         {/* Image Container */}
         <div className="relative overflow-hidden">
           <img
             src={thumbnail ? thumbnail : "/placeholder.jpg"}
-            alt="Testimony Thumbnail"
+            alt="Devotional Thumbnail"
             className="w-full h-72 object-cover transition-transform duration-300 group-hover:scale-105"
           />
 
@@ -95,7 +95,7 @@ const DevotionalCard = ({
 
           {/* Edit Button */}
           {edit && (
-            <Link to={`/dashboard/testimonies/${id}/edit`}>
+            <Link to={`/dashboard/devotionals/${id}/edit`}>
               <span className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2.5 rounded-full text-gray-700 hover:bg-white hover:shadow-md transition-all duration-200 group/edit">
                 <Edit3
                   size={16}

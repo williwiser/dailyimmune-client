@@ -671,7 +671,10 @@ const FeedList = () => {
                   className="inline"
                 />
 
-                <span className="text-sm"> Save</span>
+                <span className="text-sm">
+                  {" "}
+                  {savedItems[activity.id] ? "Unsave" : "Save"}
+                </span>
               </button>
             </div>
           </div>

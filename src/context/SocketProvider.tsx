@@ -3,8 +3,10 @@ import React, { useEffect, useState, type ReactNode } from "react";
 import { io } from "socket.io-client";
 import { SocketContext } from "./SocketContext";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 // Create socket instance (singleton)
-const socket = io("http://localhost:3000", {
+const socket = io(BACKEND_URL, {
   autoConnect: true,
   withCredentials: true,
 });
@@ -24,45 +26,14 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       setIsConnected(true);
     });
 
-    socket.on(
-      "receive-message",
-      ({ sender, message, roomId, senderId, recipientId }) => {
-        console.log("📩 Message received from:", sender);
-        console.log("💬 Message:", message);
-        console.log(
-          "roomId:",
-          roomId,
-          "senderId:",
-          senderId,
-          "recipientId:",
-          recipientId
-        );
-
-        // If you have state for messages, you can update it here
-        // setMessages(prev => [...prev, { sender, message }]);
-      }
-    );
-
     socket.on("disconnect", () => {
       console.log("❌ Socket disconnected");
       setIsConnected(false);
     });
 
-    // socket.on("test", (value) => {
-    //   console.log(`Received it!: ${value}`);
-    //   alert(`Received it!: ${value}`);
-    // });
-
-    socket.on("message", (msg) => {
-      console.log("📩 Message received:", msg);
-    });
-
     return () => {
       socket.off("connect");
       socket.off("disconnect");
-      socket.off("test");
-      socket.off("message");
-      socket.off("receive-message");
     };
   }, []);
 

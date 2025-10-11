@@ -141,18 +141,10 @@ const FloatingChatWidget = () => {
       id: Date.now().toString(),
       admin: null,
       roomId: null,
-      latestMessage: "Hi! How can we help you today?",
+      latestMessage: "Waiting for admin...",
       createdAt: new Date(),
       unread: 0,
-      messages: [
-        {
-          id: "1",
-          content: "Hi! How can we help you today?",
-          sender: "support",
-          createdAt: new Date(),
-          read: true,
-        },
-      ],
+      messages: [],
     };
     setConversations((prev) => [conv, ...prev]);
     setActiveConversationId(conv.id);
@@ -192,6 +184,12 @@ const FloatingChatWidget = () => {
     if (!inputMessage.trim() || !activeConversationId) return;
     const currentConversation = getCurrentConversation();
     socket.emit("send-message", {
+      roomId: currentRoomId,
+      message: inputMessage,
+      senderId: user?.id,
+      recipientId: currentConversation?.admin?.id,
+    });
+    console.log({
       roomId: currentRoomId,
       message: inputMessage,
       senderId: user?.id,
@@ -284,6 +282,7 @@ const FloatingChatWidget = () => {
     });
 
     socket.on("receive-message", ({ sender, message, roomId }) => {
+      console.log("receive message");
       const newMessage: Message = {
         id: Date.now().toString(),
         content: message,
@@ -305,22 +304,39 @@ const FloatingChatWidget = () => {
           </div>
         </div>
       );
-      setConversations((prev) =>
-        prev.map((conv) => {
-          if (conv.id === activeConversationId) newMessage.read = true;
-          const updatedMessages = [...conv.messages, newMessage];
-          if (conv.roomId === roomId || conv.id === activeConversationId) {
-            return {
-              ...conv,
-              messages: updatedMessages,
-              latestMessage: message,
-              unread: conv.id === activeConversationId ? 0 : conv.unread + 1,
-              createdAt: new Date(),
-            };
-          }
-          return conv;
-        })
+      const conversationExists = conversations.find(
+        (conv) => conv.roomId === roomId
       );
+
+      if (conversationExists) {
+        setConversations((prev) =>
+          prev.map((conv) => {
+            if (conv.id === activeConversationId) newMessage.read = true;
+            const updatedMessages = [...conv.messages, newMessage];
+            if (conv.roomId === roomId || conv.id === activeConversationId) {
+              return {
+                ...conv,
+                messages: updatedMessages,
+                latestMessage: message,
+                unread: conv.id === activeConversationId ? 0 : conv.unread + 1,
+                createdAt: new Date(),
+              };
+            }
+            return conv;
+          })
+        );
+      } else {
+        const conv: Conversation = {
+          id: Date.now().toString(),
+          admin: sender,
+          roomId,
+          latestMessage: message,
+          createdAt: new Date(),
+          unread: 1,
+          messages: [message],
+        };
+        setConversations((prev) => [conv, ...prev]);
+      }
     });
 
     return () => {

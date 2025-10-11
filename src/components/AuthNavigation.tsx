@@ -33,7 +33,6 @@ import {
   ShoppingBag,
   User,
   Users,
-  Video,
 } from "lucide-react";
 import { useAuth } from "@/context/useAuth";
 import { useNavigate } from "react-router";
@@ -375,14 +374,7 @@ const AuthNavigation = () => {
                             </div>
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to="/dashboard/devotionals/new">
-                            <div className="flex gap-2">
-                              <Video />
-                              <span>New Video</span>
-                            </div>
-                          </Link>
-                        </DropdownMenuItem>
+
                         <DropdownMenuItem asChild>
                           <Link to="/dashboard/events/me">
                             <div className="flex gap-2">
