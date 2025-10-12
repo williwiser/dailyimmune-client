@@ -41,6 +41,7 @@ import DevotionalEditor from "./pages/DevotionalEditor";
 import MyDevotionals from "./pages/MyDevotionals";
 import DevotionalArticle from "./pages/DevotionalArticle";
 import Devotionals from "./pages/Devotionals";
+import Verification from "./pages/Verification";
 
 const router = createBrowserRouter([
   {
@@ -131,6 +132,7 @@ const router = createBrowserRouter([
       { path: "/login", element: <LogIn /> },
       { path: "/activate", element: <VerifyToken /> },
       { path: "/activation-link", element: <ActivationLink /> },
+      { path: "/verification", element: <Verification /> },
     ],
   },
 ]);
