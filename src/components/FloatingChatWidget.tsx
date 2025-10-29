@@ -183,18 +183,19 @@ const FloatingChatWidget = () => {
   const handleSendMessage = () => {
     if (!inputMessage.trim() || !activeConversationId) return;
     const currentConversation = getCurrentConversation();
-    socket.emit("send-message", {
-      roomId: currentRoomId,
+    const data: {
+      roomId: string;
+      message: string;
+      senderId: string;
+      recipientId: string;
+    } = {
+      roomId: currentRoomId!,
       message: inputMessage,
-      senderId: user?.id,
-      recipientId: currentConversation?.admin?.id,
-    });
-    console.log({
-      roomId: currentRoomId,
-      message: inputMessage,
-      senderId: user?.id,
-      recipientId: currentConversation?.admin?.id,
-    });
+      senderId: user!.id,
+      recipientId: currentConversation!.admin!.id,
+    };
+    socket.emit("send-message", data);
+    console.log(data);
     const newMessage: Message = {
       id: Date.now().toString(),
       content: inputMessage,

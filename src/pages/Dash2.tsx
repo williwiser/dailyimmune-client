@@ -166,35 +166,42 @@ const Dashboard: React.FC = () => {
               </div>
 
               <div className="space-y-4">
-                {staffPicks.map((staffPick) => (
-                  <div className="border-l-4 border-[#3b3b19] pl-3">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-semibold text-[#3b3b19] text-sm">
-                        {staffPick.user.firstName} {staffPick.user.lastName[0]}.
-                      </span>
-                      <span className="text-xs text-[#747474]">
-                        {formatDistanceToNow(new Date(staffPick.updatedAt), {
-                          addSuffix: true,
-                        })}
-                      </span>
+                {staffPicks.length === 0 ? (
+                  <p className="text-center p-4 mt-4 bg-gray-50 text-gray-500 rounded-md border">
+                    No staff picks
+                  </p>
+                ) : (
+                  staffPicks.map((staffPick) => (
+                    <div className="border-l-4 border-[#3b3b19] pl-3">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-semibold text-[#3b3b19] text-sm">
+                          {staffPick.user.firstName}{" "}
+                          {staffPick.user.lastName[0]}.
+                        </span>
+                        <span className="text-xs text-[#747474]">
+                          {formatDistanceToNow(new Date(staffPick.updatedAt), {
+                            addSuffix: true,
+                          })}
+                        </span>
+                      </div>
+                      <Link
+                        to={`/testimonies/${staffPick.id}/${slugify(
+                          staffPick.title
+                        )}`}
+                        className="text-sm font-medium text-[#3b3b19] mb-1 hover:text-[#61612e] hover:underline transition-all duration-200"
+                      >
+                        {staffPick.title}
+                      </Link>
+                      <p className="text-[#747474] text-xs leading-relaxed line-clamp-2">
+                        {truncateText(staffPick.body, 20)}
+                      </p>
+                      <div className="mt-2 flex items-center text-xs text-[#747474]">
+                        <Heart className="w-3 h-3 mr-1" />
+                        <span>{staffPick.likes}</span>
+                      </div>
                     </div>
-                    <Link
-                      to={`/testimonies/${staffPick.id}/${slugify(
-                        staffPick.title
-                      )}`}
-                      className="text-sm font-medium text-[#3b3b19] mb-1 hover:text-[#61612e] hover:underline transition-all duration-200"
-                    >
-                      {staffPick.title}
-                    </Link>
-                    <p className="text-[#747474] text-xs leading-relaxed line-clamp-2">
-                      {truncateText(staffPick.body, 20)}
-                    </p>
-                    <div className="mt-2 flex items-center text-xs text-[#747474]">
-                      <Heart className="w-3 h-3 mr-1" />
-                      <span>{staffPick.likes}</span>
-                    </div>
-                  </div>
-                ))}{" "}
+                  ))
+                )}{" "}
               </div>
               <div className="mt-6 text-center">
                 <Link

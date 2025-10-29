@@ -756,12 +756,18 @@ const FeedList = () => {
           Recent Community Activity
         </h2>
       </div>
-      {feed.map((activity: FeedActivity) => (
-        <>
-          {renderActivity(activity)}
-          {activity.type !== "event" && <hr />}
-        </>
-      ))}
+      {feed.length === 0 ? (
+        <p className="text-center p-4 mt-4 bg-gray-50 text-gray-500 rounded-md border">
+          No recent activity
+        </p>
+      ) : (
+        feed.map((activity: FeedActivity) => (
+          <>
+            {renderActivity(activity)}
+            {activity.type !== "event" && <hr />}
+          </>
+        ))
+      )}
       {hasMore && (
         <div ref={loaderRef} className="flex justify-center items-center p-12">
           <PulseLoader color="#79716b" />
