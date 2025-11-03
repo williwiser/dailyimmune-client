@@ -122,31 +122,30 @@ const Dashboard: React.FC = () => {
                       </span>
                     </div>
                   </Link>
-                  {user?.role === "ADMIN" ||
-                    (user?.role === "SUPERADMIN" && (
-                      <div className="px-4 flex gap-8 mt-4">
-                        <button
-                          className="cursor-pointer w-fit text-sm"
-                          onClick={() => setOpenVideoModal(true)}
-                        >
-                          <FontAwesomeIcon
-                            icon={faFileVideo}
-                            className="text-stone-500"
-                          />{" "}
-                          Upload Video
-                        </button>
-                        <button
-                          className="cursor-pointer w-fit text-sm"
-                          onClick={() => setOpenAudioModal(true)}
-                        >
-                          <FontAwesomeIcon
-                            icon={faFileWaveform}
-                            className="text-stone-500"
-                          />{" "}
-                          Upload Audio
-                        </button>
-                      </div>
-                    ))}
+                  {(user?.role === "ADMIN" || user?.role === "SUPERADMIN") && (
+                    <div className="px-4 flex gap-8 mt-4">
+                      <button
+                        className="cursor-pointer w-fit text-sm"
+                        onClick={() => setOpenVideoModal(true)}
+                      >
+                        <FontAwesomeIcon
+                          icon={faFileVideo}
+                          className="text-stone-500"
+                        />{" "}
+                        Upload Video
+                      </button>
+                      <button
+                        className="cursor-pointer w-fit text-sm"
+                        onClick={() => setOpenAudioModal(true)}
+                      >
+                        <FontAwesomeIcon
+                          icon={faFileWaveform}
+                          className="text-stone-500"
+                        />{" "}
+                        Upload Audio
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </SlideIn>

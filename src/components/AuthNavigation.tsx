@@ -710,9 +710,10 @@ const AuthNavigation = () => {
                     </Link>
                   </li>
                 </ul>
+                <hr className="border-gray-600 border-b-2"></hr>
               </>
             )}
-            <hr className="border-gray-600 border-b-2"></hr>
+
             <li>
               <Link
                 className="flex justify-between items-center size-full p-4"
