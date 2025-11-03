@@ -42,6 +42,9 @@ import MyDevotionals from "./pages/MyDevotionals";
 import DevotionalArticle from "./pages/DevotionalArticle";
 import Devotionals from "./pages/Devotionals";
 import Verification from "./pages/Verification";
+import NotFound from "./pages/NotFound";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 const router = createBrowserRouter([
   {
@@ -92,6 +95,7 @@ const router = createBrowserRouter([
           { path: "devotionals/:id/:slug", element: <DevotionalArticle /> },
           { path: "prayers", element: <PrayerRequests /> },
           { path: "profile/:id", element: <Profile /> },
+          { path: "404", element: <NotFound /> },
         ],
       },
       {
@@ -133,6 +137,12 @@ const router = createBrowserRouter([
       { path: "/activate", element: <VerifyToken /> },
       { path: "/activation-link", element: <ActivationLink /> },
       { path: "/verification", element: <Verification /> },
+      { path: "/forgot-password", element: <ForgotPassword /> },
+      { path: "/reset-password", element: <ResetPassword /> },
+      {
+        element: <UniversalLayout />,
+        children: [{ path: "*", element: <NotFound /> }],
+      },
     ],
   },
 ]);

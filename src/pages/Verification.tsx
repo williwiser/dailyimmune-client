@@ -13,7 +13,7 @@ const Verification = () => {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const navigate = useNavigate();
   const location = useLocation();
-  const { email } = location.state || {};
+  const { email, passwordReset } = location.state || {};
 
   useEffect(() => {
     inputRefs.current[0]?.focus();
@@ -73,7 +73,11 @@ const Verification = () => {
       .get(`${BACKEND_URL}/api/v1/auth/verify-email?token=${fullCode}`)
       .then((response) => {
         console.log(response.data);
-        navigate("/login", { state: { verified: true } });
+        if (passwordReset) {
+          navigate("/reset-password", { state: { verified: true, email } });
+        } else {
+          navigate("/login", { state: { verified: true } });
+        }
       })
       .catch((error) => {
         setError(error.response.data);
@@ -88,7 +92,9 @@ const Verification = () => {
   const handleResend = () => {
     setIsResending(true);
     axios
-      .get(`${BACKEND_URL}/api/v1/auth/resend-otp?email=${email}`)
+      .get(
+        `${BACKEND_URL}/api/v1/auth/resend-otp?email=${email}&passwordReset=${passwordReset}`
+      )
       .then(() => {
         setError("");
         setCode(["", "", "", "", "", ""]);

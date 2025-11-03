@@ -272,7 +272,7 @@ const DevotionalEditor = () => {
       >
         <div className="border-b text-lg bg-gray-50">
           <Container>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center  px-6 2xl:px-0 pt-2">
               <div className="flex gap-2 items-center">
                 <Link
                   to="/dashboard"
@@ -323,7 +323,7 @@ const DevotionalEditor = () => {
                   )}
                 </button>
               </div>
-              <div className="flex gap-4 md:hidden">
+              <div className="flex gap-4 md:hidden ">
                 <button
                   type="submit"
                   name="save"
@@ -347,7 +347,7 @@ const DevotionalEditor = () => {
             </div>
           </Container>
         </div>
-        <Section>
+        <Section className="p-6">
           <div className="flex flex-col gap-4">
             {gotError ? (
               <p className="text-red-500">
@@ -409,7 +409,7 @@ const DevotionalEditor = () => {
             ) : (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <button className="flex gap-2 text-sm items-center text-gray-500 cursor-pointer hover:text-stone-800 transition-all duration-300 w-fit hover:no-underline p-0">
+                  <button className="lex  hidden gap-2 text-sm items-center text-gray-500 cursor-pointer hover:text-stone-800 transition-all duration-300 w-fit hover:no-underline p-0">
                     <>
                       <Book />
                       <span>Add featured verse</span>
@@ -460,7 +460,7 @@ const DevotionalEditor = () => {
             <hr className="my-4" />
             <textarea
               className="min-h-96 resize-none"
-              placeholder="Start writing your testimony here."
+              placeholder="Start writing your devotional here."
               value={formData.body}
               onChange={handleChange}
               name="body"

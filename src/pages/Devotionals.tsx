@@ -93,8 +93,7 @@ const Devotionals = () => {
           No Devotionals Yet
         </h3>
         <p className="text-gray-500">
-          Be the first to share your testimony and inspire others in our
-          community.
+          Devotionals will be shared by administrators.
         </p>
       </div>
     </div>

@@ -16,7 +16,7 @@ const LogIn = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
   const location = useLocation();
-  const { verified } = location.state || {};
+  const { verified, passwordReset } = location.state || {};
 
   const googleLogin = useGoogleLogin({
     flow: "auth-code",
@@ -80,6 +80,9 @@ const LogIn = () => {
     if (verified) toast.success("Email verified successfully!");
   }, [verified]);
 
+  useEffect(() => {
+    if (passwordReset) toast.success("Password reset succesfully!");
+  }, [passwordReset]);
   return (
     <div className="h-screen flex flex-row-reverse">
       <Toaster />
@@ -150,7 +153,10 @@ const LogIn = () => {
                 className="p-2 border rounded-md w-full"
               />
             </label>
-            <Link to="/" className="text-xs text-gray-500 mb-4">
+            <Link
+              to="/forgot-password"
+              className="text-xs text-gray-500 hover:text-gray-800 transition-all duration-200 mb-4"
+            >
               Forgot password?
             </Link>
             <button

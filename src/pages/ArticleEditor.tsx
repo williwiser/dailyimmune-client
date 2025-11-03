@@ -219,7 +219,7 @@ const ArticleEditor = () => {
       >
         <div className="border-b text-lg bg-gray-50">
           <Container>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center px-6 2xl:px-0 pt-2">
               <div className="flex gap-2 items-center">
                 <Link
                   to="/dashboard"
@@ -294,7 +294,7 @@ const ArticleEditor = () => {
             </div>
           </Container>
         </div>
-        <Section>
+        <Section className="p-6">
           <div className="flex flex-col gap-4">
             {gotError ? (
               <p className="text-red-500">

@@ -47,7 +47,9 @@ const SignUp = () => {
     axios
       .post(`${BACKEND_URL}/api/v1/auth/signup`, formData)
       .then(() => {
-        navigate("/verification", { state: { email: formData.email } });
+        navigate("/verification", {
+          state: { email: formData.email, passwordReset: false },
+        });
       })
       .catch((error) => {
         setGotError(true);

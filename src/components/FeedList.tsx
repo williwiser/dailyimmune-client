@@ -21,6 +21,7 @@ import {
   faBookmark,
   faCheckCircle,
   faCopy,
+  faNewspaper,
 } from "@fortawesome/free-solid-svg-icons";
 import PulseLoader from "react-spinners/PulseLoader";
 import { PrayerModal } from "./PrayerModal";
@@ -757,9 +758,19 @@ const FeedList = () => {
         </h2>
       </div>
       {feed.length === 0 ? (
-        <p className="text-center p-4 mt-4 bg-gray-50 text-gray-500 rounded-md border">
-          No recent activity
-        </p>
+        hasMore ? null : (
+          <div className="text-center p-4 mt-4 bg-gray-50 text-gray-500 rounded-md border">
+            <div className="w-20 h-20 mx-auto mb-6 bg-gray-200 rounded-full flex items-center justify-center">
+              <FontAwesomeIcon
+                icon={faNewspaper}
+                className="text-3xl text-gray-400"
+              />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-3">
+              No Recent Activity
+            </h3>
+          </div>
+        )
       ) : (
         feed.map((activity: FeedActivity) => (
           <>

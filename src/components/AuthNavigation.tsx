@@ -30,6 +30,7 @@ import {
   MessageCircle,
   Plus,
   ReceiptText,
+  Settings,
   ShoppingBag,
   User,
   Users,
@@ -94,7 +95,7 @@ interface ReceiveMessageProps {
 const AuthNavigation = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [showCommunityMenu, setShowCommunityMenu] = useState(false);
-
+  const [showAdminMenu, setShowAdminMenu] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -187,6 +188,14 @@ const AuthNavigation = () => {
         console.log(error);
       });
   };
+
+  useEffect(() => {
+    if (showMenu) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+  }, [showMenu]);
 
   useEffect(() => {
     const handleReceiveMessage = ({
@@ -564,7 +573,7 @@ const AuthNavigation = () => {
         <div
           className={`${
             showMenu ? "fixed" : "hidden"
-          } md:hidden w-full bg-gray-800 text-white h-full`}
+          } md:hidden inset-0 w-full bg-gray-800 text-white h-full overflow-y-scroll mt-22`}
         >
           <ul className="text-lg font-semibold">
             <li>
@@ -653,6 +662,56 @@ const AuthNavigation = () => {
                 </div>
               </Link>
             </li>
+            <hr className="border-gray-600 border-b-2"></hr>
+            {(user?.role === "ADMIN" || user?.role === "SUPERADMIN") && (
+              <>
+                <li>
+                  <button
+                    className="flex justify-between items-center size-full p-4"
+                    onClick={() => setShowAdminMenu((prev) => !prev)}
+                  >
+                    <div className="flex gap-4 items-center">
+                      <Settings />
+                      <span>Admin Actions</span>
+                    </div>
+                    <FontAwesomeIcon
+                      icon={showCommunityMenu ? faChevronUp : faChevronDown}
+                      className="text-gray-600"
+                    />
+                  </button>
+                </li>
+                <ul
+                  className={`${
+                    showAdminMenu ? "" : "hidden"
+                  } bg-gray-600 w-full`}
+                >
+                  <li>
+                    <Link
+                      className="flex justify-between items-center size-full p-4"
+                      onClick={() => setShowMenu(false)}
+                      to="/dashboard/devotionals/new"
+                    >
+                      <div className="flex pl-10 gap-4 items-center">
+                        <Plus />
+                        <span>New Devotional</span>
+                      </div>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      className="flex justify-between items-center size-full p-4"
+                      onClick={() => setShowMenu(false)}
+                      to="/dashboard/events/me"
+                    >
+                      <div className="flex pl-10 gap-4 items-center">
+                        <FontAwesomeIcon icon={faCalendar} />
+                        <span>Manage Sessions</span>
+                      </div>
+                    </Link>
+                  </li>
+                </ul>
+              </>
+            )}
             <hr className="border-gray-600 border-b-2"></hr>
             <li>
               <Link

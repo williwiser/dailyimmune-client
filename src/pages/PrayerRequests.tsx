@@ -1,6 +1,8 @@
 import PrayerRequestCard from "@/components/PrayerRequestCard";
 import Header from "@/layouts/Header";
 import Section from "@/layouts/Section";
+import { faPersonPraying } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import PulseLoader from "react-spinners/PulseLoader";
@@ -21,6 +23,25 @@ interface PrayerRequest {
   isAnswered: boolean;
   // add other properties if needed
 }
+
+const EmptyState = () => (
+  <div className="text-center py-20 bg-gray-50 rounded-xl border border-gray-200">
+    <div className="max-w-md mx-auto">
+      <div className="w-20 h-20 mx-auto mb-6 bg-gray-200 rounded-full flex items-center justify-center">
+        <FontAwesomeIcon
+          icon={faPersonPraying}
+          className="text-3xl text-gray-400"
+        />
+      </div>
+      <h3 className="text-xl font-semibold text-gray-700 mb-3">
+        No Prayer Requests Yet
+      </h3>
+      <p className="text-gray-500">
+        Need prayer? Be the first to submit a prayer request.
+      </p>
+    </div>
+  </div>
+);
 
 const PrayerRequests = () => {
   const [prayerRequests, setPrayerRequests] = useState<PrayerRequest[]>([]);
@@ -61,24 +82,28 @@ const PrayerRequests = () => {
         </Section>
       ) : (
         <Section>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 px-8">
-            {prayerRequests.map((prayerRequest: PrayerRequest) => (
-              <div
-                key={prayerRequest.id}
-                className="flex items-center justify-center"
-              >
-                <PrayerRequestCard
+          {prayerRequests.length === 0 ? (
+            <EmptyState />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 px-8">
+              {prayerRequests.map((prayerRequest: PrayerRequest) => (
+                <div
                   key={prayerRequest.id}
-                  id={prayerRequest.id}
-                  subject={prayerRequest.subject}
-                  author={`${prayerRequest.requester.firstName} ${prayerRequest.requester.lastName}`}
-                  body={truncateText(prayerRequest.body, 15)}
-                  updatedAt={prayerRequest.updatedAt}
-                  isAnswered={prayerRequest.isAnswered}
-                />
-              </div>
-            ))}
-          </div>
+                  className="flex items-center justify-center"
+                >
+                  <PrayerRequestCard
+                    key={prayerRequest.id}
+                    id={prayerRequest.id}
+                    subject={prayerRequest.subject}
+                    author={`${prayerRequest.requester.firstName} ${prayerRequest.requester.lastName}`}
+                    body={truncateText(prayerRequest.body, 15)}
+                    updatedAt={prayerRequest.updatedAt}
+                    isAnswered={prayerRequest.isAnswered}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </Section>
       )}
     </>
