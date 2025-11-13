@@ -31,7 +31,6 @@ import {
 import { Button } from "@/components/ui/button";
 import PulseLoader from "react-spinners/PulseLoader";
 import { toast, Toaster } from "sonner";
-import { fetchUser } from "@/utils/fetchUser";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -82,7 +81,7 @@ interface User {
 
 const ManageProfile = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, refetchUser } = useAuth();
   const [me, setMe] = useState<User>({
     id: "",
     firstName: "",
@@ -102,7 +101,6 @@ const ManageProfile = () => {
   const [profilePhoto, setProfilePhoto] = useState<string>();
   const [photoLoading, setPhotoLoading] = useState(false);
   const [joined, setJoined] = useState("");
-  const { setUser } = useAuth();
 
   useEffect(() => {
     axios
@@ -139,8 +137,7 @@ const ManageProfile = () => {
       console.log(response.data.profilePhoto);
       toast.success("Profile photo changed successfully!");
       setProfilePhoto(response.data.profilePhoto);
-      const loggedUser = await fetchUser();
-      setUser({ ...loggedUser, profilePhoto: response.data.profilePhoto });
+      await refetchUser();
     } catch (error) {
       console.log(error);
       toast.error("Oops, something went wrong. Please try again later.");

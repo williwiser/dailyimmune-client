@@ -10,7 +10,6 @@ import { useAuth } from "@/context/useAuth";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const SignUp = () => {
-  const { setUser } = useAuth();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -21,6 +20,7 @@ const SignUp = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
+  const { refetchUser } = useAuth();
   const navigate = useNavigate();
   const googleLogin = useGoogleLogin({
     flow: "auth-code",
@@ -35,8 +35,8 @@ const SignUp = () => {
         { withCredentials: true }
       );
       console.log(tokens.data);
-      setUser(tokens.data);
       setIsLoadingGoogle(false);
+      await refetchUser();
       navigate("/dashboard");
     },
     onError: (errorResponse) => console.log(errorResponse),
