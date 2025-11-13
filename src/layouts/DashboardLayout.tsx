@@ -2,12 +2,19 @@ import SafeArea from "./SafeArea";
 import AuthNavigation from "@/components/AuthNavigation";
 import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
-import { Outlet } from "react-router";
+import { Navigate, Outlet } from "react-router";
 import Container from "./Container";
 import FloatingChatWidget from "@/components/FloatingChatWidget";
+import { useAuth } from "@/context/useAuth";
+import PulseLoader from "react-spinners/PulseLoader";
 
 const DashboardLayout = () => {
-  return (
+  const { user, loading } = useAuth();
+  return loading ? (
+    <main className="flex h-screen justify-center items-center">
+      <PulseLoader color="#79716b" />
+    </main>
+  ) : user ? (
     <div className="w-full bg-stone-100">
       <AuthNavigation />
       <Container className="md:px-8">
@@ -21,6 +28,8 @@ const DashboardLayout = () => {
       <Footer />
       <FloatingChatWidget />
     </div>
+  ) : (
+    <Navigate to="/" />
   );
 };
 

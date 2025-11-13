@@ -27,20 +27,22 @@ interface PrayerModalProps {
 }
 
 interface User {
-  id: string;
   firstName: string;
   lastName: string;
   profilePhoto: string;
 }
 
 interface PrayerRequest {
-  subject: string;
+  title: string;
   body: string;
-  isAnswered: boolean;
+  meta?: {
+    isAnswered: boolean;
+  };
   userIsIntercessor: boolean;
   prayingCount: number;
   updatedAt: Date;
-  requester: User | null;
+  authorId: string | null;
+  author: User | null;
 }
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -97,13 +99,16 @@ export const PrayerModal = ({ id, open, onOpenChange }: PrayerModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
   const [prayerRequest, setPrayerRequest] = useState<PrayerRequest>({
-    subject: "",
+    title: "",
     body: "",
-    isAnswered: false,
+    meta: {
+      isAnswered: false,
+    },
     userIsIntercessor: false,
     prayingCount: 0,
     updatedAt: new Date(),
-    requester: null,
+    authorId: null,
+    author: null,
   });
 
   const handlePrayingForYou = async () => {
@@ -140,16 +145,16 @@ export const PrayerModal = ({ id, open, onOpenChange }: PrayerModalProps) => {
         <div className="flex gap-2 items-center">
           <Avatar>
             <AvatarImage
-              src={prayerRequest.requester?.profilePhoto}
+              src={prayerRequest.author?.profilePhoto}
               className="object-cover"
             />
             <AvatarFallback>
-              {prayerRequest.requester?.firstName[0]}
+              {prayerRequest.author?.firstName[0]}
             </AvatarFallback>
           </Avatar>
           <span>
             <span className="font-semibold">
-              {prayerRequest.requester?.firstName}
+              {prayerRequest.author?.firstName}
             </span>{" "}
             is now in your prayer list
           </span>
@@ -177,16 +182,16 @@ export const PrayerModal = ({ id, open, onOpenChange }: PrayerModalProps) => {
         <div className="flex gap-2 items-center">
           <Avatar>
             <AvatarImage
-              src={prayerRequest.requester?.profilePhoto}
+              src={prayerRequest.author?.profilePhoto}
               className="object-cover"
             />
             <AvatarFallback>
-              {prayerRequest.requester?.firstName[0]}
+              {prayerRequest.author?.firstName[0]}
             </AvatarFallback>
           </Avatar>
           <span>
             <span className="font-semibold">
-              {prayerRequest.requester?.firstName}
+              {prayerRequest.author?.firstName}
             </span>{" "}
             has been removed from your prayer list
           </span>
@@ -205,10 +210,10 @@ export const PrayerModal = ({ id, open, onOpenChange }: PrayerModalProps) => {
   useEffect(() => {
     setIsLoading(true);
     axios
-      .get(`${BACKEND_URL}/api/v1/prayers/${id}`, { withCredentials: true })
+      .get(`${BACKEND_URL}/api/v1/posts/${id}`, { withCredentials: true })
       .then((response) => {
-        console.log(response.data.prayerRequest);
-        setPrayerRequest(response.data.prayerRequest);
+        console.log(response.data);
+        setPrayerRequest(response.data);
       })
       .catch((error) => console.log(error))
       .finally(() => {
@@ -239,23 +244,24 @@ export const PrayerModal = ({ id, open, onOpenChange }: PrayerModalProps) => {
               ))}
             </div>
           )}
-
           <DialogHeader>
-            <DialogTitle>{prayerRequest.subject}</DialogTitle>
+            <DialogTitle>{prayerRequest.title}</DialogTitle>
             <DialogDescription>
               <span
                 className={`${
-                  prayerRequest.isAnswered
+                  prayerRequest.meta?.isAnswered
                     ? "bg-lime-400/50 border border-lime-600 text-lime-900"
                     : "bg-amber-400/50 border border-amber-600 text-amber-900"
                 } text-xs py-1 px-1.5 rounded-full font-semibold w-fit inline-flex justify-center items-center mb-3 mt-1`}
               >
-                {prayerRequest.isAnswered ? "Answered" : "Still needs prayer"}
+                {prayerRequest.meta?.isAnswered
+                  ? "Answered"
+                  : "Still needs prayer"}
               </span>{" "}
               <br />
               <span className="italic">
-                Submitted by {prayerRequest.requester?.firstName}{" "}
-                {prayerRequest.requester?.lastName}
+                Submitted by {prayerRequest.author?.firstName}{" "}
+                {prayerRequest.author?.lastName}
               </span>
             </DialogDescription>
           </DialogHeader>

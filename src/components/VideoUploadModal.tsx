@@ -22,18 +22,23 @@ interface VideoUploadModalProps {
 
 interface FormData {
   title: string;
-  caption: string;
-  videoUpload?: File;
+  body: string;
+  type: string;
+  status: string;
 }
 const VideoUploadModal = ({ open, onOpenChange }: VideoUploadModalProps) => {
   const [selectedVideo, setSelectedVideo] = useState<File>();
   const [formData, setFormData] = useState<FormData>({
     title: "",
-    caption: "",
+    body: "",
+    type: "video",
+    status: "published",
   });
   const [isLoading, setIsLoading] = useState(false);
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) setSelectedVideo(e.target.files[0]);
+    if (e.target.files) {
+      setSelectedVideo(e.target.files[0]);
+    }
   };
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -45,14 +50,22 @@ const VideoUploadModal = ({ open, onOpenChange }: VideoUploadModalProps) => {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setFormData((prev) => ({ ...prev, videoUpload: selectedVideo }));
+    console.log(formData);
+    setFormData((prev) => ({ ...prev, file: selectedVideo }));
     axios
-      .post(`${BACKEND_URL}/api/v1/videos`, formData, {
+      .post(`${BACKEND_URL}/api/v1/posts`, formData, {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" },
       })
       .then(() => {
         alert("Successful!");
+        setFormData({
+          title: "",
+          body: "",
+          type: "",
+          status: "",
+        });
+        setSelectedVideo(undefined);
         onOpenChange(false);
       })
       .finally(() => {
@@ -68,6 +81,7 @@ const VideoUploadModal = ({ open, onOpenChange }: VideoUploadModalProps) => {
           id="video-form"
           onSubmit={handleSubmit}
           className="flex flex-col space-y-4"
+          encType="multipart/form-data"
         >
           <div className="space-y-2">
             <label
@@ -94,7 +108,7 @@ const VideoUploadModal = ({ open, onOpenChange }: VideoUploadModalProps) => {
               Video Upload
             </label>
             <label
-              htmlFor="video-upload"
+              htmlFor="file"
               className="w-full p-1.5 px-4 border rounded-md text-gray-500 cursor-pointer hover:text-stone-700 hover:border-stone-300 duration-200 transition-all"
             >
               <FontAwesomeIcon icon={faFileVideo} />
@@ -103,8 +117,8 @@ const VideoUploadModal = ({ open, onOpenChange }: VideoUploadModalProps) => {
 
             <input
               type="file"
-              id="video-upload"
-              name="videoUpload"
+              id="file"
+              name="file"
               accept="video/*"
               className="hidden"
               onChange={handleFileChange}
@@ -112,22 +126,19 @@ const VideoUploadModal = ({ open, onOpenChange }: VideoUploadModalProps) => {
           </div>
 
           <div className="space-y-2">
-            <label
-              htmlFor="caption"
-              className="text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="body" className="text-sm font-medium text-gray-700">
               Caption
             </label>
             <textarea
-              id="caption"
-              name="caption"
+              id="body"
+              name="body"
               placeholder="Add a caption to your video (optional)"
               className="w-full p-1.5 px-4 border rounded-md text-gray-700 placeholder:text-gray-400 hover:border-gray-400 focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-200 duration-200 transition-all h-24 resize-none"
               onChange={handleChange}
-              value={formData.caption}
+              value={formData.body}
             />
             <p className="text-xs text-gray-500">
-              {formData.caption.length} characters
+              {formData.body.length} characters
             </p>
           </div>
         </form>

@@ -10,23 +10,9 @@ import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 import PulseLoader from "react-spinners/PulseLoader";
 import { Separator } from "@/components/ui/separator";
+import type Post from "@/types/Post";
 
-type User = {
-  id: string;
-  firstName: string;
-  lastName: string;
-};
-
-type Testimony = {
-  id: string;
-  title: string;
-  body: string;
-  thumbnail: string;
-  updatedAt: Date;
-  user: User;
-  status: string;
-  // add other properties if needed
-};
+type Testimony = Omit<Post<"testimony">, "body">;
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -36,17 +22,10 @@ const MyTestimonies = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
-  console.log(user);
-  const truncateText = (text: string, wordLimit: number) => {
-    const words = text.split(" ");
-    if (words.length <= wordLimit) return text;
-
-    return words.slice(0, wordLimit).join(" ") + "...";
-  };
 
   const handleDelete = (postId: string) => {
     axios
-      .delete(`${BACKEND_URL}/api/v1/testimonies/${postId}`, {
+      .delete(`${BACKEND_URL}/api/v1/posts/${postId}`, {
         withCredentials: true,
       })
       .then(() => {
@@ -66,12 +45,9 @@ const MyTestimonies = () => {
     setSearchQuery(query);
     setIsLoading(true);
     axios
-      .get(
-        `${BACKEND_URL}/api/v1/testimonies/me/search?q=${query}&page=1&limit=12`,
-        {
-          withCredentials: true,
-        }
-      )
+      .get(`${BACKEND_URL}/api/v1/posts/me/search?q=${query}&page=1&limit=12`, {
+        withCredentials: true,
+      })
       .then((response) => {
         setTestimonies(response.data);
       })
@@ -82,7 +58,7 @@ const MyTestimonies = () => {
   useEffect(() => {
     axios
       .get(
-        `${BACKEND_URL}/api/v1/testimonies?authorId=${user?.id}&page=1&limit=10`,
+        `${BACKEND_URL}/api/v1/posts/me?type=testimony&status=published&page=1&limit=10`,
         {
           withCredentials: true,
         }
@@ -94,9 +70,12 @@ const MyTestimonies = () => {
 
   useEffect(() => {
     axios
-      .get(`${BACKEND_URL}/api/v1/drafts?&page=1&limit=10`, {
-        withCredentials: true,
-      })
+      .get(
+        `${BACKEND_URL}/api/v1/posts/me?type=testimony&status=draft&page=1&limit=10`,
+        {
+          withCredentials: true,
+        }
+      )
       .then((response) => {
         setDrafts(response.data);
       });
@@ -171,11 +150,11 @@ const MyTestimonies = () => {
                       <TestimonyCard
                         key={draft.id}
                         id={draft.id}
-                        thumbnail={draft.thumbnail}
+                        thumbnail={draft.meta.thumbnail}
                         title={draft.title}
-                        body={truncateText(draft.body, 15)}
+                        body={draft.preview}
                         edited={draft.updatedAt}
-                        author={`${draft.user.firstName} ${draft.user.lastName}`}
+                        author={`${draft.author.firstName} ${draft.author.lastName}`}
                         status={draft.status}
                         edit
                         onDelete={handleDelete}
@@ -211,11 +190,11 @@ const MyTestimonies = () => {
                       <TestimonyCard
                         key={testimony.id}
                         id={testimony.id}
-                        thumbnail={testimony.thumbnail}
+                        thumbnail={testimony.meta.thumbnail}
                         title={testimony.title}
-                        body={truncateText(testimony.body, 15)}
+                        body={testimony.preview}
                         edited={testimony.updatedAt}
-                        author={`${testimony.user.firstName} ${testimony.user.lastName}`}
+                        author={`${testimony.author.firstName} ${testimony.author.lastName}`}
                         status={testimony.status}
                         edit
                         onDelete={handleDelete}
@@ -252,11 +231,11 @@ const MyTestimonies = () => {
                   <TestimonyCard
                     key={testimony.id}
                     id={testimony.id}
-                    thumbnail={testimony.thumbnail}
+                    thumbnail={testimony.meta.thumbnail}
                     title={testimony.title}
-                    body={truncateText(testimony.body, 15)}
+                    body={testimony.preview}
                     edited={testimony.updatedAt}
-                    author={`${testimony.user.firstName} ${testimony.user.lastName}`}
+                    author={`${testimony.author.firstName} ${testimony.author.lastName}`}
                     status={testimony.status}
                     edit
                     onDelete={handleDelete}

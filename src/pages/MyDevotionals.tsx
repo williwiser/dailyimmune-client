@@ -10,44 +10,21 @@ import "react-tabs/style/react-tabs.css";
 import DevotionalCard from "@/components/DevotionalCard";
 import PulseLoader from "react-spinners/PulseLoader";
 import { Separator } from "@/components/ui/separator";
+import type Post from "@/types/Post";
 
-type User = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  profilePhoto: string;
-};
-
-type Devotional = {
-  id: string;
-  title: string;
-  body: string;
-  thumbnail: string;
-  updatedAt: Date;
-  author: User;
-  status: string;
-  // add other properties if needed
-};
-
+type Devotional = Omit<Post<"devotional">, "body">;
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const MyDevotionals = () => {
-  const [devotionals, setDevotionals] = useState([]);
-  const [drafts, setDrafts] = useState([]);
+  const [devotionals, setDevotionals] = useState<Devotional[]>([]);
+  const [drafts, setDrafts] = useState<Devotional[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
-  console.log(user);
-  const truncateText = (text: string, wordLimit: number) => {
-    const words = text.split(" ");
-    if (words.length <= wordLimit) return text;
-
-    return words.slice(0, wordLimit).join(" ") + "...";
-  };
 
   const handleDelete = (postId: string) => {
     axios
-      .delete(`${BACKEND_URL}/api/v1/devotionals/${postId}`, {
+      .delete(`${BACKEND_URL}/api/v1/posts/${postId}`, {
         withCredentials: true,
       })
       .then(() => {
@@ -68,7 +45,7 @@ const MyDevotionals = () => {
     setIsLoading(true);
     axios
       .get(
-        `${BACKEND_URL}/api/v1/devotionals/me/search?q=${query}&page=1&limit=12`,
+        `${BACKEND_URL}/api/v1/posts/me/search?q=${query}&type=devotional&page=1&limit=12`,
         {
           withCredentials: true,
         }
@@ -82,9 +59,12 @@ const MyDevotionals = () => {
   };
   useEffect(() => {
     axios
-      .get(`${BACKEND_URL}/api/v1/devotionals/me?page=1&limit=10`, {
-        withCredentials: true,
-      })
+      .get(
+        `${BACKEND_URL}/api/v1/posts/me?type=devotional&status=published&page=1&limit=10`,
+        {
+          withCredentials: true,
+        }
+      )
       .then((response) => {
         setDevotionals(response.data);
       });
@@ -92,9 +72,12 @@ const MyDevotionals = () => {
 
   useEffect(() => {
     axios
-      .get(`${BACKEND_URL}/api/v1/devotionals/me/drafts?&page=1&limit=10`, {
-        withCredentials: true,
-      })
+      .get(
+        `${BACKEND_URL}/api/v1/posts/me?type=devotional&status=draft&page=1&limit=10`,
+        {
+          withCredentials: true,
+        }
+      )
       .then((response) => {
         setDrafts(response.data);
       });
@@ -169,9 +152,9 @@ const MyDevotionals = () => {
                       <DevotionalCard
                         key={draft.id}
                         id={draft.id}
-                        thumbnail={draft.thumbnail}
+                        thumbnail={draft.meta.thumbnail}
                         title={draft.title}
-                        body={truncateText(draft.body, 15)}
+                        body={draft.preview}
                         edited={draft.updatedAt}
                         author={`${draft.author.firstName} ${draft.author.lastName}`}
                         status={draft.status}
@@ -209,9 +192,9 @@ const MyDevotionals = () => {
                       <DevotionalCard
                         key={devotional.id}
                         id={devotional.id}
-                        thumbnail={devotional.thumbnail}
+                        thumbnail={devotional.meta.thumbnail}
                         title={devotional.title}
-                        body={truncateText(devotional.body, 15)}
+                        body={devotional.preview}
                         edited={devotional.updatedAt}
                         author={`${devotional.author.firstName} ${devotional.author.lastName}`}
                         status={devotional.status}
@@ -250,9 +233,9 @@ const MyDevotionals = () => {
                   <DevotionalCard
                     key={devotional.id}
                     id={devotional.id}
-                    thumbnail={devotional.thumbnail}
+                    thumbnail={devotional.meta.thumbnail}
                     title={devotional.title}
-                    body={truncateText(devotional.body, 15)}
+                    body={devotional.preview}
                     edited={devotional.updatedAt}
                     author={`${devotional.author.firstName} ${devotional.author.lastName}`}
                     status={devotional.status}

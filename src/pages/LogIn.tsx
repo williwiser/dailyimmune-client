@@ -2,11 +2,11 @@ import { Link, useLocation, useNavigate } from "react-router";
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import axios from "axios";
 import PulseLoader from "react-spinners/PulseLoader";
-import { useAuth } from "@/context/useAuth";
 import { useGoogleLogin } from "@react-oauth/google";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { toast, Toaster } from "sonner";
+import { useAuth } from "@/context/useAuth";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -15,6 +15,7 @@ const LogIn = () => {
   const [gotError, setGotError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
+  const { refetchUser } = useAuth();
   const location = useLocation();
   const { verified, passwordReset } = location.state || {};
 
@@ -31,14 +32,13 @@ const LogIn = () => {
         { withCredentials: true }
       );
       console.log(tokens.data);
-      setUser(tokens.data);
       setIsLoadingGoogle(false);
+      await refetchUser();
       navigate("/dashboard");
     },
     onError: (errorResponse) => console.log(errorResponse),
   });
   const [isLoading, setIsLoading] = useState(false);
-  const { user, setUser } = useAuth();
   const navigate = useNavigate();
 
   const handleGoogleLogIn = () => {
@@ -47,29 +47,25 @@ const LogIn = () => {
     setIsLoadingGoogle(false);
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    axios
-      .post(`${BACKEND_URL}/api/v1/auth/login`, formData, {
+    try {
+      await axios.post(`${BACKEND_URL}/api/v1/auth/login`, formData, {
         withCredentials: true,
-      })
-      .then((response) => {
-        setUser(response.data);
-        console.log(user);
-        navigate("/dashboard");
-      })
-      .catch((error) => {
-        setGotError(true);
-        if (axios.isAxiosError(error) && error.response) {
-          setErrorMessage(error.response.data.message);
-        } else {
-          setErrorMessage("Something went wrong. Please try again later.");
-        }
-      })
-      .finally(() => {
-        setIsLoading(false);
       });
+      await refetchUser();
+      navigate("/dashboard");
+    } catch (error) {
+      setGotError(true);
+      if (axios.isAxiosError(error) && error.response) {
+        setErrorMessage(error.response.data.message);
+      } else {
+        setErrorMessage("Something went wrong. Please try again later.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

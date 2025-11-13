@@ -22,16 +22,22 @@ const SubmitPrayerRequest = () => {
   const [showDialog, setShowDialog] = useState(false);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    subject: "",
+    title: "",
     body: "",
-    isPublic: true,
+    type: "prayerRequest",
+    status: "published",
+    extras: {
+      isPublic: true,
+      isAnswered: false,
+    },
   });
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+    console.log(formData);
     axios
-      .post(`${BACKEND_URL}/api/v1/prayers/`, formData, {
+      .post(`${BACKEND_URL}/api/v1/posts/`, formData, {
         withCredentials: true,
       })
       .then(() => {
@@ -58,7 +64,10 @@ const SubmitPrayerRequest = () => {
   const handleRadioChange = (value: string) => {
     setFormData((prev) => ({
       ...prev,
-      isPublic: value === "public",
+      extras: {
+        ...prev.extras,
+        isPublic: value === "public",
+      },
     }));
   };
   return (
@@ -99,11 +108,11 @@ const SubmitPrayerRequest = () => {
               our community will lift you up in faith and love
             </p>
             <input
-              name="subject"
+              name="title"
               type="text"
               placeholder="Subject"
               onChange={handleChange}
-              value={formData.subject}
+              value={formData.title}
               className="p-2 border border-stone-400 rounded-md w-full bg-white"
             />
 

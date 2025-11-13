@@ -61,6 +61,7 @@ interface FormData {
   reference?: string;
   status: string;
   action: string;
+  type: "devotional" | "testimony" | "prayerRequest";
 }
 
 const statusStates = [
@@ -106,6 +107,7 @@ const DevotionalEditor = () => {
     reference: undefined,
     status: "draft",
     action: "",
+    type: "devotional",
   });
   const [savedStatus, setSavedStatus] = useState(
     isEditMode ? statusStates[0] : statusStates[1]
@@ -114,7 +116,7 @@ const DevotionalEditor = () => {
   useEffect(() => {
     if (isEditMode) {
       axios
-        .get(`${BACKEND_URL}/api/v1/devotionals/${id}`, {
+        .get(`${BACKEND_URL}/api/v1/posts/${id}`, {
           withCredentials: true,
         })
         .then((response) => {
@@ -134,6 +136,7 @@ const DevotionalEditor = () => {
             verse: response.data.verse,
             reference: response.data.reference,
             action: "",
+            type: "devotional",
           });
         });
     }
@@ -158,7 +161,7 @@ const DevotionalEditor = () => {
     console.log("action " + action);
 
     // Create FormData object
-    const submitData = new FormData();
+    // const submitData = new FormData();
 
     // Set status based on action
     let status = "draft";
@@ -170,26 +173,17 @@ const DevotionalEditor = () => {
       status = "published";
     }
 
-    // Append all form fields to FormData
-    submitData.append("title", formData.title);
-    submitData.append("body", formData.body);
-    submitData.append("verse", verse ?? "");
-    if (reference !== null && reference !== undefined) {
-      submitData.append("reference", reference);
-    } else {
-      submitData.append("reference", "");
-    }
-    submitData.append("status", status);
+    const submitData = {
+      title: formData.title,
+      body: formData.body,
+      type: formData.type,
+      status,
+      file: formData.thumbnail,
+    };
 
-    // Only append thumbnail if it exists
-    if (formData.thumbnail) {
-      submitData.append("thumbnail", formData.thumbnail);
-    }
-
-    console.log("Submitting FormData:", Object.fromEntries(submitData));
-
+    console.log(submitData);
     axios
-      .post(`${BACKEND_URL}/api/v1/devotionals`, submitData, {
+      .post(`${BACKEND_URL}/api/v1/posts`, submitData, {
         withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data",
@@ -232,8 +226,16 @@ const DevotionalEditor = () => {
     }
     // Step 1: Get signed URL from backend
 
+    const submitData = {
+      title: formData.title,
+      body: formData.body,
+      type: formData.type,
+      status: formData.status,
+      file: formData.thumbnail,
+    };
+
     axios
-      .patch(`${BACKEND_URL}/api/v1/devotionals/${devotional.id}`, formData, {
+      .patch(`${BACKEND_URL}/api/v1/posts/${devotional.id}`, submitData, {
         withCredentials: true,
       })
       .then(() => {

@@ -10,17 +10,22 @@ import PulseLoader from "react-spinners/PulseLoader";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 interface User {
-  id: string;
   firstName: string;
   lastName: string;
+  profilePhoto: string;
 }
 interface PrayerRequest {
   id: string;
-  subject: string;
-  body: string;
+  title: string;
+  preview: string;
   updatedAt: Date;
-  requester: User;
-  isAnswered: boolean;
+  createdAt: Date;
+  author: User;
+  authorId: string;
+  meta: {
+    isAnswered: boolean;
+  };
+
   // add other properties if needed
 }
 
@@ -46,16 +51,10 @@ const EmptyState = () => (
 const PrayerRequests = () => {
   const [prayerRequests, setPrayerRequests] = useState<PrayerRequest[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const truncateText = (text: string, wordLimit: number) => {
-    const words = text.split(" ");
-    if (words.length <= wordLimit) return text;
-
-    return words.slice(0, wordLimit).join(" ") + "...";
-  };
   useEffect(() => {
     setIsLoading(true);
     axios
-      .get(`${BACKEND_URL}/api/v1/prayers?page=1&limit=25`, {
+      .get(`${BACKEND_URL}/api/v1/posts?type=prayerRequest&page=1&limit=25`, {
         withCredentials: true,
       })
       .then((response) => {
@@ -94,11 +93,11 @@ const PrayerRequests = () => {
                   <PrayerRequestCard
                     key={prayerRequest.id}
                     id={prayerRequest.id}
-                    subject={prayerRequest.subject}
-                    author={`${prayerRequest.requester.firstName} ${prayerRequest.requester.lastName}`}
-                    body={truncateText(prayerRequest.body, 15)}
+                    subject={prayerRequest.title}
+                    author={`${prayerRequest.author.firstName} ${prayerRequest.author.lastName}`}
+                    body={prayerRequest.preview}
                     updatedAt={prayerRequest.updatedAt}
-                    isAnswered={prayerRequest.isAnswered}
+                    isAnswered={prayerRequest.meta.isAnswered}
                   />
                 </div>
               ))}

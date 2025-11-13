@@ -25,17 +25,13 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 interface AudioUploadModalProps {
   open: boolean;
   onOpenChange: (state: boolean) => void;
-  onSubmit?: (data: {
-    file: File | Blob;
-    caption: string;
-    title: string;
-  }) => void;
+  onSubmit?: (data: { file: File | Blob; body: string; title: string }) => void;
 }
 
 const AudioUploadModal = ({ open, onOpenChange }: AudioUploadModalProps) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
-  const [caption, setCaption] = useState("");
+  const [body, setBody] = useState("");
   const [title, setTitle] = useState("");
   const [error, setError] = useState("");
 
@@ -59,7 +55,7 @@ const AudioUploadModal = ({ open, onOpenChange }: AudioUploadModalProps) => {
   };
 
   const handleCaptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setCaption(e.target.value);
+    setBody(e.target.value);
   };
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,11 +82,13 @@ const AudioUploadModal = ({ open, onOpenChange }: AudioUploadModalProps) => {
     }
 
     axios.post(
-      `${BACKEND_URL}/api/v1/audios`,
+      `${BACKEND_URL}/api/v1/posts`,
       {
-        file: audioFile,
-        caption,
         title,
+        body,
+        type: "audio",
+        status: "published",
+        file: audioFile,
       },
       {
         withCredentials: true,
@@ -106,7 +104,7 @@ const AudioUploadModal = ({ open, onOpenChange }: AudioUploadModalProps) => {
   const handleClose = () => {
     setSelectedFile(null);
     setRecordedBlob(null);
-    setCaption("");
+    setBody("");
     setError("");
     onOpenChange(false);
   };
@@ -247,21 +245,18 @@ const AudioUploadModal = ({ open, onOpenChange }: AudioUploadModalProps) => {
 
           {/* Caption Input */}
           <div className="space-y-2">
-            <label
-              htmlFor="caption"
-              className="text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="body" className="text-sm font-medium text-gray-700">
               Caption
             </label>
             <textarea
-              id="caption"
-              name="caption"
+              id="body"
+              name="body"
               placeholder="Add a caption to your audio (optional)"
               className="w-full p-1.5 px-4 border rounded-md text-gray-700 placeholder:text-gray-400 hover:border-gray-400 focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-200 duration-200 transition-all h-24 resize-none"
               onChange={handleCaptionChange}
-              value={caption}
+              value={body}
             />
-            <p className="text-xs text-gray-500">{caption.length} characters</p>
+            <p className="text-xs text-gray-500">{body.length} characters</p>
           </div>
         </div>
 

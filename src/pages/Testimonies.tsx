@@ -14,7 +14,6 @@ import PulseLoader from "react-spinners/PulseLoader";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 type User = {
-  id: string;
   firstName: string;
   lastName: string;
   profilePhoto: string;
@@ -23,10 +22,13 @@ type User = {
 type Testimony = {
   id: string;
   title: string;
-  body: string;
-  thumbnail: string;
+  preview: string;
+  meta: {
+    thumbnail?: string;
+  };
   updatedAt: Date;
-  user: User;
+  authorId: string;
+  author: User;
   status: string;
 };
 
@@ -40,17 +42,11 @@ const Testimonies = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMoreTestimonies, setHasMoreTestimonies] = useState(true);
 
-  const truncateText = (text: string, wordLimit: number) => {
-    const words = text.split(" ");
-    if (words.length <= wordLimit) return text;
-    return words.slice(0, wordLimit).join(" ") + "...";
-  };
-
   const loadTestimonies = async (page: number = 1, append: boolean = false) => {
     try {
       setIsLoading(!append);
       const response = await axios.get(
-        `${BACKEND_URL}/api/v1/testimonies?page=${page}&limit=24`,
+        `${BACKEND_URL}/api/v1/posts?type=testimony&page=${page}&limit=24`,
         { withCredentials: true }
       );
 
@@ -121,7 +117,11 @@ const Testimonies = () => {
       <div className="rounded-2xl flex flex-col md:flex-row gap-6 items-centers overflow-hidden mb-12 px-4 lg:px-8 w-full">
         <div className="max-w-xl min-h-32">
           <img
-            src={testimony.thumbnail ? testimony.thumbnail : "/placeholder.jpg"}
+            src={
+              testimony.meta.thumbnail
+                ? testimony.meta.thumbnail
+                : "/placeholder.jpg"
+            }
             className="object-cover rounded-md"
           />
         </div>
@@ -136,7 +136,7 @@ const Testimonies = () => {
                   {testimony.title}
                 </h2>
                 <p className="flex-1 text-xl text-gray-500 leading-relaxed mb-6 max-w-3xl">
-                  {truncateText(testimony.body, 50)}
+                  {testimony.preview}
                 </p>
               </div>
 
@@ -144,15 +144,15 @@ const Testimonies = () => {
                 <div className="flex items-center gap-2 text-gray-500">
                   <Avatar className="size-10 border">
                     <AvatarImage
-                      src={testimony.user.profilePhoto}
+                      src={testimony.author.profilePhoto}
                     ></AvatarImage>
                     <AvatarFallback>
-                      {testimony.user.firstName[0]}
+                      {testimony.author.firstName[0]}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="font-medium">
-                      {testimony.user.firstName} {testimony.user.lastName}
+                      {testimony.author.firstName} {testimony.author.lastName}
                     </p>
                     <p className="text-sm opacity-75">
                       {new Date(testimony.updatedAt).toLocaleDateString()}
@@ -215,11 +215,11 @@ const Testimonies = () => {
                   <TestimonyCard
                     key={testimony.id}
                     id={testimony.id}
-                    thumbnail={testimony.thumbnail}
+                    thumbnail={testimony.meta.thumbnail}
                     title={testimony.title}
-                    body={truncateText(testimony.body, 15)}
+                    body={testimony.preview}
                     edited={testimony.updatedAt}
-                    author={`${testimony.user.firstName} ${testimony.user.lastName}`}
+                    author={`${testimony.author.firstName} ${testimony.author.lastName}`}
                     status={testimony.status}
                   />
                 ))}

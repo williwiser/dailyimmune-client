@@ -24,6 +24,8 @@ import { Link, useLocation, useParams } from "react-router";
 import PulseLoader from "react-spinners/PulseLoader";
 import { toast, Toaster } from "sonner";
 import DotLoader from "react-spinners/DotLoader";
+import { useAuth } from "@/context/useAuth";
+import { SPECIAL_ROLES } from "@/permissions/roles";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -41,6 +43,7 @@ interface FormData {
   body: string;
   status: string;
   action: string;
+  type: "testimony";
 }
 
 const statusStates = [
@@ -75,32 +78,35 @@ const ArticleEditor = () => {
     body: "",
     status: "draft",
     action: "",
+    type: "testimony",
   });
   const [savedStatus, setSavedStatus] = useState(
     isEditMode ? statusStates[0] : statusStates[1]
   );
+  const { user } = useAuth();
 
   useEffect(() => {
     if (isEditMode) {
       axios
-        .get(`${BACKEND_URL}/api/v1/testimonies/${id}`, {
+        .get(`${BACKEND_URL}/api/v1/posts/${id}`, {
           withCredentials: true,
         })
         .then((response) => {
           setTestimony({
             id: response.data.id,
             title: response.data.title,
-            thumbnail: response.data.thumbnail,
+            thumbnail: response.data.meta.thumbnail,
             body: response.data.body,
             status: response.data.status,
           });
 
           setFormData({
             title: response.data.title,
-            thumbnail: response.data.thumbnail,
+            thumbnail: response.data.meta.thumbnail,
             body: response.data.body,
             status: response.data.status,
             action: "",
+            type: "testimony",
           });
         });
     }
@@ -128,15 +134,30 @@ const ArticleEditor = () => {
       formData.status = "draft";
     } else if (action === "publish") {
       setIsLoading(true);
-      setFormData({ ...formData, status: "published" });
-      formData.status = "published";
+      setFormData({
+        ...formData,
+        status: SPECIAL_ROLES.includes(user?.role || "USER")
+          ? "published"
+          : "pending",
+      });
+      formData.status = SPECIAL_ROLES.includes(user?.role || "USER")
+        ? "published"
+        : "pending";
     }
     // Step 1: Get signed URL from backend
 
     // console.log(formData); // Logging moved to useEffect
 
+    const submitData = {
+      title: formData.title,
+      body: formData.body,
+      type: formData.type,
+      status: formData.status,
+      file: formData.thumbnail,
+    };
+
     axios
-      .post(`${BACKEND_URL}/api/v1/testimonies`, formData, {
+      .post(`${BACKEND_URL}/api/v1/posts`, submitData, {
         withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data",
@@ -179,8 +200,16 @@ const ArticleEditor = () => {
     }
     // Step 1: Get signed URL from backend
 
+    const submitData = {
+      title: formData.title,
+      body: formData.body,
+      type: formData.type,
+      status: formData.status,
+      file: formData.thumbnail,
+    };
+
     axios
-      .patch(`${BACKEND_URL}/api/v1/testimonies/${testimony.id}`, formData, {
+      .patch(`${BACKEND_URL}/api/v1/posts/${testimony.id}`, submitData, {
         withCredentials: true,
       })
       .then(() => {

@@ -44,13 +44,6 @@ const Header = () => {
               </div>
             </SlideIn>
           </div>
-          {/* <div className="hidden md:block max-w-xl overflow-y-hidden h-full">
-              <img
-                src="/school_girl5.webp"
-                className="relative top-16 size-full object-contain"
-                alt="daily immune"
-              />
-            </div> */}
         </div>
       </Container>
     </header>

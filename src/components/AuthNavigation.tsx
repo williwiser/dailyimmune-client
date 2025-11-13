@@ -108,21 +108,17 @@ const AuthNavigation = () => {
     comment: "",
   });
   const navigate = useNavigate();
-  const { user, setUser } = useAuth();
+  const { user, logout } = useAuth();
   const { socket } = useSocket();
 
   const handleSignOut = async () => {
-    axios
-      .post(`${BACKEND_URL}/api/v1/auth/logout`, {}, { withCredentials: true })
-      .then((response) => {
-        console.log(response);
-        setUser(null);
-        navigate("/");
-        return;
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    try {
+      await logout();
+      console.log(user);
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {

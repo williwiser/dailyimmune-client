@@ -7,19 +7,14 @@ import axios from "axios";
 import DevotionalCard from "@/components/DevotionalCard";
 import { Link } from "react-router";
 import { slugify } from "@/utils/slugify";
-import type Devotional from "@/types/Devotional";
+import type Post from "@/types/Post";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight, faStar } from "@fortawesome/free-solid-svg-icons";
 import Container from "@/layouts/Container";
 
-const truncateText = (text: string, wordLimit: number) => {
-  const words = text.split(" ");
-  if (words.length <= wordLimit) return text;
-
-  return words.slice(0, wordLimit).join(" ") + "...";
-};
-
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
+type Devotional = Omit<Post<"devotional">, "body">;
 
 const Devotionals = () => {
   const [allDevotionals, setAllDevotionals] = useState<Devotional[]>([]);
@@ -34,7 +29,7 @@ const Devotionals = () => {
     try {
       setIsLoading(!append);
       const response = await axios.get(
-        `${BACKEND_URL}/api/v1/devotionals?page=${page}&limit=24`,
+        `${BACKEND_URL}/api/v1/posts?type=devotional&page=${page}&limit=24`,
         { withCredentials: true }
       );
 
@@ -105,7 +100,9 @@ const Devotionals = () => {
         <div className="max-w-xl min-h-32">
           <img
             src={
-              devotional.thumbnail ? devotional.thumbnail : "/placeholder.jpg"
+              devotional.meta.thumbnail
+                ? devotional.meta.thumbnail
+                : "/placeholder.jpg"
             }
             className="object-cover rounded-md"
           />
@@ -121,7 +118,7 @@ const Devotionals = () => {
                   {devotional.title}
                 </h2>
                 <p className="flex-1 text-xl text-gray-500 leading-relaxed mb-6 max-w-3xl">
-                  {truncateText(devotional.body, 50)}
+                  {devotional.preview}
                 </p>
               </div>
 
@@ -200,9 +197,9 @@ const Devotionals = () => {
                   <DevotionalCard
                     key={devotional.id}
                     id={devotional.id}
-                    thumbnail={devotional.thumbnail}
+                    thumbnail={devotional.meta.thumbnail}
                     title={devotional.title}
-                    body={truncateText(devotional.body, 15)}
+                    body={devotional.preview}
                     edited={devotional.updatedAt}
                     author={`${devotional.author.firstName} ${devotional.author.lastName}`}
                     status={devotional.status}

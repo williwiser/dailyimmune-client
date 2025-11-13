@@ -11,6 +11,7 @@ export interface User {
 
 export interface AuthContextType {
   user: User | null;
-  setUser: (user: User | null) => void;
   loading: boolean;
+  refetchUser: () => void;
+  logout: () => void;
 }

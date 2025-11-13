@@ -31,7 +31,9 @@ interface Devotional {
   body: string;
   createdAt?: Date;
   updatedAt?: Date;
-  thumbnail?: string;
+  meta: {
+    thumbnail?: string;
+  };
   likes: number;
   author: User;
   likedByUser: boolean;
@@ -52,7 +54,7 @@ const DevotionalArticle = () => {
     authorId: "",
     body: "",
     likes: 0,
-    thumbnail: "",
+    meta: {},
     createdAt: undefined,
     author: { id: "", firstName: "", lastName: "" },
     likedByUser: false,
@@ -93,9 +95,7 @@ const DevotionalArticle = () => {
       setLikes((prev) => (liked ? prev - 1 : prev + 1));
       axios
         .patch(
-          `${BACKEND_URL}/api/v1/devotionals/${id}/${
-            liked ? "unlike" : "like"
-          }`,
+          `${BACKEND_URL}/api/v1/posts/${id}/${liked ? "unlike" : "like"}`,
           {},
           {
             withCredentials: true,
@@ -114,7 +114,7 @@ const DevotionalArticle = () => {
   };
   useEffect(() => {
     axios
-      .get(`${BACKEND_URL}/api/v1/devotionals/${id}`, {
+      .get(`${BACKEND_URL}/api/v1/posts/${id}`, {
         withCredentials: true,
       })
       .then((response) => {
@@ -123,21 +123,21 @@ const DevotionalArticle = () => {
         setLikes(devotional.likes);
       });
   }, [id, devotional.likes]);
-  console.log(devotional.thumbnail);
+
   return (
     <div>
       <Toaster />
       <header
         className={`bg-stone-100 bg-cover h-56`}
         style={{
-          backgroundImage: `url('${devotional.thumbnail}')`,
+          backgroundImage: `url('${devotional.meta.thumbnail}')`,
           backgroundSize: "cover",
         }}
       />
       {isLoading ? (
         <Loader />
       ) : (
-        <Container>
+        <Container className="px-6">
           <article className="py-8">
             <Breadcrumb className="mb-4">
               <BreadcrumbList>

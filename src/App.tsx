@@ -33,18 +33,18 @@ import { Events } from "./pages/Events";
 import ManageProfile from "./pages/ManageProfile";
 import SocketTest from "./pages/SocketTest";
 import { SocketProvider } from "./context/SocketProvider";
-import MySavedTestimonies from "./pages/MySavedTestimonies";
 import EventInfo from "./pages/EventInfo";
 import LiveStream from "./pages/LiveStream";
 import WatchStream from "./pages/WatchStream";
 import DevotionalEditor from "./pages/DevotionalEditor";
 import MyDevotionals from "./pages/MyDevotionals";
-import DevotionalArticle from "./pages/DevotionalArticle";
 import Devotionals from "./pages/Devotionals";
 import Verification from "./pages/Verification";
 import NotFound from "./pages/NotFound";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import MySavedPosts from "./pages/MySavedPosts";
 
 const router = createBrowserRouter([
   {
@@ -92,7 +92,7 @@ const router = createBrowserRouter([
             element: <Shop />,
           },
           { path: "testimonies/:id/:slug", element: <Article /> },
-          { path: "devotionals/:id/:slug", element: <DevotionalArticle /> },
+          { path: "devotionals/:id/:slug", element: <Article /> },
           { path: "prayers", element: <PrayerRequests /> },
           { path: "profile/:id", element: <Profile /> },
           { path: "404", element: <NotFound /> },
@@ -104,7 +104,7 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <Dashboard /> },
           { path: "testimonies/me", element: <MyTestimonies /> },
-          { path: "testimonies/saved", element: <MySavedTestimonies /> },
+          { path: "saved/me", element: <MySavedPosts /> },
           { path: "prayer-requests/me", element: <MyPrayerRequests /> },
           { path: "events/me", element: <Events /> },
           { path: "devotionals/me", element: <MyDevotionals /> },
@@ -148,14 +148,18 @@ const router = createBrowserRouter([
 ]);
 
 const App = () => {
+  const queryClient = new QueryClient();
+
   return (
     <StreamTheme style={{ fontFamily: "sans-serif", color: "black" }}>
       <SocketProvider>
-        <GoogleOAuthProvider clientId="10720018217-esrs5ojfien6rbceu9rvn210s6um0uvk.apps.googleusercontent.com">
-          <AuthProvider>
-            <RouterProvider router={router} />
-          </AuthProvider>
-        </GoogleOAuthProvider>
+        <QueryClientProvider client={queryClient}>
+          <GoogleOAuthProvider clientId="10720018217-esrs5ojfien6rbceu9rvn210s6um0uvk.apps.googleusercontent.com">
+            <AuthProvider>
+              <RouterProvider router={router} />
+            </AuthProvider>
+          </GoogleOAuthProvider>
+        </QueryClientProvider>
       </SocketProvider>
     </StreamTheme>
   );

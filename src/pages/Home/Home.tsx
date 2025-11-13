@@ -1,16 +1,16 @@
 import Header from "./Sections/Header";
 import Features from "./Sections/Features";
-import RecentTestimonies from "./Sections/RecentTestimonies";
-import DailyEncouragement from "./Sections/DailyEncouragement";
 import CTA from "./Sections/CTA";
+import BeInspired from "./Sections/BeInspired";
+import ShareYourStory from "./Sections/ShareYourStory";
 
 const Home = () => {
   return (
     <>
       <Header />
       <Features />
-      <RecentTestimonies />
-      <DailyEncouragement />
+      <ShareYourStory />
+      <BeInspired />
       <CTA />
     </>
   );

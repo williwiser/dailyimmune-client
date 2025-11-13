@@ -10,21 +10,14 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { slugify } from "@/utils/slugify";
 import { Separator } from "@/components/ui/separator";
+import type Post from "@/types/Post";
 
-type SavedItem = {
-  id: string;
-  itemId: string;
-  itemTitle: string;
-  itemBody: string;
-  itemType: string;
-  itemThumbnail?: string;
-  itemAuthorName: string;
-};
+type SavedPost = Post<"devotional" | "testimony">;
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-const MySavedTestimonies = () => {
-  const [testimonies, setTestimonies] = useState([]);
+const MySavedPosts = () => {
+  const [posts, setPosts] = useState<SavedPost[]>([]);
   const { user } = useAuth();
   console.log(user);
   const truncateText = (text: string, wordLimit: number) => {
@@ -34,25 +27,21 @@ const MySavedTestimonies = () => {
     return words.slice(0, wordLimit).join(" ") + "...";
   };
 
-  const getSavedLink = (savedItem: SavedItem) => {
-    switch (savedItem.itemType) {
+  const getSavedLink = (savedItem: SavedPost) => {
+    switch (savedItem.type) {
       case "devotional":
-        return `/devotionals/${savedItem.itemId}/${slugify(
-          savedItem.itemTitle
-        )}`;
+        return `/devotionals/${savedItem.id}/${slugify(savedItem.title)}`;
       case "testimony":
-        return `/testimonies/${savedItem.itemId}/${slugify(
-          savedItem.itemTitle
-        )}`;
+        return `/testimonies/${savedItem.id}/${slugify(savedItem.title)}`;
       case "event":
-        return `/events/${savedItem.itemId}`;
+        return `/events/${savedItem.id}`;
       default:
         return "";
     }
   };
 
-  const getSavedIcon = (savedItem: SavedItem) => {
-    switch (savedItem.itemType) {
+  const getSavedIcon = (savedItem: SavedPost) => {
+    switch (savedItem.type) {
       case "devotional":
         return faHeart;
       case "testimony":
@@ -66,11 +55,11 @@ const MySavedTestimonies = () => {
 
   useEffect(() => {
     axios
-      .get(`${BACKEND_URL}/api/v1/users/saved?page=1&limit=12`, {
+      .get(`${BACKEND_URL}/api/v1/posts/me/saved?page=1&limit=12`, {
         withCredentials: true,
       })
       .then((response) => {
-        setTestimonies(response.data);
+        setPosts(response.data);
       });
   }, [user?.id]);
   return (
@@ -85,24 +74,22 @@ const MySavedTestimonies = () => {
         <Separator className="my-6" />
 
         <div className="grid gap-4 mt-6">
-          {testimonies.length === 0 ? (
+          {posts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 px-6 col-span-3 bg-white rounded-md border">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                 <FontAwesomeIcon icon={faBookmark} />
               </div>
-              <p className="text-gray-500 font-medium">
-                No saved testimonies here
-              </p>
+              <p className="text-gray-500 font-medium">No saved posts here</p>
               <p className="text-gray-400 text-sm mt-1">
-                Your saved testimonies will appear here.
+                Your saved posts will appear here.
               </p>
             </div>
           ) : (
-            testimonies.map((savedItem: SavedItem) => (
+            posts.map((savedItem: SavedPost) => (
               <div className="flex items-center gap-4 bg-white border px-4 py-6 rounded-md">
-                {savedItem.itemThumbnail ? (
+                {savedItem.meta.thumbnail ? (
                   <img
-                    src={savedItem.itemThumbnail}
+                    src={savedItem.meta.thumbnail}
                     className="size-24 rounded-md object-cover"
                   />
                 ) : (
@@ -116,16 +103,16 @@ const MySavedTestimonies = () => {
 
                 <div className="flex flex-col flex-1 h-full">
                   <p className="text-stone-500 text-sm capitalize-first">
-                    {savedItem.itemType}
+                    {savedItem.type}
                   </p>
                   <Link
                     to={getSavedLink(savedItem)}
                     className="text-2xl font-semibold hover:text-stone-600 transition-all duration-200"
                   >
-                    {savedItem.itemTitle}
+                    {savedItem.title}
                   </Link>
                   <p className="text-gray-500 flex-1">
-                    {truncateText(savedItem.itemBody, 20)}
+                    {truncateText(savedItem.preview, 20)}
                   </p>
                 </div>
               </div>
@@ -137,4 +124,4 @@ const MySavedTestimonies = () => {
   );
 };
 
-export default MySavedTestimonies;
+export default MySavedPosts;

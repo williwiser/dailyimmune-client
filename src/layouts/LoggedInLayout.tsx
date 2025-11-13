@@ -1,10 +1,17 @@
 import SafeArea from "./SafeArea";
 import AuthNavigation from "@/components/AuthNavigation";
 import Footer from "@/components/Footer";
-import { Outlet } from "react-router";
+import { useAuth } from "@/context/useAuth";
+import { Navigate, Outlet } from "react-router";
+import PulseLoader from "react-spinners/PulseLoader";
 
 const LoggedInLayout = () => {
-  return (
+  const { user, loading } = useAuth();
+  return loading ? (
+    <main className="flex h-screen justify-center items-center">
+      <PulseLoader color="#79716b" />
+    </main>
+  ) : user ? (
     <div className="w-full">
       <AuthNavigation />
       <SafeArea>
@@ -14,6 +21,8 @@ const LoggedInLayout = () => {
       </SafeArea>
       <Footer />
     </div>
+  ) : (
+    <Navigate to="/login" />
   );
 };
 

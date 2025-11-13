@@ -4,6 +4,7 @@ import type { AuthContextType } from "./auth";
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
-  setUser: () => {},
+  refetchUser: () => {},
   loading: true,
+  logout: () => {},
 });
