@@ -1,8 +1,10 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/context/useAuth";
 import type Post from "@/types/Post";
+import { slugify } from "@/utils/slugify";
 import {
   faBookmark,
+  faCopy,
   faHeart,
   faHeartCircleMinus,
 } from "@fortawesome/free-solid-svg-icons";
@@ -12,6 +14,7 @@ import { motion } from "framer-motion";
 import { Bookmark, Edit, Heart, Calendar } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
+import PulseLoader from "react-spinners/PulseLoader";
 import { toast, Toaster } from "sonner";
 
 type Testimony = Post<"testimony">;
@@ -46,8 +49,10 @@ const Article = () => {
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(0);
   const [saved, setSaved] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
   useEffect(() => {
+    setIsLoading(true);
     axios
       .get(`${BACKEND_URL}/api/v1/posts/${id}`, { withCredentials: true })
       .then((response) => {
@@ -58,8 +63,43 @@ const Article = () => {
       })
       .catch((error) => {
         console.log(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   }, [id]);
+
+  const handleShare = () => {
+    let shareUrl = "";
+    if (navigator.share) {
+      navigator
+        .share({
+          title: testimony.title,
+          text: `Read this post: ${testimony.title}`,
+          url: window.location.href,
+        })
+        .catch((err) => console.error("Error sharing:", err));
+    } else {
+      if (testimony.type === "testimony") {
+        shareUrl = `${window.location.origin}/testimonies/${
+          testimony.id
+        }/${slugify(testimony.title)}`;
+      } else if (testimony.type === "devotional") {
+        shareUrl = `${window.location.origin}/devotionals/${
+          testimony.id
+        }/${slugify(testimony.title)}`;
+      }
+
+      navigator.clipboard
+        .writeText(shareUrl)
+        .then(() =>
+          toast("Link copied to clipboard!", {
+            icon: <FontAwesomeIcon icon={faCopy} />,
+          })
+        )
+        .catch((err) => console.error("Failed to copy:", err));
+    }
+  };
 
   const toggleSaved = () => {
     if (!user) {
@@ -118,7 +158,11 @@ const Article = () => {
     }
   };
 
-  return (
+  return isLoading ? (
+    <main className="flex h-screen justify-center items-center">
+      <PulseLoader color="#79716b" />
+    </main>
+  ) : (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <Toaster />
       {/* Hero Section with Parallax Effect */}
@@ -258,22 +302,27 @@ const Article = () => {
           {/* Footer Section */}
           <div className="p-8 md:p-12 bg-gradient-to-br from-gray-50 to-blue-50 border-t border-gray-100">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-gray-600">
-                Did you find this story inspiring?
-              </p>
+              <p className="text-gray-600">Did you find this inspiring?</p>
               <div className="flex gap-3">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  onClick={handleShare}
                   className="cursor-pointer px-6 py-2 bg-white border border-gray-200 rounded-full font-medium text-gray-700 hover:border-gray-300 transition-colors"
                 >
                   Share
                 </motion.button>
-                <Link to="/testimonies">
+                <Link
+                  to={
+                    testimony.type === "devotional"
+                      ? "/devotionals"
+                      : "/testimonies"
+                  }
+                >
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="cursor-pointer px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full font-medium hover:shadow-md transition-shadow"
+                    className="cursor-pointer px-6 py-2 bg-gradient-to-r from-stone-500 to-stone-600 text-white rounded-full font-medium hover:shadow-md transition-shadow"
                   >
                     Read More Stories
                   </motion.button>
@@ -285,7 +334,7 @@ const Article = () => {
 
         {/* Related or Additional Content Placeholder */}
         <div className="mt-12 mb-16 text-center text-gray-500">
-          <p className="text-sm">More amazing stories coming soon...</p>
+          <p className="text-sm">More amazing posts coming soon...</p>
         </div>
       </div>
     </div>

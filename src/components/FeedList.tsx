@@ -38,6 +38,8 @@ interface FeedItem {
   preview: string;
   createdAt: string;
   authorId: string;
+  likes: number;
+  saves: number;
   isSaved: boolean;
   meta?: Meta;
   author: User;
@@ -65,13 +67,13 @@ const FeedList = () => {
         .catch((err) => console.error("Error sharing:", err));
     } else {
       if (item.type === "testimony") {
-        shareUrl = `${window.location.origin}/testimonies/${
-          item.id.split("-")[1]
-        }/${slugify(item.title)}`;
+        shareUrl = `${window.location.origin}/testimonies/${item.id}/${slugify(
+          item.title
+        )}`;
       } else if (item.type === "devotional") {
-        shareUrl = `${window.location.origin}/devotionals/${
-          item.id.split("-")[1]
-        }/${slugify(item.title)}`;
+        shareUrl = `${window.location.origin}/devotionals/${item.id}/${slugify(
+          item.title
+        )}`;
       }
 
       navigator.clipboard
@@ -130,7 +132,7 @@ const FeedList = () => {
             >
               {feedItem.title}
             </Link>
-            <p className="text-gray-500 mb-4">{feedItem.preview}</p>
+            <p className="text-gray-500 mb-4">{feedItem.preview}...</p>
             {feedItem.meta?.thumbnail && (
               <img
                 src={feedItem.meta.thumbnail}
@@ -141,11 +143,11 @@ const FeedList = () => {
               <div className="flex gap-4 items-center">
                 <div className="text-gray-400">
                   <Heart size={16} fill="none" className="inline" />
-                  <span className="text-sm"> {0}</span>
+                  <span className="text-sm"> {feedItem.likes}</span>
                 </div>
                 <div className="text-gray-400">
                   <Bookmark size={16} fill="none" className="inline" />
-                  <span className="text-sm"> {0}</span>
+                  <span className="text-sm"> {feedItem.saves}</span>
                 </div>
               </div>
 
@@ -203,7 +205,7 @@ const FeedList = () => {
               {feedItem.title}
             </Link>
 
-            <p className="text-gray-500 mb-4">{feedItem.preview}</p>
+            <p className="text-gray-500 mb-4">{feedItem.preview}...</p>
             {feedItem.meta?.thumbnail && (
               <img
                 src={feedItem.meta.thumbnail}
@@ -213,11 +215,11 @@ const FeedList = () => {
             <div className="flex gap-4 mt-4">
               <div className={`text-gray-400 transition-all duration-200`}>
                 <Heart size={16} fill="none" className="inline" />
-                <span className="text-sm"> {0}</span>
+                <span className="text-sm"> {feedItem.likes}</span>
               </div>
               <div className="text-gray-400">
                 <Bookmark size={16} fill="none" className="inline" />
-                <span className="text-sm"> {0}</span>
+                <span className="text-sm"> {feedItem.saves}</span>
               </div>
 
               <button
