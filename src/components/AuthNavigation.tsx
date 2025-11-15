@@ -114,7 +114,6 @@ const AuthNavigation = () => {
   const handleSignOut = async () => {
     try {
       await logout();
-      console.log(user);
       navigate("/login", { replace: true });
     } catch (error) {
       console.log(error);

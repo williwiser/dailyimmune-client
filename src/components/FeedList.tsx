@@ -1,18 +1,15 @@
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
 import ReactPlayer from "react-player";
 import { Link } from "react-router";
 import { slugify } from "@/utils/slugify";
 import { Bookmark, Clock, Eye, Heart, Share2, User } from "lucide-react";
 import { toast } from "sonner";
+import InfiniteScroll from "react-infinite-scroll-component";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCheckCircle,
-  faCopy,
-  faNewspaper,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCheckCircle, faCopy } from "@fortawesome/free-solid-svg-icons";
 import PulseLoader from "react-spinners/PulseLoader";
 import { PrayerModal } from "./PrayerModal";
 
@@ -47,12 +44,10 @@ interface FeedItem {
 
 const FeedList = () => {
   const [feed, setFeed] = useState<FeedItem[]>([]);
-  const [page, setPage] = useState(1);
+  const [cursor, setCursor] = useState<string | null>(null);
   const [activePrayerId, setActivePrayerId] = useState<string>();
   const [showModal, setShowModal] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [cursor, setCursor] = useState<string | null>(null);
-  const loaderRef = useRef<HTMLDivElement | null>(null);
 
   // Helper Functions
   const handleShare = (item: FeedItem) => {
@@ -426,58 +421,29 @@ const FeedList = () => {
     }
   };
 
+  const fetchFeed = useCallback(async () => {
+    try {
+      const url = new URL(`${BACKEND_URL}/api/v1/feed?limit=10`);
+      url.searchParams.set("limit", "10");
+      if (cursor) url.searchParams.set("cursor", cursor);
+
+      const response = await axios.get(url.toString(), {
+        withCredentials: true,
+      });
+
+      const { items, nextCursor, hasMore } = response.data;
+
+      setFeed((prev) => [...prev, ...items]);
+      setCursor(nextCursor);
+      setHasMore(hasMore);
+    } catch (error) {
+      console.log(error);
+    }
+  }, [cursor]);
+
   useEffect(() => {
-    const fetchFeed = async () => {
-      const url = new URL(`${BACKEND_URL}/api/v1/feed`);
-      //if (cursor) url.searchParams.set("cursor", cursor);
-
-      try {
-        const response = await axios.get(url.toString(), {
-          withCredentials: true,
-        });
-
-        const items: FeedItem[] = response.data.items || response.data;
-        const nextCursor = response.data.nextCursor;
-
-        if (!items.length) {
-          setHasMore(false);
-          return;
-        }
-
-        setFeed((prev) => {
-          const newItems = items.filter(
-            (item) => !prev.some((p) => p.id === item.id)
-          );
-          return [...prev, ...newItems];
-        });
-
-        setCursor(nextCursor ?? null);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
     fetchFeed();
-  }, [cursor, hasMore, page]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const first = entries[0];
-        if (first.isIntersecting && hasMore) {
-          setPage((prev) => prev + 1);
-        }
-      },
-      { threshold: 1 }
-    );
-
-    const current = loaderRef.current;
-    if (current) observer.observe(current);
-
-    return () => {
-      if (current) observer.unobserve(current);
-    };
-  }, [hasMore]);
+  }, [fetchFeed]);
 
   return (
     <div className="p-6 md:rounded-md border bg-white">
@@ -487,33 +453,29 @@ const FeedList = () => {
           Recent Community Activity
         </h2>
       </div>
-      {feed.length === 0 ? (
-        hasMore ? null : (
-          <div className="text-center p-4 mt-4 bg-gray-50 text-gray-500 rounded-md border">
-            <div className="w-20 h-20 mx-auto mb-6 bg-gray-200 rounded-full flex items-center justify-center">
-              <FontAwesomeIcon
-                icon={faNewspaper}
-                className="text-3xl text-gray-400"
-              />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-3">
-              No Recent Activity
-            </h3>
+
+      <InfiniteScroll
+        dataLength={feed.length}
+        next={fetchFeed}
+        hasMore={hasMore}
+        loader={
+          <div className="flex justify-center p-12">
+            <PulseLoader color="#79716b" />
           </div>
-        )
-      ) : (
-        feed.map((feedItem: FeedItem) => (
-          <>
+        }
+        endMessage={
+          <div className="text-center p-4 mt-4 text-gray-500 border rounded-md bg-gray-50">
+            <p>End of feed</p>
+          </div>
+        }
+      >
+        {feed.map((feedItem) => (
+          <div key={feedItem.id}>
             {renderActivity(feedItem)}
             <hr />
-          </>
-        ))
-      )}
-      {hasMore && (
-        <div ref={loaderRef} className="flex justify-center items-center p-12">
-          <PulseLoader color="#79716b" />
-        </div>
-      )}
+          </div>
+        ))}
+      </InfiniteScroll>
     </div>
   );
 };

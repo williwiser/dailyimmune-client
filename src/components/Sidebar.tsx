@@ -59,7 +59,7 @@ const Sidebar = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-md overflow-hidden h-max p-4 border text-gray-500">
+      <div className="bg-white rounded-md overflow-hidden h-max p-4 border">
         <ul className="flex flex-col gap-6">
           <li>
             {loading ? (
@@ -67,7 +67,7 @@ const Sidebar = () => {
             ) : (
               <Link
                 to="/dashboard/testimonies/me"
-                className="flex gap-2 items-center text-sm hover:text-gray-800 duration-200 transition-all"
+                className="flex gap-2 items-center text-sm hover:text-gray-600 duration-200 transition-all"
               >
                 <FontAwesomeIcon icon={faHeart} />
                 <span className="text-sm">My Testimonies</span>
@@ -81,7 +81,7 @@ const Sidebar = () => {
               ) : (
                 <Link
                   to="/dashboard/devotionals/me"
-                  className="flex gap-2 items-center text-sm hover:text-gray-800 duration-200 transition-all"
+                  className="flex gap-2 items-center text-sm hover:text-gray-600 duration-200 transition-all"
                 >
                   <FontAwesomeIcon icon={faBible} />
                   <span className="text-sm">My Devotionals</span>
@@ -96,7 +96,7 @@ const Sidebar = () => {
             ) : (
               <Link
                 to="/dashboard/prayer-requests/me"
-                className="flex gap-2 items-center text-sm hover:text-gray-800 duration-200 transition-all"
+                className="flex gap-2 items-center text-sm hover:text-gray-600 duration-200 transition-all"
               >
                 <FontAwesomeIcon icon={faPray} />
                 <span className="text-sm">My Prayer Requests</span>
@@ -109,7 +109,7 @@ const Sidebar = () => {
             ) : (
               <Link
                 to="/dashboard/events/me"
-                className="flex gap-2 items-center text-sm hover:text-gray-800 duration-200 transition-all"
+                className="flex gap-2 items-center text-sm hover:text-gray-600 duration-200 transition-all"
               >
                 <FontAwesomeIcon icon={faCalendar} />
                 <span className="text-sm">Upcoming Events</span>
@@ -122,7 +122,7 @@ const Sidebar = () => {
             ) : (
               <Link
                 to="/dashboard/saved/me"
-                className="flex gap-2 items-center text-sm hover:text-gray-800 duration-200 transition-all"
+                className="flex gap-2 items-center text-sm hover:text-gray-600 duration-200 transition-all"
               >
                 <FontAwesomeIcon icon={faBookmark} />
                 <span>Saved Items</span>
@@ -137,7 +137,7 @@ const Sidebar = () => {
       ) : (
         <Link
           to="/dashboard/prayer"
-          className="flex items-center bg-white rounded-md overflow-hidden h-max p-4 border text-sm gap-2 text-gray-500 hover:text-gray-800 duration-200 transition-all"
+          className="flex items-center bg-white rounded-md overflow-hidden h-max p-4 border text-sm gap-2 hover:text-gray-600 duration-200 transition-all"
         >
           <FontAwesomeIcon icon={faEdit} />
           <span>Submit a prayer request</span>

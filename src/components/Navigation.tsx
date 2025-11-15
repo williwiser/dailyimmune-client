@@ -59,7 +59,7 @@ const Navigation = () => {
               <Link to="/">Home</Link>
             </li>
             <li>
-              <DropdownMenu>
+              <DropdownMenu modal={false}>
                 <DropdownMenuTrigger className="flex items-center gap-1 cursor-pointer">
                   <span>Community</span>
                   {"   "}
