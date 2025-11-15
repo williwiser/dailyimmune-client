@@ -7,13 +7,12 @@ const ShareYourStory = () => {
       <div className="flex flex-col lg:flex-row justify-between gap-8 pl-4">
         <article>
           <h1 className="text-5xl text-[#747474] playfair-display-600 font-bold mb-8">
-            Share Your Story
+            Let’s Grow Together
           </h1>
           <p className="text-lg text-gray-400 max-w-3xl mb-8">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae
-            adipisci magnam ullam quia praesentium. Dolore, distinctio aliquam,
-            quasi odio provident cupiditate, excepturi vitae ut quia aut sunt
-            modi? Rem, quibusdam.
+            Open your heart and share the testimony of what God has done in your
+            life. Your story can encourage others, strengthen faith, and remind
+            someone that God is still moving today.
           </p>
           <Link
             to="/testimonies"
@@ -23,7 +22,7 @@ const ShareYourStory = () => {
           </Link>
         </article>
         <div className="max-w-xl h-80 overflow-hidden rounded-md">
-          <img src="backdrop11.jpg" />
+          <img src="backdrop11.webp" />
         </div>
       </div>
     </Section>

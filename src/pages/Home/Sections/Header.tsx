@@ -10,7 +10,7 @@ const Header = () => {
       className=" h-[95dvh] max-h-[750px] overflow-hidden bg-gradient-to-b from-white to-gray-50 bg-top bg-cover"
       style={{
         backgroundImage:
-          "linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.45)), url('/backdrop10.jpg')",
+          "linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.45)), url('/backdrop10.webp')",
       }}
     >
       <Container noVerticalPadding>

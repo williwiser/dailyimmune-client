@@ -15,7 +15,7 @@ const CommunityCard = ({ icon, title, desc }: CommunityCardProps) => {
         icon={icon}
       />
       <h1 className="text-2xl font-bold">{title}</h1>
-      <p className="text-gray-600">{desc}</p>
+      <p className="text-gray-600 max-w-sm text-pretty">{desc}</p>
     </div>
   );
 };

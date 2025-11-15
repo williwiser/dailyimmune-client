@@ -10,20 +10,20 @@ const BeInspired = () => {
             Be Inspired By God's Word
           </h1>
           <p className="text-lg text-gray-400 max-w-3xl mb-8">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae
-            adipisci magnam ullam quia praesentium. Dolore, distinctio aliquam,
-            quasi odio provident cupiditate, excepturi vitae ut quia aut sunt
-            modi? Rem, quibusdam.
+            Receive daily devotionals filled with scripture, encouragement, and
+            truth. Each message is designed to uplift your spirit, draw you
+            closer to God, and help you navigate everyday life with renewed
+            hope.
           </p>
           <Link
             to="/devotionals"
-            className="flex items-center gap-3 px-4 py-3 font-semibold rounded-md  bg-[#585841] text-white w-fit"
+            className="flex items-center gap-3 px-4 py-3 font-semibold rounded-md bg-[#585841] text-white w-fit"
           >
             Explore Devotionals
           </Link>
         </article>
         <div className="max-w-xl h-80 overflow-hidden rounded-md">
-          <img src="backdrop7.jpg" />
+          <img src="backdrop7.webp" />
         </div>
       </div>
     </Section>
