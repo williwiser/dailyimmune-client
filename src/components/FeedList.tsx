@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import axios from "axios";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
 import ReactPlayer from "react-player";
 import { Link } from "react-router";
@@ -48,6 +48,7 @@ const FeedList = () => {
   const [activePrayerId, setActivePrayerId] = useState<string>();
   const [showModal, setShowModal] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const initialLoad = useRef(false);
 
   // Helper Functions
   const handleShare = (item: FeedItem) => {
@@ -421,9 +422,9 @@ const FeedList = () => {
     }
   };
 
-  const fetchFeed = useCallback(async () => {
+  const fetchFeed = async () => {
     try {
-      const url = new URL(`${BACKEND_URL}/api/v1/feed?limit=10`);
+      const url = new URL(`${BACKEND_URL}/api/v1/feed`);
       url.searchParams.set("limit", "10");
       if (cursor) url.searchParams.set("cursor", cursor);
 
@@ -439,11 +440,14 @@ const FeedList = () => {
     } catch (error) {
       console.log(error);
     }
-  }, [cursor]);
+  };
 
   useEffect(() => {
+    if (initialLoad.current) return;
+    initialLoad.current = true;
     fetchFeed();
-  }, [fetchFeed]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="p-6 md:rounded-md border bg-white">
