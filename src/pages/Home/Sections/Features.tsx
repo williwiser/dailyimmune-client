@@ -10,8 +10,9 @@ const Features = () => {
       className="py-10 px-6 md:px-8"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {communityFeatures.map((feature) => (
+        {communityFeatures.map((feature, index) => (
           <CommunityCard
+            key={index}
             icon={feature.icon}
             title={feature.title}
             desc={feature.desc}
