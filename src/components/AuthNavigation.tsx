@@ -60,6 +60,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import BadgeDialog from "./BadgeDialog";
 import { useSocket } from "@/context/useSocket";
 import { toast, Toaster } from "sonner";
+import { motion } from "framer-motion";
 
 interface Notification {
   id: string;
@@ -564,8 +565,13 @@ const AuthNavigation = () => {
         </Container>
 
         {/* mobile menu */}
-
-        <div
+        <motion.div
+          initial={{ x: "-100%", opacity: 0 }}
+          animate={{
+            x: showMenu ? 0 : "-100%",
+            opacity: showMenu ? 1 : 0,
+          }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
           className={`${
             showMenu ? "fixed" : "hidden"
           } md:hidden inset-0 w-full bg-gray-800 text-white h-full overflow-y-scroll mt-22`}
@@ -670,7 +676,7 @@ const AuthNavigation = () => {
                       <span>Admin Actions</span>
                     </div>
                     <FontAwesomeIcon
-                      icon={showCommunityMenu ? faChevronUp : faChevronDown}
+                      icon={showAdminMenu ? faChevronUp : faChevronDown}
                       className="text-gray-600"
                     />
                   </button>
@@ -785,7 +791,7 @@ const AuthNavigation = () => {
               </Link>
             </li>
           </ul>
-        </div>
+        </motion.div>
       </nav>
     </>
   );

@@ -5,12 +5,12 @@ import { Link } from "react-router";
 
 const CTA = () => {
   return (
-    <Section className="py-10 bg-gray-200 px-2">
+    <Section className="py-12 bg-gray-200 px-6">
       <div className="flex flex-col items-center justify-center text-center">
         <h1 className="text-5xl text-[#747474] playfair-display-600 font-bold mb-8">
           Share Your Story
         </h1>
-        <p className="text-lg text-gray-400 max-w-3xl mb-8">
+        <p className="text-lg text-gray-400 max-w-3xl mb-8 text-balance">
           Become part of a growing family of believers. Connect, share, and grow
           together as we encourage one another in faith and walk boldly with
           Christ every day.

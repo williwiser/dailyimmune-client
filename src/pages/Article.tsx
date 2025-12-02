@@ -542,7 +542,8 @@ const Article = () => {
                   onFocus={() => setShowCommentButtons(true)}
                   onChange={handleCommentChange}
                   autoComplete="off"
-                  className="border-b focus:border-b-2 focus:border-gray-800 focus:outline-0 w-full py-3 text-sm"
+                  disabled={user ? false : true}
+                  className="border-b focus:border-b-2 disabled:bg-gray-100 disabled:cursor-not-allowed focus:border-gray-800 focus:outline-0 w-full py-3 text-sm"
                 />
                 <div className="flex justify-end items-center w-full">
                   <div

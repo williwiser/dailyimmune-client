@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBars,
@@ -147,7 +147,13 @@ const Navigation = () => {
           </button>
         </div>
       </Container>
-      <div
+      <motion.div
+        initial={{ x: "-100%", opacity: 0 }}
+        animate={{
+          x: showMenu ? 0 : "-100%",
+          opacity: showMenu ? 1 : 0,
+        }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
         className={`${
           showMenu ? "fixed" : "hidden"
         } md:hidden w-full bg-slate-800 text-white h-full`}
@@ -227,7 +233,7 @@ const Navigation = () => {
             </li>
           </ul>
         </Container>
-      </div>
+      </motion.div>
     </nav>
   );
 };
