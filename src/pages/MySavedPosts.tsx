@@ -1,18 +1,14 @@
-import {
-  faBookmark,
-  faCalendar,
-  faHeart,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { useAuth } from "@/context/useAuth";
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
 import { slugify } from "@/utils/slugify";
-import { Separator } from "@/components/ui/separator";
 import type Post from "@/types/Post";
+import { Separator } from "@/components/ui/separator";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBookmark, faNewspaper } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router";
 
-type SavedPost = Post<"devotional" | "testimony">;
+type SavedPost = Post<"article">;
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -28,29 +24,7 @@ const MySavedPosts = () => {
   };
 
   const getSavedLink = (savedItem: SavedPost) => {
-    switch (savedItem.type) {
-      case "devotional":
-        return `/devotionals/${savedItem.id}/${slugify(savedItem.title)}`;
-      case "testimony":
-        return `/testimonies/${savedItem.id}/${slugify(savedItem.title)}`;
-      case "event":
-        return `/events/${savedItem.id}`;
-      default:
-        return "";
-    }
-  };
-
-  const getSavedIcon = (savedItem: SavedPost) => {
-    switch (savedItem.type) {
-      case "devotional":
-        return faHeart;
-      case "testimony":
-        return faHeart;
-      case "event":
-        return faCalendar;
-      default:
-        return faHeart;
-    }
+    return `/posts/${savedItem.id}/${slugify(savedItem.title)}`;
   };
 
   useEffect(() => {
@@ -95,7 +69,7 @@ const MySavedPosts = () => {
                 ) : (
                   <div className="flex justify-center items-center size-24 bg-stone-300 rounded-md">
                     <FontAwesomeIcon
-                      icon={getSavedIcon(savedItem)}
+                      icon={faNewspaper}
                       className="text-xl text-stone-800"
                     />
                   </div>
