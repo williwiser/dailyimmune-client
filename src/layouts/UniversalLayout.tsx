@@ -4,20 +4,38 @@ import Navigation from "../components/Navigation";
 import { useAuth } from "@/context/useAuth";
 import AuthNavigation from "@/components/AuthNavigation";
 import SafeArea from "./SafeArea";
+import PulseLoader from "react-spinners/PulseLoader";
 
 const UniversalLayout = () => {
-  const { user } = useAuth();
-  const loggedIn = user !== null;
+  const { user, loading } = useAuth();
   return (
     <>
       <div>
-        {loggedIn ? <AuthNavigation /> : <Navigation />}
-        <SafeArea>
-          <main>
-            <Outlet />
+        {loading ? (
+          <main className="flex h-screen justify-center items-center">
+            <PulseLoader color="#79716b" />
           </main>
-        </SafeArea>
-        <Footer />
+        ) : user ? (
+          <>
+            <AuthNavigation />
+            <SafeArea>
+              <main>
+                <Outlet />
+              </main>
+            </SafeArea>
+            <Footer />
+          </>
+        ) : (
+          <>
+            <Navigation />
+            <SafeArea>
+              <main>
+                <Outlet />
+              </main>
+            </SafeArea>
+            <Footer />
+          </>
+        )}
       </div>
     </>
   );

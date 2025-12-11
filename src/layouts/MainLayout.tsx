@@ -14,7 +14,7 @@ const MainLayout = () => {
           <PulseLoader color="#79716b" />
         </main>
       ) : user ? (
-        <Navigate to="/dashboard" />
+        <Navigate to="/feed" />
       ) : (
         <div>
           <Navigation />
