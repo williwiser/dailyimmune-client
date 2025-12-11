@@ -5,17 +5,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faAward,
   faBars,
-  faBible,
   faBookmark,
   faCalendar,
   faChevronDown,
   faChevronUp,
   faClose,
   faDotCircle,
-  faEdit,
   faHeart,
   faHome,
   faMessage,
+  faNewspaper,
   faPray,
   faShoppingBag,
   faUser,
@@ -25,12 +24,11 @@ import { useEffect, useState } from "react";
 import {
   Bell,
   Calendar,
-  Heart,
   HelpCircleIcon,
   MessageCircle,
+  Newspaper,
   Plus,
   ReceiptText,
-  Settings,
   ShoppingBag,
   User,
   Users,
@@ -93,10 +91,44 @@ interface ReceiveMessageProps {
   recipientId: string;
 }
 
+const navItems = [
+  { title: "Home", icon: faHome, link: "/feed" },
+  { title: "Posts", icon: faNewspaper, link: "/posts" },
+  { title: "Prayers", icon: faPray, link: "/prayers" },
+  { title: "Shop", icon: faShoppingBag, link: "/shop" },
+];
+
+// const mobileMenuItems = [
+//   { title: "Home", icon: faHome, link: "/feed" },
+//   { title: "Shop", icon: faShoppingBag, link: "/shop" },
+// ];
+
+const sidebarNavItems = [
+  {
+    title: "My Posts",
+    icon: faNewspaper,
+    link: "/posts/me",
+  },
+  {
+    title: "My Prayer Requests",
+    icon: faHeart,
+    link: "/prayer-requests/me",
+  },
+  {
+    title: "Upcoming Events",
+    icon: faCalendar,
+    link: "/events/me",
+  },
+  {
+    title: "Saved Items",
+    icon: faBookmark,
+    link: "/saved/me",
+  },
+];
+
 const AuthNavigation = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [showCommunityMenu, setShowCommunityMenu] = useState(false);
-  const [showAdminMenu, setShowAdminMenu] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -286,75 +318,22 @@ const AuthNavigation = () => {
               </div>
 
               <ul className="hidden md:flex justify-center gap-8 text-sm">
-                <li>
-                  <NavLink
-                    to="/dashboard"
-                    className={({ isActive }) =>
-                      `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
-                        isActive ? "text-green-500" : ""
-                      }`
-                    }
-                    end
-                  >
-                    <FontAwesomeIcon icon={faHome} />
-                    <span>Home</span>
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/testimonies"
-                    className={({ isActive }) =>
-                      `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
-                        isActive ? "text-green-500" : ""
-                      }`
-                    }
-                    end
-                  >
-                    <FontAwesomeIcon icon={faHeart} />
-                    <span>Testimonies</span>
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/prayers"
-                    className={({ isActive }) =>
-                      `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
-                        isActive ? "text-green-500" : ""
-                      }`
-                    }
-                    end
-                  >
-                    <FontAwesomeIcon icon={faPray} />
-                    <span>Prayers</span>
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/devotionals"
-                    className={({ isActive }) =>
-                      `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
-                        isActive ? "text-green-500" : ""
-                      }`
-                    }
-                    end
-                  >
-                    <FontAwesomeIcon icon={faBible} />
-                    <span>Devotionals</span>
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/shop"
-                    className={({ isActive }) =>
-                      `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
-                        isActive ? "text-green-500" : ""
-                      }`
-                    }
-                  >
-                    <FontAwesomeIcon icon={faShoppingBag} />
-                    <span>Shop</span>
-                  </NavLink>
-                </li>
+                {navItems.map((navItem) => (
+                  <li>
+                    <NavLink
+                      to={navItem.link}
+                      className={({ isActive }) =>
+                        `flex flex-col gap-0.5 items-center hover:text-green-700 transition-all duration-200 ${
+                          isActive ? "text-green-500" : ""
+                        }`
+                      }
+                      end
+                    >
+                      <FontAwesomeIcon icon={navItem.icon} />
+                      <span>{navItem.title}</span>
+                    </NavLink>
+                  </li>
+                ))}
               </ul>
 
               <div className="flex justify-end">
@@ -584,7 +563,7 @@ const AuthNavigation = () => {
                   setShowMenu(false);
                   setShowCommunityMenu(false);
                 }}
-                to="/dashboard"
+                to="/feed"
               >
                 <div className="flex gap-4 items-center">
                   <FontAwesomeIcon icon={faHome} />
@@ -618,11 +597,11 @@ const AuthNavigation = () => {
                 <Link
                   className="flex justify-between items-center size-full p-4"
                   onClick={() => setShowMenu(false)}
-                  to="/testimonies"
+                  to="/posts"
                 >
                   <div className="flex pl-10 gap-4 items-center">
-                    <Heart />
-                    <span>Testimonies</span>
+                    <Newspaper />
+                    <span>Posts</span>
                   </div>
                 </Link>
               </li>
@@ -635,18 +614,6 @@ const AuthNavigation = () => {
                   <div className="flex pl-10 gap-4 items-center">
                     <FontAwesomeIcon icon={faPray} />
                     <span>Prayer Requests</span>
-                  </div>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  className="flex justify-between items-center size-full p-4"
-                  onClick={() => setShowMenu(false)}
-                  to="/devotionals"
-                >
-                  <div className="flex pl-10 gap-4 items-center">
-                    <FontAwesomeIcon icon={faBible} />
-                    <span>Devotionals</span>
                   </div>
                 </Link>
               </li>
@@ -664,132 +631,21 @@ const AuthNavigation = () => {
               </Link>
             </li>
             <hr className="border-gray-600 border-b-2"></hr>
-            {(user?.role === "ADMIN" || user?.role === "SUPERADMIN") && (
-              <>
-                <li>
-                  <button
-                    className="flex justify-between items-center size-full p-4"
-                    onClick={() => setShowAdminMenu((prev) => !prev)}
-                  >
-                    <div className="flex gap-4 items-center">
-                      <Settings />
-                      <span>Admin Actions</span>
-                    </div>
-                    <FontAwesomeIcon
-                      icon={showAdminMenu ? faChevronUp : faChevronDown}
-                      className="text-gray-600"
-                    />
-                  </button>
-                </li>
-                <ul
-                  className={`${
-                    showAdminMenu ? "" : "hidden"
-                  } bg-gray-600 w-full`}
-                >
-                  <li>
-                    <Link
-                      className="flex justify-between items-center size-full p-4"
-                      onClick={() => setShowMenu(false)}
-                      to="/dashboard/devotionals/new"
-                    >
-                      <div className="flex pl-10 gap-4 items-center">
-                        <Plus />
-                        <span>New Devotional</span>
-                      </div>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      className="flex justify-between items-center size-full p-4"
-                      onClick={() => setShowMenu(false)}
-                      to="/dashboard/events/me"
-                    >
-                      <div className="flex pl-10 gap-4 items-center">
-                        <FontAwesomeIcon icon={faCalendar} />
-                        <span>Manage Sessions</span>
-                      </div>
-                    </Link>
-                  </li>
-                </ul>
-                <hr className="border-gray-600 border-b-2"></hr>
-              </>
-            )}
 
-            <li>
-              <Link
-                className="flex justify-between items-center size-full p-4"
-                onClick={() => setShowMenu(false)}
-                to="/dashboard/testimonies/me"
-              >
-                <div className="flex gap-4 items-center">
-                  <FontAwesomeIcon icon={faHeart} />
-                  <span>My Testimonies</span>
-                </div>
-              </Link>
-            </li>
-            {(user?.role === "ADMIN" || user?.role === "SUPERADMIN") && (
+            {sidebarNavItems.map((navItem) => (
               <li>
                 <Link
                   className="flex justify-between items-center size-full p-4"
                   onClick={() => setShowMenu(false)}
-                  to="/dashboard/devotionals/me"
+                  to={navItem.link}
                 >
                   <div className="flex gap-4 items-center">
-                    <FontAwesomeIcon icon={faBible} />
-                    <span>My Devotionals</span>
+                    <FontAwesomeIcon icon={navItem.icon} />
+                    <span>{navItem.title}</span>
                   </div>
                 </Link>
               </li>
-            )}
-            <li>
-              <Link
-                className="flex justify-between items-center size-full p-4"
-                onClick={() => setShowMenu(false)}
-                to="/dashboard/prayer-requests/me"
-              >
-                <div className="flex gap-4 items-center">
-                  <FontAwesomeIcon icon={faPray} />
-                  <span>My Prayer Requests</span>
-                </div>
-              </Link>
-            </li>
-            <li>
-              <Link
-                className="flex justify-between items-center size-full p-4"
-                onClick={() => setShowMenu(false)}
-                to="/dashboard/events/me"
-              >
-                <div className="flex gap-4 items-center">
-                  <FontAwesomeIcon icon={faCalendar} />
-                  <span>Upcoming Events</span>
-                </div>
-              </Link>
-            </li>
-            <li>
-              <Link
-                className="flex justify-between items-center size-full p-4"
-                onClick={() => setShowMenu(false)}
-                to="/dashboard/testimonies/saved"
-              >
-                <div className="flex gap-4 items-center">
-                  <FontAwesomeIcon icon={faBookmark} />
-                  <span>Saved Items</span>
-                </div>
-              </Link>
-            </li>
-            <hr className="border-gray-600 border-b-2"></hr>
-            <li>
-              <Link
-                className="flex justify-between items-center size-full p-4"
-                onClick={() => setShowMenu(false)}
-                to="/dashboard/prayer"
-              >
-                <div className="flex gap-4 items-center">
-                  <FontAwesomeIcon icon={faEdit} />
-                  <span>Submit a prayer request</span>
-                </div>
-              </Link>
-            </li>
+            ))}
           </ul>
         </motion.div>
       </nav>

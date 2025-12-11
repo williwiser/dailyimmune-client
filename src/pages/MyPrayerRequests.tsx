@@ -41,7 +41,7 @@ const MyPrayerRequests = () => {
       });
   }, []);
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 p-4 md:p-0">
       <div className=" lg:col-span-2">
         <div className="px-4 pt-6">
           <h1 className="text-3xl font-semibold text-stone-600 mb-1">
@@ -62,7 +62,7 @@ const MyPrayerRequests = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 mt-6">
           {prayerRequests.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 px-6 col-span-3 bg-white rounded-md border">
+            <div className="flex flex-col items-center justify-center py-12 px-6 col-span-full bg-white rounded-md border">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                 <FontAwesomeIcon icon={faHeart} />
               </div>

@@ -1,0 +1,1 @@
+export const SPECIAL_ROLES = ["ADMIN", "SUPERADMIN", "MODERATOR"];

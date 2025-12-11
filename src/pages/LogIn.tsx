@@ -34,7 +34,7 @@ const LogIn = () => {
       console.log(tokens.data);
       setIsLoadingGoogle(false);
       await refetchUser();
-      navigate("/dashboard");
+      navigate("/feed");
     },
     onError: (errorResponse) => console.log(errorResponse),
   });
@@ -55,7 +55,7 @@ const LogIn = () => {
         withCredentials: true,
       });
       await refetchUser();
-      navigate("/dashboard");
+      navigate("/feed");
     } catch (error) {
       setGotError(true);
       if (axios.isAxiosError(error) && error.response) {

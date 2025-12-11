@@ -27,7 +27,7 @@ import {
   AlertDialogTitle,
 } from "./ui/alert-dialog";
 
-interface DevotionalCardProps {
+interface PostCardProps {
   id: string;
   thumbnail?: string;
   title: string;
@@ -39,7 +39,7 @@ interface DevotionalCardProps {
   onDelete?: (id: string) => void;
 }
 
-const DevotionalCard = ({
+const PostCard = ({
   id,
   thumbnail,
   title,
@@ -49,7 +49,7 @@ const DevotionalCard = ({
   author,
   edit,
   onDelete,
-}: DevotionalCardProps) => {
+}: PostCardProps) => {
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const handleDelete = () => {
     if (onDelete) onDelete(id);
@@ -79,7 +79,7 @@ const DevotionalCard = ({
         <div className="relative overflow-hidden">
           <img
             src={thumbnail ? thumbnail : "/placeholder.jpg"}
-            alt="Devotional Thumbnail"
+            alt="Post Thumbnail"
             className="w-full h-72 object-cover transition-transform duration-300 group-hover:scale-105"
           />
 
@@ -95,7 +95,7 @@ const DevotionalCard = ({
 
           {/* Edit Button */}
           {edit && (
-            <Link to={`/dashboard/devotionals/${id}/edit`}>
+            <Link to={`/posts/${id}/edit`}>
               <span className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2.5 rounded-full text-gray-700 hover:bg-white hover:shadow-md transition-all duration-200 group/edit">
                 <Edit3
                   size={16}
@@ -179,7 +179,7 @@ const DevotionalCard = ({
               </span>
             </div>
             <Link
-              to={`/devotionals/${id}/${slugify(title)}`}
+              to={`/posts/${id}/${slugify(title)}`}
               className="inline-flex items-center px-4 py-2 text-sm font-semibold text-stone-600 hover:text-stone-700 hover:bg-blue-50 rounded-lg transition-all duration-200 group/read"
             >
               Read more
@@ -204,4 +204,4 @@ const DevotionalCard = ({
   );
 };
 
-export default DevotionalCard;
+export default PostCard;

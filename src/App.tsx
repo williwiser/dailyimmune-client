@@ -3,8 +3,7 @@ import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/Home/Home";
 import SignUp from "./pages/SignUp";
 import LogIn from "./pages/LogIn";
-import Testimonies from "./pages/Testimonies";
-import Encouragement from "./pages/Devotionals";
+import Encouragement from "./pages/Posts";
 import Shop from "./pages/Shop";
 import About from "./pages/About";
 import Prayer from "./pages/Prayer";
@@ -12,7 +11,6 @@ import Forum from "./pages/Forum";
 import { StreamTheme } from "@stream-io/video-react-sdk";
 
 import "@stream-io/video-react-sdk/dist/css/styles.css";
-//import Dashboard from "./pages/Dashboard";
 import VerifyToken from "./pages/VerifyToken";
 import ActivationLink from "./pages/ActivationLink";
 import AuthProvider from "./context/AuthProvider";
@@ -26,8 +24,6 @@ import PrayerRequests from "./pages/PrayerRequests";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import ScrollToTopLayout from "./components/ScrollToTopLayout";
 import LoggedInLayout from "./layouts/LoggedInLayout";
-import Dashboard from "./pages/Dash2";
-import MyTestimonies from "./pages/MyTestimonies";
 import MyPrayerRequests from "./pages/MyPrayerRequests";
 import { Events } from "./pages/Events";
 import ManageProfile from "./pages/ManageProfile";
@@ -36,15 +32,15 @@ import { SocketProvider } from "./context/SocketProvider";
 import EventInfo from "./pages/EventInfo";
 import LiveStream from "./pages/LiveStream";
 import WatchStream from "./pages/WatchStream";
-import DevotionalEditor from "./pages/DevotionalEditor";
-import MyDevotionals from "./pages/MyDevotionals";
-import Devotionals from "./pages/Devotionals";
 import Verification from "./pages/Verification";
 import NotFound from "./pages/NotFound";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import MySavedPosts from "./pages/MySavedPosts";
+import Feed from "./pages/Feed";
+import Posts from "./pages/Posts";
+import MyPosts from "./pages/MyPosts";
 
 const router = createBrowserRouter([
   {
@@ -80,46 +76,35 @@ const router = createBrowserRouter([
         element: <UniversalLayout />,
         children: [
           {
-            path: "/testimonies",
-            element: <Testimonies />,
-          },
-          {
-            path: "/devotionals",
-            element: <Devotionals />,
+            path: "/posts",
+            element: <Posts />,
           },
           {
             path: "/shop",
             element: <Shop />,
           },
-          { path: "testimonies/:id/:slug", element: <Article /> },
-          { path: "devotionals/:id/:slug", element: <Article /> },
+          { path: "posts/:id/:slug", element: <Article /> },
           { path: "prayers", element: <PrayerRequests /> },
           { path: "profile/:id", element: <Profile /> },
           { path: "404", element: <NotFound /> },
         ],
       },
       {
-        path: "dashboard",
         element: <DashboardLayout />,
         children: [
-          { index: true, element: <Dashboard /> },
-          { path: "testimonies/me", element: <MyTestimonies /> },
+          { path: "/feed", element: <Feed /> },
           { path: "saved/me", element: <MySavedPosts /> },
           { path: "prayer-requests/me", element: <MyPrayerRequests /> },
           { path: "events/me", element: <Events /> },
-          { path: "devotionals/me", element: <MyDevotionals /> },
+          { path: "posts/me", element: <MyPosts /> },
           { path: "socket", element: <SocketTest /> },
         ],
       },
       {
-        path: "dashboard",
         element: <LoggedInLayout />,
         children: [
-          { path: "testimonies", element: <Testimonies /> },
-          { path: "testimonies/new", element: <ArticleEditor /> },
-          { path: "testimonies/:id/edit", element: <ArticleEditor /> },
-          { path: "devotionals/new", element: <DevotionalEditor /> },
-          { path: "devotionals/:id/edit", element: <DevotionalEditor /> },
+          { path: "posts/new", element: <ArticleEditor /> },
+          { path: "posts/:id/edit", element: <ArticleEditor /> },
           { path: "prayer", element: <SubmitPrayerRequest /> },
           { path: "profile/me", element: <ManageProfile /> },
         ],

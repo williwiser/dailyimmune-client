@@ -1,71 +1,54 @@
-import TestimonyCard from "@/components/TestimonyCard";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import Container from "@/layouts/Container";
 import Header from "@/layouts/Header";
-import Section from "@/layouts/Section";
-import { slugify } from "@/utils/slugify";
-import { faChevronRight, faStar } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import axios from "axios";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
 import PulseLoader from "react-spinners/PulseLoader";
+import Section from "@/layouts/Section";
+import axios from "axios";
+import { Link } from "react-router";
+import { slugify } from "@/utils/slugify";
+import type Post from "@/types/Post";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronRight, faStar } from "@fortawesome/free-solid-svg-icons";
+import Container from "@/layouts/Container";
+import PostCard from "@/components/PostCard";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-type User = {
-  firstName: string;
-  lastName: string;
-  profilePhoto: string;
-};
+type PostPreview = Omit<Post<"article">, "body">;
 
-type Testimony = {
-  id: string;
-  title: string;
-  preview: string;
-  meta: {
-    thumbnail?: string;
-  };
-  updatedAt: Date;
-  authorId: string;
-  author: User;
-  status: string;
-};
-
-const Testimonies = () => {
-  const [allTestimonies, setAllTestimonies] = useState<Testimony[]>([]);
-  const [featuredTestimony, setFeaturedTestimony] = useState<Testimony | null>(
-    null
-  );
-  const [recentTestimonies, setRecentTestimonies] = useState<Testimony[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+const Posts = () => {
+  const [allPosts, setAllPosts] = useState<PostPreview[]>([]);
+  const [featuredPost, setFeaturedPost] = useState<PostPreview>();
+  const [recentPosts, setRecentPosts] = useState<PostPreview[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [hasMoreTestimonies, setHasMoreTestimonies] = useState(true);
+  const [hasMorePosts, setHasMorePosts] = useState(true);
 
-  const loadTestimonies = async (page: number = 1, append: boolean = false) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const loadPosts = async (page: number = 1, append: boolean = false) => {
     try {
       setIsLoading(!append);
       const response = await axios.get(
-        `${BACKEND_URL}/api/v1/posts?type=testimony&page=${page}&limit=24`,
+        `${BACKEND_URL}/api/v1/posts?page=${page}&limit=24`,
         { withCredentials: true }
       );
 
-      const testimonies = response.data;
+      const posts = response.data;
 
       if (page === 1) {
-        setAllTestimonies(testimonies);
+        setAllPosts(posts);
 
         // Set featured testimony (most recent)
-        if (testimonies.length > 0) {
-          setFeaturedTestimony(testimonies[0]);
-          setRecentTestimonies(testimonies.slice(1));
+        if (posts.length > 0) {
+          setFeaturedPost(posts[0]);
+          setRecentPosts(posts.slice(1));
         }
       } else {
-        setAllTestimonies((prev) => [...prev, ...testimonies]);
-        setRecentTestimonies((prev) => [...prev, ...testimonies]);
+        setAllPosts((prev) => [...prev, ...posts]);
+        setRecentPosts((prev) => [...prev, ...posts]);
       }
 
-      setHasMoreTestimonies(testimonies.length === 24);
+      setHasMorePosts(posts.length === 24);
     } catch (error) {
       console.error("Error fetching testimonies:", error);
     } finally {
@@ -76,11 +59,11 @@ const Testimonies = () => {
   const handleLoadMore = () => {
     const nextPage = currentPage + 1;
     setCurrentPage(nextPage);
-    loadTestimonies(nextPage, true);
+    loadPosts(nextPage, true);
   };
 
   useEffect(() => {
-    loadTestimonies();
+    loadPosts();
   }, []);
 
   const EmptyState = () => (
@@ -102,26 +85,21 @@ const Testimonies = () => {
           </svg>
         </div>
         <h3 className="text-xl font-semibold text-gray-700 mb-3">
-          No Testimonies Yet
+          No Devotionals Yet
         </h3>
         <p className="text-gray-500">
-          Be the first to share your testimony and inspire others in our
-          community.
+          Devotionals will be shared by administrators.
         </p>
       </div>
     </div>
   );
 
-  const FeaturedTestimony = ({ testimony }: { testimony: Testimony }) => (
+  const FeaturedPost = ({ post }: { post: PostPreview }) => (
     <Section>
       <div className="rounded-2xl flex flex-col md:flex-row gap-6 items-centers overflow-hidden mb-12 px-4 lg:px-8 w-full">
         <div className="max-w-xl min-h-32">
           <img
-            src={
-              testimony.meta.thumbnail
-                ? testimony.meta.thumbnail
-                : "/placeholder.jpg"
-            }
+            src={post.meta.thumbnail ? post.meta.thumbnail : "/placeholder.jpg"}
             className="object-cover rounded-md"
           />
         </div>
@@ -130,40 +108,34 @@ const Testimonies = () => {
             <div className="max-w-4xl mx-auto">
               <div className="flex flex-col py-8 mb-6">
                 <div className="inline-flex items-center w-fit px-3 py-1 gap-2 rounded-full bg-stone-500 bg-opacity-20 backdrop-blur-sm text-white text-sm font-medium mb-4">
-                  <FontAwesomeIcon icon={faStar} /> <span>Featured Story</span>
+                  <FontAwesomeIcon icon={faStar} /> <span>Featured Post</span>
                 </div>
                 <h2 className="text-3xl lg:text-4xl font-bold mb-4">
-                  {testimony.title}
+                  {post.title}
                 </h2>
                 <p className="flex-1 text-xl text-gray-500 leading-relaxed mb-6 max-w-3xl">
-                  {testimony.preview}
+                  {post.preview}
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
                 <div className="flex items-center gap-2 text-gray-500">
                   <Avatar className="size-10 border">
-                    <AvatarImage
-                      src={testimony.author.profilePhoto}
-                    ></AvatarImage>
-                    <AvatarFallback>
-                      {testimony.author.firstName[0]}
-                    </AvatarFallback>
+                    <AvatarImage src={post.author.profilePhoto}></AvatarImage>
+                    <AvatarFallback>{post.author.firstName[0]}</AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="font-medium">
-                      {testimony.author.firstName} {testimony.author.lastName}
+                      {post.author.firstName} {post.author.lastName}
                     </p>
                     <p className="text-sm opacity-75">
-                      {new Date(testimony.updatedAt).toLocaleDateString()}
+                      {new Date(post.updatedAt).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
 
                 <Link
-                  to={`/testimonies/${testimony.id}/${slugify(
-                    testimony.title
-                  )}`}
+                  to={`/devotionals/${post.id}/${slugify(post.title)}`}
                   className="inline-flex items-center gap-2 px-6 py-3 bg-white text-stone-600 rounded-lg font-medium hover:bg-gray-100 transition-colors"
                 >
                   <span>Read Full Story</span>
@@ -180,53 +152,49 @@ const Testimonies = () => {
   return (
     <>
       <Header
-        title="Testimonies"
-        desc="Read powerful stories of how God is transforming lives in our community."
+        title="Posts"
+        desc="Find strength and inspiration for your faith journey through scripture and reflections."
         className="bg-stone-100"
-      ></Header>
-
-      {featuredTestimony && <FeaturedTestimony testimony={featuredTestimony} />}
+      />
+      {featuredPost && <FeaturedPost post={featuredPost} />}
       <Container noVerticalPadding>
         <hr />
       </Container>
-      <Section className=" px-4 md:px-8 py-8 bg-white">
-        {isLoading && allTestimonies.length === 0 ? (
+      <Section className="px-4 md:px-8 py-8 bg-white">
+        {isLoading && allPosts.length === 0 ? (
           <div className="flex justify-center items-center py-20">
             <PulseLoader color="#79716b" />
           </div>
-        ) : allTestimonies.length === 0 ? (
+        ) : allPosts.length === 0 ? (
           <EmptyState />
         ) : (
           <div className="space-y-8 flex justify-center items-center w-full px-4 md:px-8">
-            {/* Recent Testimonies Section */}
             <div className="flex flex-col justify-center items-center w-full">
               <div className="text-center mb-10">
                 <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">
-                  Recent Stories
+                  Recent Posts
                 </h2>
                 <p className="text-gray-600 max-w-2xl mx-auto">
                   Discover more inspiring testimonies from our community members
                 </p>
               </div>
 
-              {/* Desktop View - Horizontal Scroll */}
               <div className="flex flex-col items-center md:grid gap-6 md:grid-cols-3 lg:grid-cols-3 2xl:grid-cols-4 w-full">
-                {recentTestimonies.map((testimony: Testimony) => (
-                  <TestimonyCard
-                    key={testimony.id}
-                    id={testimony.id}
-                    thumbnail={testimony.meta.thumbnail}
-                    title={testimony.title}
-                    body={testimony.preview}
-                    edited={testimony.updatedAt}
-                    author={`${testimony.author.firstName} ${testimony.author.lastName}`}
-                    status={testimony.status}
+                {recentPosts.map((post: PostPreview) => (
+                  <PostCard
+                    key={post.id}
+                    id={post.id}
+                    thumbnail={post.meta.thumbnail}
+                    title={post.title}
+                    body={post.preview}
+                    edited={post.updatedAt}
+                    author={`${post.author.firstName} ${post.author.lastName}`}
+                    status={post.status}
                   />
                 ))}
               </div>
-
               {/* Load More Button */}
-              {hasMoreTestimonies && (
+              {hasMorePosts && (
                 <div className="text-center pt-6">
                   <button
                     onClick={handleLoadMore}
@@ -244,7 +212,7 @@ const Testimonies = () => {
                       </>
                     ) : (
                       <>
-                        Load More Stories
+                        Load More Articles
                         <svg
                           className="ml-2 w-4 h-4"
                           fill="none"
@@ -271,4 +239,4 @@ const Testimonies = () => {
   );
 };
 
-export default Testimonies;
+export default Posts;

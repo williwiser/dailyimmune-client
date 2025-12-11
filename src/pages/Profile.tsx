@@ -17,6 +17,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAward } from "@fortawesome/free-solid-svg-icons";
 import { slugify } from "@/utils/slugify";
+import type Post from "@/types/Post";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -28,18 +29,6 @@ interface Badge {
   category: string;
   rarity: "common" | "rare" | "legendary";
   createdAt: Date;
-}
-
-interface Testimony {
-  id: string;
-  title: string;
-  body: string;
-  thumbnail: string;
-  updatedAt: Date;
-  user: User;
-  status: string;
-  likes: number;
-  // add other properties if needed
 }
 
 interface PrayerRequest {
@@ -60,7 +49,7 @@ interface User {
   profilePhoto: string;
   createdAt: Date;
   badges: Badge[];
-  testimonies: Testimony[];
+  posts: Post<"article" | "video" | "audio" | "prayerRequest">[];
   prayerRequests: PrayerRequest[];
 }
 
@@ -75,11 +64,13 @@ const Profile = () => {
     profilePhoto: "",
     createdAt: new Date(),
     badges: [],
-    testimonies: [],
+    posts: [],
     prayerRequests: [],
   });
   const [badges, setBadges] = useState<Badge[]>([]);
-  const [testimonies, setTestimonies] = useState<Testimony[]>([]);
+  const [posts, setPosts] = useState<
+    Post<"article" | "video" | "audio" | "prayerRequest">[]
+  >([]);
   const [prayerRequests, setPrayerRequests] = useState<PrayerRequest[]>([]);
   const { id } = useParams();
   const [joined, setJoined] = useState("");
@@ -116,7 +107,7 @@ const Profile = () => {
 
         // TODO: Replace with actual API calls
         setBadges(user.badges);
-        setTestimonies(user.testimonies);
+        setPosts(user.posts);
         setPrayerRequests(user.prayerRequests);
       });
   }, [id, user]);
@@ -220,7 +211,7 @@ const Profile = () => {
                   </div>
                   <div className="text-center p-3 bg-green-50 rounded-lg">
                     <div className="text-2xl font-bold text-green-600">
-                      {testimonies.length}
+                      {posts.length}
                     </div>
                     <div className="text-sm text-gray-600">Testimonies</div>
                   </div>
@@ -248,31 +239,29 @@ const Profile = () => {
               <div className="flex items-center gap-3 pb-6">
                 <Heart className="size-8 text-yellow-500" />
                 <div className="flex flex-col">
-                  <span className="font-semibold text-xl">
-                    Testimonies shared
-                  </span>
+                  <span className="font-semibold text-xl">Posts shared</span>
                   <p className="text-gray-500 text-sm">
-                    Stories of God's faithfulness
+                    Articles on God's faithfulness
                   </p>
                 </div>
               </div>
               <div>
-                {testimonies.length === 0 ? (
+                {posts.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     <MessageCircle className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                    <p>No testimonies shared yet</p>
+                    <p>No posts shared yet</p>
                   </div>
                 ) : (
                   <div className="space-y-6">
-                    {testimonies.map((testimony, index) => (
-                      <div key={testimony.id}>
+                    {posts.map((post, index) => (
+                      <div key={post.id}>
                         <article className="group">
-                          <div className="flex items-center gap-4">
+                          <div className="flex flex-col md:flex-row md:items-center gap-4">
                             <div className="flex-shrink-0">
                               <img
                                 src={
-                                  testimony.thumbnail
-                                    ? testimony.thumbnail
+                                  post.meta.thumbnail
+                                    ? post.meta.thumbnail
                                     : "/placeholder.jpg"
                                 }
                                 className="size-32 rounded-md object-cover"
@@ -281,37 +270,36 @@ const Profile = () => {
                             </div>
                             <div className="flex-1">
                               <Link
-                                to={`/testimonies/${testimony.id}/${slugify(
-                                  testimony.title
-                                )}`}
+                                to={`/posts/${post.id}/${slugify(post.title)}`}
                                 className="text-xl font-semibold text-stone-800 mb-2 group-hover:text-stone-600 transition-colors"
                               >
-                                {testimony.title}
+                                {post.title}
                               </Link>
                               <p className="text-gray-700 leading-relaxed mb-3">
-                                {truncateText(testimony.body, 30)}
+                                {truncateText(post.body, 30)}
                               </p>
                               <div className="flex items-center gap-4 text-sm text-gray-500">
                                 <div className="flex items-center gap-1">
                                   <Calendar className="w-4 h-4" />
-                                  {new Date(
-                                    testimony.updatedAt
-                                  ).toLocaleDateString("en-US", {
-                                    month: "long",
-                                    day: "numeric",
-                                    year: "numeric",
-                                  })}
+                                  {new Date(post.updatedAt).toLocaleDateString(
+                                    "en-US",
+                                    {
+                                      month: "long",
+                                      day: "numeric",
+                                      year: "numeric",
+                                    }
+                                  )}
                                 </div>
                                 <div className="flex items-center gap-1">
                                   <Heart className="w-4 h-4 text-red-400" />
-                                  {testimony.likes}{" "}
-                                  {testimony.likes === 1 ? "like" : "likes"}
+                                  {post.likes}{" "}
+                                  {post.likes === 1 ? "like" : "likes"}
                                 </div>
                               </div>
                             </div>
                           </div>
                         </article>
-                        {index < testimonies.length - 1 && (
+                        {index < posts.length - 1 && (
                           <Separator className="mt-6" />
                         )}
                       </div>

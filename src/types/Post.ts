@@ -3,27 +3,25 @@ import type User from "./User";
 interface PrayerRequestMeta {
   isAnswered: boolean;
   isPublic: boolean;
-}
-
-interface DevotionalMeta {
   thumbnail?: string;
 }
 
-interface TestimonyMeta {
+interface ArticleMeta {
   thumbnail?: string;
 }
 
 interface AudioMeta {
   url: string;
+  thumbnail?: string;
 }
 
 interface VideoMeta {
   url: string;
+  thumbnail?: string;
 }
 
 interface MetaMap {
-  testimony: TestimonyMeta;
-  devotional: DevotionalMeta;
+  article: ArticleMeta;
   prayerRequest: PrayerRequestMeta;
   video: VideoMeta;
   audio: AudioMeta;
@@ -38,16 +36,8 @@ export default interface Post<T extends keyof MetaMap> {
   authorId: string;
   likes: number;
   saves: number;
-  isLiked: T extends "testimony"
-    ? boolean
-    : T extends "devotional"
-    ? boolean
-    : undefined;
-  isSaved: T extends "testimony"
-    ? boolean
-    : T extends "devotional"
-    ? boolean
-    : undefined;
+  isLiked: T extends "article" ? boolean : undefined;
+  isSaved: T extends "article" ? boolean : undefined;
   createdAt: Date;
   updatedAt: Date;
   author: Omit<User, "id">;

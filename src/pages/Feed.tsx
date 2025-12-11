@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Heart, PenSquare } from "lucide-react";
-import { Link } from "react-router";
+import { Link, Navigate } from "react-router";
 import SlideIn from "@/components/SlideIn";
 import { useAuth } from "@/context/useAuth";
 import axios from "axios";
@@ -13,6 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileVideo, faFileWaveform } from "@fortawesome/free-solid-svg-icons";
 import VideoUploadModal from "@/components/VideoUploadModal";
 import AudioUploadModal from "@/components/AudioUploadModal";
+import { SPECIAL_ROLES } from "@/permissions/roles";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -33,7 +34,7 @@ interface Testimony {
   likes: number;
   // add other properties if needed
 }
-const Dashboard: React.FC = () => {
+const Feed: React.FC = () => {
   const [staffPicks, setStaffPicks] = useState<Testimony[]>([]);
   const [openVideoModal, setOpenVideoModal] = useState(false);
   const [openAudioModal, setOpenAudioModal] = useState(false);
@@ -71,7 +72,7 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     axios
-      .get(`${BACKEND_URL}/api/v1/testimonies/staff-picks?page=1&limit=3`)
+      .get(`${BACKEND_URL}/api/v1/posts/staff-picks?page=1&limit=3`)
       .then((response) => {
         setStaffPicks(response.data);
       });
@@ -86,7 +87,7 @@ const Dashboard: React.FC = () => {
 
   return isLoading ? (
     <Loader />
-  ) : (
+  ) : user ? (
     <div className="min-h-screen g-[#eae7dd]">
       <Toaster />
       <VideoUploadModal
@@ -108,13 +109,13 @@ const Dashboard: React.FC = () => {
               <div className="flex flex-col gap-2 text-[#747474] md:bg-none bg-white border bg-size-[13rem] bg-no-repeat bg-bottom-right md:bg-right md:rounded-md p-6">
                 <div className="flex flex-col gap-2 w-full">
                   <Link
-                    to="/dashboard/testimonies/new"
+                    to="/posts/new"
                     className="w-full border rounded-full bg-gray-50 hover:bg-gray-100 transition-all duration-200"
                   >
                     <div className="inline-flex gap-2 text-gray-500 px-6 py-2 w-full">
                       <PenSquare />{" "}
                       <span>
-                        What's your testimony
+                        What's on your heart
                         <span className="hidden md:inline">
                           , {user?.firstName}
                         </span>
@@ -122,7 +123,7 @@ const Dashboard: React.FC = () => {
                       </span>
                     </div>
                   </Link>
-                  {(user?.role === "ADMIN" || user?.role === "SUPERADMIN") && (
+                  {SPECIAL_ROLES.includes(user.role) && (
                     <div className="px-4 flex gap-8 mt-4">
                       <button
                         className="cursor-pointer w-fit text-sm"
@@ -215,7 +216,9 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
     </div>
+  ) : (
+    <Navigate to="/login" />
   );
 };
 
-export default Dashboard;
+export default Feed;

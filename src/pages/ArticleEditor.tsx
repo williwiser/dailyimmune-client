@@ -29,7 +29,7 @@ import { SPECIAL_ROLES } from "@/permissions/roles";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-interface Testimony {
+interface Article {
   id: string;
   title: string;
   thumbnail: File | null;
@@ -43,7 +43,7 @@ interface FormData {
   body: string;
   status: string;
   action: string;
-  type: "testimony";
+  type: string;
 }
 
 const statusStates = [
@@ -62,7 +62,7 @@ const ArticleEditor = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [image, setImage] = useState<File | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const [testimony, setTestimony] = useState<Testimony>({
+  const [article, setArticle] = useState<Article>({
     id: "",
     title: "",
     body: "",
@@ -78,7 +78,7 @@ const ArticleEditor = () => {
     body: "",
     status: "draft",
     action: "",
-    type: "testimony",
+    type: "article",
   });
   const [savedStatus, setSavedStatus] = useState(
     isEditMode ? statusStates[0] : statusStates[1]
@@ -92,7 +92,7 @@ const ArticleEditor = () => {
           withCredentials: true,
         })
         .then((response) => {
-          setTestimony({
+          setArticle({
             id: response.data.id,
             title: response.data.title,
             thumbnail: response.data.meta.thumbnail,
@@ -106,11 +106,11 @@ const ArticleEditor = () => {
             body: response.data.body,
             status: response.data.status,
             action: "",
-            type: "testimony",
+            type: "article",
           });
         });
     }
-  }, [id, isEditMode]);
+  }, [id, isEditMode, user]);
 
   interface FileChangeEvent extends ChangeEvent<HTMLInputElement> {
     target: HTMLInputElement & { files: FileList };
@@ -209,7 +209,7 @@ const ArticleEditor = () => {
     };
 
     axios
-      .patch(`${BACKEND_URL}/api/v1/posts/${testimony.id}`, submitData, {
+      .patch(`${BACKEND_URL}/api/v1/posts/${article.id}`, submitData, {
         withCredentials: true,
       })
       .then(() => {
@@ -251,7 +251,7 @@ const ArticleEditor = () => {
             <div className="flex justify-between items-center px-6 2xl:px-0 pt-2">
               <div className="flex gap-2 items-center">
                 <Link
-                  to="/dashboard"
+                  to="/feed"
                   className="inline-flex justify-center items-center border rounded-sm size-8"
                 >
                   <FontAwesomeIcon icon={faArrowLeft} />
@@ -370,7 +370,7 @@ const ArticleEditor = () => {
             <hr className="my-4" />
             <textarea
               className="min-h-96 resize-none"
-              placeholder="Start writing your testimony here."
+              placeholder="Start writing your article here."
               value={formData.body}
               onChange={handleChange}
               name="body"
@@ -378,27 +378,50 @@ const ArticleEditor = () => {
           </div>
         </Section>
         <Dialog open={showDialog} onOpenChange={setShowDialog}>
-          <DialogContent className="flex flex-col justify-center items-center [&>button:last-child]:hidden">
-            <DialogHeader>
-              <DialogTitle className="text-center text-4xl playfair-display-600 text-[#747474]">
-                You article has been submitted for review!
-              </DialogTitle>
-            </DialogHeader>
-            <DialogDescription className="flex justify-center text-center w-full">
-              <p className="max-w-sm w-full ">
-                Thank you for sharing your story. Your article is pending review
-                and will be published by our administrator(s).
-              </p>
-            </DialogDescription>
-            <DialogFooter>
-              <button
-                onClick={() => navigate("/dashboard")}
-                className="inline-flex w-full md:w-fit justify-center items-center bg-[#3B3B1A] text-white px-4 py-2 rounded-md font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
-              >
-                Continue
-              </button>
-            </DialogFooter>
-          </DialogContent>
+          {!SPECIAL_ROLES.includes(user?.role || "USER") ? (
+            <DialogContent className="flex flex-col justify-center items-center [&>button:last-child]:hidden">
+              <DialogHeader>
+                <DialogTitle className="text-center text-4xl playfair-display-600 text-[#747474]">
+                  You article has been submitted for review!
+                </DialogTitle>
+              </DialogHeader>
+              <DialogDescription className="flex justify-center text-center w-full">
+                <p className="max-w-sm w-full ">
+                  Thank you for sharing your post. Your article is pending
+                  review and will be published by our administrator(s).
+                </p>
+              </DialogDescription>
+              <DialogFooter>
+                <button
+                  onClick={() => navigate("/feed")}
+                  className="inline-flex w-full md:w-fit justify-center items-center bg-[#3B3B1A] text-white px-4 py-2 rounded-md font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                >
+                  Continue
+                </button>
+              </DialogFooter>
+            </DialogContent>
+          ) : (
+            <Dialog open={showDialog} onOpenChange={setShowDialog}>
+              <DialogContent className="flex flex-col justify-center items-center [&>button:last-child]:hidden">
+                <DialogHeader>
+                  <DialogTitle className="text-center text-4xl playfair-display-600 text-[#747474]">
+                    You article has been published!
+                  </DialogTitle>
+                </DialogHeader>
+                <DialogDescription className="flex justify-center text-center w-full max-w-sm">
+                  Your post has been published and is visible to the world.
+                </DialogDescription>
+                <DialogFooter>
+                  <button
+                    onClick={() => navigate("/feed")}
+                    className="inline-flex w-full md:w-fit justify-center items-center bg-[#3B3B1A] text-white px-4 py-2 rounded-md font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                  >
+                    Continue
+                  </button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
         </Dialog>
       </form>
     </div>

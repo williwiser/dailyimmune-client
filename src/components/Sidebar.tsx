@@ -7,14 +7,36 @@ import { useNavigate } from "react-router";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import {
-  faBible,
   faBookmark,
   faCalendar,
   faEdit,
   faHeart,
-  faPray,
+  faNewspaper,
   faUserEdit,
 } from "@fortawesome/free-solid-svg-icons";
+
+const navItems = [
+  {
+    title: "My Posts",
+    icon: faNewspaper,
+    link: "/posts/me",
+  },
+  {
+    title: "My Prayer Requests",
+    icon: faHeart,
+    link: "/prayer-requests/me",
+  },
+  {
+    title: "Upcoming Events",
+    icon: faCalendar,
+    link: "/events/me",
+  },
+  {
+    title: "Saved Items",
+    icon: faBookmark,
+    link: "/saved/me",
+  },
+];
 
 const Sidebar = () => {
   const { user, loading } = useAuth();
@@ -50,7 +72,7 @@ const Sidebar = () => {
             </span>
           )}
           <Button
-            onClick={() => navigate("/dashboard/profile/me")}
+            onClick={() => navigate("/profile/me")}
             className="inline-flex gap-2 mt-4 w-full"
             variant="outline"
           >
@@ -61,74 +83,21 @@ const Sidebar = () => {
 
       <div className="bg-white rounded-md overflow-hidden h-max p-4 border">
         <ul className="flex flex-col gap-6">
-          <li>
-            {loading ? (
-              <Skeleton />
-            ) : (
-              <Link
-                to="/dashboard/testimonies/me"
-                className="flex gap-2 items-center text-sm hover:text-gray-600 duration-200 transition-all"
-              >
-                <FontAwesomeIcon icon={faHeart} />
-                <span className="text-sm">My Testimonies</span>
-              </Link>
-            )}
-          </li>
-          {(user?.role === "ADMIN" || user?.role === "SUPERADMIN") && (
+          {navItems.map((navItem) => (
             <li>
               {loading ? (
                 <Skeleton />
               ) : (
                 <Link
-                  to="/dashboard/devotionals/me"
+                  to={navItem.link}
                   className="flex gap-2 items-center text-sm hover:text-gray-600 duration-200 transition-all"
                 >
-                  <FontAwesomeIcon icon={faBible} />
-                  <span className="text-sm">My Devotionals</span>
+                  <FontAwesomeIcon icon={navItem.icon} />
+                  <span className="text-sm">{navItem.title}</span>
                 </Link>
               )}
             </li>
-          )}
-
-          <li>
-            {loading ? (
-              <Skeleton />
-            ) : (
-              <Link
-                to="/dashboard/prayer-requests/me"
-                className="flex gap-2 items-center text-sm hover:text-gray-600 duration-200 transition-all"
-              >
-                <FontAwesomeIcon icon={faPray} />
-                <span className="text-sm">My Prayer Requests</span>
-              </Link>
-            )}
-          </li>
-          <li>
-            {loading ? (
-              <Skeleton />
-            ) : (
-              <Link
-                to="/dashboard/events/me"
-                className="flex gap-2 items-center text-sm hover:text-gray-600 duration-200 transition-all"
-              >
-                <FontAwesomeIcon icon={faCalendar} />
-                <span className="text-sm">Upcoming Events</span>
-              </Link>
-            )}
-          </li>
-          <li>
-            {loading ? (
-              <Skeleton />
-            ) : (
-              <Link
-                to="/dashboard/saved/me"
-                className="flex gap-2 items-center text-sm hover:text-gray-600 duration-200 transition-all"
-              >
-                <FontAwesomeIcon icon={faBookmark} />
-                <span>Saved Items</span>
-              </Link>
-            )}
-          </li>
+          ))}
         </ul>
       </div>
 

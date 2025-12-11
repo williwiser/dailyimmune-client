@@ -29,7 +29,7 @@ import { Link, useParams } from "react-router";
 import PulseLoader from "react-spinners/PulseLoader";
 import { toast, Toaster } from "sonner";
 
-type Testimony = Post<"testimony">;
+type Article = Post<"article">;
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 interface CommentData {
@@ -37,12 +37,12 @@ interface CommentData {
 }
 
 // Mock data for preview
-const emptyPost: Testimony = {
+const emptyPost: Article = {
   id: "",
   title: "",
   authorId: "",
   preview: "",
-  type: "testimony",
+  type: "article",
   body: "",
   meta: {},
   likes: 0,
@@ -124,7 +124,7 @@ const Comment = ({
 
 const Article = () => {
   const { id } = useParams();
-  const [testimony, setTestimony] = useState<Testimony>(emptyPost);
+  const [article, setArticle] = useState<Article>(emptyPost);
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(0);
   const [saved, setSaved] = useState(false);
@@ -142,7 +142,7 @@ const Article = () => {
     axios
       .get(`${BACKEND_URL}/api/v1/posts/${id}`, { withCredentials: true })
       .then((response) => {
-        setTestimony(response.data);
+        setArticle(response.data);
         setLikes(response.data.likes);
         setLiked(response.data.isLiked);
         setSaved(response.data.isSaved);
@@ -224,20 +224,16 @@ const Article = () => {
     if (navigator.share) {
       navigator
         .share({
-          title: testimony.title,
-          text: `Read this post: ${testimony.title}`,
+          title: article.title,
+          text: `Read this post: ${article.title}`,
           url: window.location.href,
         })
         .catch((err) => console.error("Error sharing:", err));
     } else {
-      if (testimony.type === "testimony") {
-        shareUrl = `${window.location.origin}/testimonies/${
-          testimony.id
-        }/${slugify(testimony.title)}`;
-      } else if (testimony.type === "devotional") {
-        shareUrl = `${window.location.origin}/devotionals/${
-          testimony.id
-        }/${slugify(testimony.title)}`;
+      if (article.type === "article") {
+        shareUrl = `${window.location.origin}/posts/${article.id}/${slugify(
+          article.title
+        )}`;
       }
 
       navigator.clipboard
@@ -360,7 +356,7 @@ const Article = () => {
           className="absolute inset-0 bg-cover bg-center transform scale-105"
           style={{
             backgroundImage: `url('${
-              testimony.meta.thumbnail || "/placeholder.jpg"
+              article.meta.thumbnail || "/placeholder.jpg"
             }')`,
           }}
         />
@@ -368,19 +364,13 @@ const Article = () => {
 
         {/* Floating Action Buttons */}
         <div className="absolute top-6 right-6 flex gap-3">
-          {user && user.id === testimony.authorId && (
+          {user && user.id === article.authorId && (
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               className="cursor-pointer p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-colors"
             >
-              <Link
-                to={`/dashboard/${
-                  testimony.type === "devotional"
-                    ? "devotionals"
-                    : "testimonies"
-                }/${testimony.id}/edit`}
-              >
+              <Link to={`/posts/${article.id}/edit`}>
                 <Edit className="w-5 h-5 text-gray-700" />
               </Link>
             </motion.button>
@@ -408,10 +398,10 @@ const Article = () => {
             {/* Header Section */}
             <div className="p-8 md:p-12 border-b border-gray-100">
               <span className="text-stone-500 uppercase text-sm bg-gray-100 px-4 py-2 rounded-full">
-                {testimony.type}
+                {article.type}
               </span>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight mt-8">
-                {testimony.title}
+                {article.title}
               </h1>
 
               {/* Author & Meta Info */}
@@ -419,16 +409,16 @@ const Article = () => {
                 <div className="flex items-center gap-4">
                   <Avatar className="cursor-pointer border">
                     <AvatarImage
-                      src={testimony.author.profilePhoto}
+                      src={article.author.profilePhoto}
                       className="object-cover"
                     />
                     <AvatarFallback>
-                      {testimony.author.firstName[0]}
+                      {article.author.firstName[0]}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="text-lg font-semibold text-gray-900">
-                      {testimony.author.firstName} {testimony.author.lastName}
+                      {article.author.firstName} {article.author.lastName}
                     </p>
                     <div className="flex items-center gap-2 text-sm text-gray-500">
                       <Calendar className="w-4 h-4" />
@@ -437,7 +427,7 @@ const Article = () => {
                           day: "2-digit",
                           month: "long",
                           year: "numeric",
-                        }).format(new Date(testimony.createdAt))}
+                        }).format(new Date(article.createdAt))}
                       </span>
                     </div>
                   </div>
@@ -475,7 +465,7 @@ const Article = () => {
             {/* Article Body */}
             <div className="p-8 md:p-12">
               <div className="prose prose-lg max-w-none">
-                {testimony.body.split("\n\n").map((paragraph, index) => (
+                {article.body.split("\n\n").map((paragraph, index) => (
                   <motion.p
                     key={index}
                     initial={{ opacity: 0, y: 20 }}
@@ -502,13 +492,7 @@ const Article = () => {
                   >
                     Share
                   </motion.button>
-                  <Link
-                    to={
-                      testimony.type === "devotional"
-                        ? "/devotionals"
-                        : "/testimonies"
-                    }
-                  >
+                  <Link to="/posts">
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -589,10 +573,6 @@ const Article = () => {
                 ))}
               </ul>
             </div>
-          </div>
-          {/* Related or Additional Content Placeholder */}
-          <div className="mt-12 mb-16 text-center text-gray-500">
-            <p className="text-sm">More amazing posts coming soon...</p>
           </div>
         </div>
       </Container>

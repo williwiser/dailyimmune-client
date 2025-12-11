@@ -3,7 +3,7 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
 import ReactPlayer from "react-player";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import { slugify } from "@/utils/slugify";
 import { Bookmark, Clock, Eye, Heart, Share2, User } from "lucide-react";
 import { toast } from "sonner";
@@ -31,7 +31,7 @@ interface User {
 interface FeedItem {
   id: string;
   title: string;
-  type: "testimony" | "devotional" | "prayerRequest" | "video" | "audio";
+  type: "article" | "prayerRequest" | "video" | "audio";
   preview: string;
   createdAt: string;
   authorId: string;
@@ -48,6 +48,7 @@ const FeedList = () => {
   const [activePrayerId, setActivePrayerId] = useState<string>();
   const [showModal, setShowModal] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const location = useLocation();
   const initialLoad = useRef(false);
 
   // Helper Functions
@@ -58,18 +59,16 @@ const FeedList = () => {
         .share({
           title: item.title,
           text: `Read this post: ${item.title}`,
-          url: window.location.href,
+          url: `${location.pathname.split("/")[0]}/posts/${item.id}/${slugify(
+            item.title
+          )}`,
         })
         .catch((err) => console.error("Error sharing:", err));
     } else {
-      if (item.type === "testimony") {
-        shareUrl = `${window.location.origin}/testimonies/${item.id}/${slugify(
-          item.title
-        )}`;
-      } else if (item.type === "devotional") {
-        shareUrl = `${window.location.origin}/devotionals/${item.id}/${slugify(
-          item.title
-        )}`;
+      if (item.type === "article") {
+        shareUrl = `${location.pathname.split("/")[0]}/posts/${
+          item.id
+        }/${slugify(item.title)}`;
       }
 
       navigator.clipboard
@@ -85,7 +84,7 @@ const FeedList = () => {
 
   const renderActivity = (feedItem: FeedItem) => {
     switch (feedItem.type) {
-      case "testimony":
+      case "article":
         return (
           <div className="flex flex-col py-6">
             <div className="flex gap-2 items-center mb-4">
@@ -120,10 +119,10 @@ const FeedList = () => {
               </div>
             </div>
             <span className="bg-gray-100 text-stone-500 text-sm mb-2 w-fit px-4 py-0.5 rounded-full">
-              &bull; Testimony
+              &bull; Article
             </span>
             <Link
-              to={`/testimonies/${feedItem.id}/${slugify(feedItem.title)}`}
+              to={`/posts/${feedItem.id}/${slugify(feedItem.title)}`}
               className="font-bold text-3xl hover:text-gray-500 transition-all duration-200 mb-2 text-wrap"
             >
               {feedItem.title}
@@ -157,77 +156,7 @@ const FeedList = () => {
             </div>
           </div>
         );
-      case "devotional":
-        return (
-          <div className="flex flex-col py-6">
-            <div className="flex gap-2 items-center mb-4">
-              <Avatar className="border">
-                <AvatarImage
-                  src={feedItem.author.profilePhoto}
-                  className="object-cover"
-                />
-                <AvatarFallback>{feedItem.author.firstName[0]}</AvatarFallback>
-              </Avatar>
-              <div className="text-gray-500 text-sm">
-                <Link
-                  to={`/profile/${feedItem.authorId}`}
-                  className="font-semibold flex items-center gap-2"
-                >
-                  <span>
-                    {feedItem.author.firstName} {feedItem.author.lastName}
-                  </span>
-                  {(feedItem.author.role === "SUPERADMIN" ||
-                    feedItem.author.role === "ADMIN") && (
-                    <FontAwesomeIcon
-                      icon={faCheckCircle}
-                      className="text-green-500"
-                    />
-                  )}
-                </Link>
-                <p>
-                  {formatDistanceToNow(new Date(feedItem.createdAt), {
-                    addSuffix: true,
-                  })}
-                </p>
-              </div>
-            </div>
-            <span className="bg-gray-100 text-stone-500 text-sm mb-2 w-fit px-4 py-0.5 rounded-full">
-              &bull; Devotional
-            </span>
-            <Link
-              to={`/devotionals/${feedItem.id}/${slugify(feedItem.title)}`}
-              className="font-bold text-3xl hover:text-gray-500 transition-all duration-200 mb-2"
-            >
-              {feedItem.title}
-            </Link>
 
-            <p className="text-gray-500 mb-4">{feedItem.preview}...</p>
-            {feedItem.meta?.thumbnail && (
-              <img
-                src={feedItem.meta.thumbnail}
-                className="w-full h-56 object-cover rounded-sm"
-              />
-            )}
-            <div className="flex gap-4 mt-4">
-              <div className={`text-gray-400 transition-all duration-200`}>
-                <Heart size={16} fill="none" className="inline" />
-                <span className="text-sm"> {feedItem.likes}</span>
-              </div>
-              <div className="text-gray-400">
-                <Bookmark size={16} fill="none" className="inline" />
-                <span className="text-sm"> {feedItem.saves}</span>
-              </div>
-
-              <button
-                onClick={() => handleShare(feedItem)}
-                className="cursor-pointer text-gray-400 hover:text-gray-600 transition-all duration-200"
-              >
-                <Share2 size={16} className="inline" />
-                <span className="text-sm"> Share</span>
-              </button>
-            </div>
-          </div>
-        );
       case "prayerRequest":
         return (
           <div className="flex flex-col py-6">
